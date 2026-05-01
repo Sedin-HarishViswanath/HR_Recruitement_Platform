@@ -10,6 +10,12 @@ const envSchema = z.object({
   DATABASE_URL: z.string().optional(),
   JWT_SECRET: z.string().default('fallback_secret_do_not_use_in_prod'),
   JWT_REFRESH_SECRET: z.string().default('fallback_refresh_secret_do_not_use_in_prod'),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  SMTP_HOST: z.string().default('smtp.ethereal.email'),
+  SMTP_PORT: z.string().default('587'),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  FRONTEND_URL: z.string().default('http://localhost:5173'),
 });
 
 const envVars = envSchema.safeParse(process.env);
