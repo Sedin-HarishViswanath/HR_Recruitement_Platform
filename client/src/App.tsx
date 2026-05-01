@@ -7,6 +7,7 @@ import { CompaniesPage } from './features/admin/pages/CompaniesPage';
 import { RoleGuard } from './shared/components/RoleGuard';
 import { CompanyLayout } from './features/company/components/CompanyLayout';
 import { UsersPage } from './features/company/pages/UsersPage';
+import { CompanyJobsPage } from './features/job/pages/CompanyJobsPage';
 import { AdminLayout } from './features/admin/components/AdminLayout';
 import { AdminDashboard } from './features/admin/pages/AdminDashboard';
 
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
           {
             path: 'users',
             element: <UsersPage />,
+          },
+          {
+            path: 'jobs',
+            element: <CompanyJobsPage />,
           },
         ],
       },
