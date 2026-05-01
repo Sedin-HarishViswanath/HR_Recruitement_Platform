@@ -1,0 +1,197 @@
+import bcrypt from 'bcryptjs';
+import { db } from '../../config/db';
+import { SignupInput, LoginInput } from './auth.schema';
+import { AppError } from '../../shared/errors/AppError';
+import { generateAccessToken, generateRefreshToken } from '../../shared/utils/jwt';
+import crypto from 'crypto';
+
+const SALT_ROUNDS = 12;
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+
+export class AuthService {
+  async signup(data: SignupInput) {
+    const { name, email, password, role } = data;
+
+    // Check for duplicate email in both tables
+    const existingUser = await db('users').where({ email }).first();
+    const existingCandidate = await db('candidates').where({ email }).first();
+
+    if (existingUser || existingCandidate) {
+      throw new AppError('Email already in use', 400);
+    }
+
+    const password_digest = await bcrypt.hash(password, SALT_ROUNDS);
+
+    return await db.transaction(async (trx) => {
+      if (role === 'candidate') {
+        const [candidate] = await trx('candidates')
+          .insert({
+            name,
+            email,
+            password_digest,
+            current_step: 1,
+            onboarding_completed: false,
+            profile_completion: 0,
+          })
+          .returning(['id', 'name', 'email']);
+
+        return { user: candidate, role: 'Candidate' };
+      } else {
+        // Company role
+        // 1. Get Admin role
+        const adminRole = await trx('roles').where({ name: 'Admin' }).first();
+        if (!adminRole) {
+          throw new AppError('Admin role not found. Seed the database.', 500);
+        }
+
+        // 2. Create User
+        const [user] = await trx('users')
+          .insert({
+            name,
+            email,
+            password_digest,
+          })
+          .returning(['id', 'name', 'email']);
+
+        // 3. Create Membership
+        await trx('memberships').insert({
+          user_id: user.id,
+          role_id: adminRole.id,
+        });
+
+        // 4. Create Pending Company
+        const [company] = await trx('companies')
+          .insert({
+            name: `${name}'s Company`, // Placeholder, will be updated in onboarding
+            status: 'pending',
+            admin_user_id: user.id,
+          })
+          .returning(['id']);
+
+        // 5. Update user with company_id
+        await trx('users').where({ id: user.id }).update({ company_id: company.id });
+
+        return { user: { ...user, company_id: company.id }, role: 'Admin' };
+      }
+    });
+  }
+
+  async login(data: LoginInput) {
+    const { email, password } = data;
+
+    // Try finding in users first
+    let userRecord = await db('users')
+      .leftJoin('memberships', 'users.id', 'memberships.user_id')
+      .leftJoin('roles', 'memberships.role_id', 'roles.id')
+      .leftJoin('companies', 'users.company_id', 'companies.id')
+      .select(
+        'users.*',
+        'roles.name as role_name',
+        'companies.status as company_status'
+      )
+      .where('users.email', email)
+      .first();
+
+    let isCandidate = false;
+
+    // If not found, try candidates
+    if (!userRecord) {
+      userRecord = await db('candidates').where({ email }).first();
+      if (userRecord) {
+        isCandidate = true;
+        userRecord.role_name = 'Candidate'; // Virtual role
+      }
+    }
+
+    if (!userRecord) {
+      throw new AppError('Invalid email or password', 401);
+    }
+
+    // Check lockout status
+    if (userRecord.failed_login_attempts >= MAX_LOGIN_ATTEMPTS && userRecord.lock_until) {
+      if (new Date() < new Date(userRecord.lock_until)) {
+        throw new AppError('Account temporarily locked. Try again later.', 423);
+      } else {
+        // Lock expired, reset
+        await this.resetLoginAttempts(userRecord.id, isCandidate);
+      }
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, userRecord.password_digest);
+
+    if (!isPasswordValid) {
+      await this.incrementLoginAttempts(userRecord.id, isCandidate, userRecord.failed_login_attempts);
+      throw new AppError('Invalid email or password', 401);
+    }
+
+    // For company users, check company status
+    if (!isCandidate && userRecord.company_status === 'pending') {
+      // Allow them to login to complete onboarding, but maybe restrict access
+      // For now, we allow them to login. Middleware will restrict them if needed.
+    }
+
+    // Reset login attempts on success
+    await this.resetLoginAttempts(userRecord.id, isCandidate);
+
+    // Generate tokens
+    const accessToken = generateAccessToken({
+      userId: userRecord.id.toString(),
+      role: userRecord.role_name,
+      companyId: userRecord.company_id?.toString(),
+      email: userRecord.email,
+    });
+
+    const refreshToken = generateRefreshToken({
+      userId: userRecord.id.toString(),
+    });
+
+    // Store refresh token hash
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    await db('refresh_tokens').insert({
+      [isCandidate ? 'candidate_id' : 'user_id']: userRecord.id,
+      token_hash: tokenHash,
+      expires_at: expiresAt,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: userRecord.id.toString(),
+        name: userRecord.name,
+        email: userRecord.email,
+        role: userRecord.role_name,
+        companyId: userRecord.company_id?.toString(),
+      },
+    };
+  }
+
+  private async incrementLoginAttempts(id: string, isCandidate: boolean, currentAttempts: number) {
+    const table = isCandidate ? 'candidates' : 'users';
+    const newAttempts = currentAttempts + 1;
+    
+    let lockUntil = null;
+    if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+      lockUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
+    }
+
+    await db(table).where({ id }).update({
+      failed_login_attempts: newAttempts,
+      lock_until: lockUntil,
+    });
+  }
+
+  private async resetLoginAttempts(id: string, isCandidate: boolean) {
+    const table = isCandidate ? 'candidates' : 'users';
+    await db(table).where({ id }).update({
+      failed_login_attempts: 0,
+      lock_until: null,
+    });
+  }
+}
+
+export const authService = new AuthService();
