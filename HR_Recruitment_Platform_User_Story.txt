@@ -1,0 +1,1269 @@
+================================================================================
+  HR RECRUITMENT MANAGEMENT SYSTEM — FULL USER STORY DOCUMENT
+  For UI Design Reference | Version 1.0
+  Covers All 8 Modules | Candidate · Company · Company Users · Super Admin
+================================================================================
+
+--------------------------------------------------------------------------------
+OVERVIEW & VISION
+--------------------------------------------------------------------------------
+
+This document is the definitive user story reference for the HR Recruitment
+Management System (ATS — Applicant Tracking System), a web-based recruitment
+platform designed to streamline the end-to-end hiring workflow. The system
+serves multiple stakeholder groups: job-seeking candidates building their
+careers, company administrators managing organizational hiring needs, internal
+company users (recruiters and interviewers) operating within the hiring pipeline,
+and a super admin overseeing the entire platform ecosystem.
+
+The platform is built with a clean, minimalist philosophy — every screen is
+intentional, every interaction is purposeful, and every data point is meaningful
+to the user consuming it. The system is designed to eliminate manual tracking,
+reduce hiring delays, and bring clarity to what is often a chaotic, spreadsheet-
+driven hiring process. It is a lean yet scalable solution suitable for small to
+mid-sized organizations looking for a structured and modern approach to talent
+acquisition.
+
+The entire application is organized across 8 core functional modules:
+  1. Authentication & Authorization
+  2. Company & User Management
+  3. Job Management
+  4. Candidate Management
+  5. Application & Hiring Pipeline
+  6. Interview Management
+  7. Notifications System
+  8. Analytics Dashboard
+
+Each module described in this document is narrated from the perspective of the
+user experiencing it — how they arrive, what they see, what they do, and what
+they feel. This narrative is supplemented by specific UI requirements, data
+fields, interaction rules, and enhancement suggestions to guide any UI agent or
+designer building the application pages.
+
+================================================================================
+MODULE 1 — AUTHENTICATION & AUTHORIZATION
+Landing Page · Login · Signup · OAuth · Password Recovery
+================================================================================
+
+THE STORY BEGINS HERE.
+
+A first-time visitor arrives at the platform's root URL and is greeted by a
+minimalistic, clean landing page. The page does not overwhelm. There is no
+lengthy copy, no animated carousels, no feature grids. The primary real estate
+of the landing page is dominated by a single, powerful CTA: a call to action
+that asks the visitor whether they are here as an Internal User (a company or
+its staff) or as a Candidate looking for a job. The left half of the screen
+surfaces the pain points of traditional HR processes — fragmented spreadsheets,
+lost candidate data, missed interviews, zero pipeline visibility — framed as
+relatable problems that this platform solves. The right half holds the login
+and signup modal, which dynamically switches between two personas.
+
+--- LANDING PAGE UI REQUIREMENTS ---
+  - Split-screen layout (50/50 or 60/40 favoring the right)
+  - Left side: Pain point messaging — short, punchy, 3-4 sentences max
+  - Right side: Login modal with a toggle to switch between "Internal" and
+    "Candidate" personas
+  - The toggle is prominent — a pill/tab switcher at the top of the modal
+  - No navbar clutter; the page is intentionally sparse
+  - Background: subtle gradient or soft texture — avoid pure white
+  - Logo at top-left; minimal footer at the bottom
+
+--- INTERNAL LOGIN (Company Admin / Recruiter / Interviewer) ---
+  - Email input field
+  - Password input field (show/hide toggle)
+  - "Forgot Password?" link below password field
+  - "Login with Google" button (Google OAuth)
+  - "Don't have an account? Sign up" link that transitions to signup mode
+  - Validation: email format check, empty field checks
+
+--- CANDIDATE LOGIN ---
+  - Email input field
+  - Password input field (show/hide toggle)
+  - "Forgot Password?" link
+  - "Login with Google" button (Google OAuth)
+  - "New here? Sign up" link that transitions to candidate signup mode
+
+--- INTERNAL SIGNUP (Company Admin) ---
+  Fields collected:
+    Company Details:
+      · Company Name (required)
+      · Company Domain (required, e.g., acme.com)
+      · Company Size (optional — dropdown: 1-10, 11-50, 51-200, 201-500, 500+)
+      · Industry (optional — dropdown: Technology, Finance, Healthcare, etc.)
+      · Address (required)
+      · Contact Email (required)
+    Admin User Details:
+      · Full Name (required)
+      · Email (required)
+      · Password (required, strength indicator)
+      · Confirm Password (required, match validation)
+  - After submission: Company marked as "Pending" awaiting Super Admin approval
+  - A confirmation email is sent to the admin email
+
+--- CANDIDATE SIGNUP ---
+  Fields collected:
+    · Full Name (required)
+    · Email (required, unique)
+    · Phone Number (required)
+    · Location (optional)
+    · Skills (optional — tag-input with suggestions)
+    · Password (required, strength indicator)
+    · Confirm Password (required)
+  - After submission: Candidate redirected to 4-step Onboarding Wizard
+  - Google OAuth signup also redirects to the same wizard
+
+--- FORGOT PASSWORD FLOW ---
+  Step 1: User enters their registered email address
+  Step 2: System sends a password reset link to that email
+  Step 3: User clicks the link and lands on a reset password page
+  Step 4: User enters new password + confirm password
+  Step 5: On success, user is redirected to login with a success toast
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Consider adding animated transitions between Internal and Candidate modes
+    on the landing page toggle — a smooth slide or fade makes the experience
+    feel premium.
+  · Add a "Remember Me" checkbox on the login form to improve returning user
+    experience.
+  · On the landing page left side, consider a subtle animated loop — perhaps
+    a slow-moving Kanban board preview or a hiring pipeline visualization — to
+    visually communicate the product's core value without words.
+  · Password strength meter should be color-coded: red → orange → green
+  · Show tooltip guidance for Domain field (e.g., "Enter your company's domain
+    without 'www', e.g., techcorp.com")
+
+================================================================================
+MODULE 2 — COMPANY ONBOARDING WIZARD
+Route: /company/onboarding | /company/onboarding/step/1 | /step/2
+================================================================================
+
+After the Company Admin completes signup and their account is approved by the
+Super Admin, they are redirected to the Company Onboarding Wizard. This is a
+focused, distraction-free two-section wizard form that walks the administrator
+through setting up the full company profile. The wizard is built to be resumable
+— if the admin closes the tab, refreshes, or decides to come back later, all
+progress is saved at the current step. The URL changes per step (/step/1,
+/step/2) so the browser history supports navigation.
+
+The wizard opens on a clean, centered card layout. A progress indicator at the
+top shows the two steps with step labels. There is no sidebar here — the full
+focus is on completing the company setup.
+
+--- WIZARD STEP 1: COMPANY PROFILE ---
+  Fields:
+    · Company Name (pre-filled from signup, editable)
+    · Company Domain (pre-filled, editable)
+    · Company Size (dropdown: 1-10, 11-50, 51-200, 201-500, 500+)
+    · Industry (dropdown with popular categories)
+    · Company Logo Upload (optional — drag and drop or file picker, accepts PNG/JPG)
+    · Company Bio / Description (optional — textarea, max 500 characters)
+    · Website URL (optional)
+  Navigation: "Save & Continue" button → goes to Step 2
+              "Save Progress" link → saves and stays on current step
+
+--- WIZARD STEP 2: LOCATION & CONTACT ---
+  Fields:
+    · Address Line 1 (required)
+    · Address Line 2 (optional)
+    · City (required)
+    · State / Province (required)
+    · Country (required — dropdown)
+    · Postal Code (required)
+    · Contact Email (pre-filled from signup, editable)
+    · Contact Phone Number (optional)
+  Navigation: "Back" → Step 1
+              "Complete Setup" → Submits wizard, redirects to Company Dashboard
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Add a third optional step for "Branding & Appearance" where admins can
+    choose an accent color for their company's internal view — small but creates
+    a sense of ownership.
+  · Show a real-time preview panel on the right side of the wizard that renders
+    a company profile card as the user fills in details — this "see it live"
+    interaction significantly improves completion rates.
+  · Show a progress percentage badge (e.g., "40% complete") alongside the step
+    indicators to encourage completion.
+  · Add inline field-level hints (e.g., "This will be visible to candidates
+    on job postings") to reduce confusion about why certain data is needed.
+
+================================================================================
+MODULE 3 — CANDIDATE ONBOARDING WIZARD
+Route: /candidate/onboarding | /step/1 through /step/4
+================================================================================
+
+When a candidate successfully registers — whether through email signup or Google
+OAuth — they are redirected immediately to the Candidate Onboarding Wizard. This
+is a four-step wizard that builds out the candidate's full profile. This wizard
+is resumable: the candidate can skip ahead, close the page, and return at any
+point to continue from where they left off. Each step saves progress independently
+via its own API endpoint.
+
+The wizard is designed to feel more like a personal introduction than a form-
+filling exercise. The copy at each step is warm and encouraging. The layout is
+clean, the fields are generously spaced, and the progress bar at the top clearly
+communicates where the candidate stands.
+
+--- WIZARD STEP 1: PERSONAL DETAILS ---
+  Fields:
+    · Avatar Selection: 6 pre-built illustrated avatars displayed as a grid of
+      circular swatches. Candidate clicks to select one. No custom upload.
+    · Full Name (pre-filled from signup, editable)
+    · Phone Number (required if not entered at signup)
+    · Location / City (text input)
+    · Date of Birth (optional)
+    · A short "About Me" text (optional, 2-3 sentences encouraged)
+  UX Notes:
+    - Avatar selection should have a clear "selected" ring animation
+    - Step title: "Let's get to know you"
+
+--- WIZARD STEP 2: RESUME & SUMMARY ---
+  Fields:
+    · Resume Upload: File picker accepting PDF only, max 5MB
+      - Drag-and-drop zone with clear instructions
+      - File name displayed after upload with a "Remove" option
+    · Resume Drive Link: Alternate option — paste a Google Drive / Dropbox link
+      - Toggle between "Upload File" and "Paste Link" using a tab switcher
+    · Professional Summary: Rich-text or simple textarea editor
+      - Placeholder copy: "Briefly describe your professional background,
+        what you're good at, and what you're looking for"
+      - Max 1000 characters
+  UX Notes:
+    - Show upload progress bar during file upload
+    - Validate file type before upload — show friendly error if non-PDF
+    - Step title: "Your resume & story"
+
+--- WIZARD STEP 3: PROFESSIONAL LINKS ---
+  Fields:
+    · GitHub Profile URL (text input with GitHub icon)
+    · LeetCode Profile URL (text input with LeetCode icon)
+    · LinkedIn Profile URL (text input with LinkedIn icon)
+    · Portfolio / Personal Website URL (text input)
+    · Any Other Link (labeled "Other" — free text)
+  UX Notes:
+    - Each field shows its platform icon on the left
+    - URL validation on blur (not on every keystroke)
+    - Step title: "Where can we find your work?"
+    - All fields are optional but the step itself is not skippable without
+      acknowledging it
+
+--- WIZARD STEP 4: JOB PREFERENCES ---
+  Fields:
+    · Skills: Tag-input field
+      - Candidate types skills and hits Enter/comma to add tags
+      - Suggestions appear from a pre-defined skills bank
+      - Visual skill tags displayed below the input
+    · Minimum Expected Salary: Number input (in local currency or USD)
+    · Maximum Expected Salary: Number input
+    · Salary Display Note: "Salary range is used for job matching only and
+      is not shown publicly"
+    · Job Type Preference: Multi-select chips
+      Options: Full-Time | Part-Time | Contract | Internship | Remote
+    · Preferred Role / Job Title (free text or dropdown)
+    · Preferred Location (text input or "Open to Relocation" toggle)
+  UX Notes:
+    - Salary inputs should be numeric-only with comma formatting
+    - Job type chips should be togglable (selected = filled, unselected = outline)
+    - Step title: "What are you looking for?"
+    - "Complete Profile" button submits and redirects to Candidate Dashboard
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Add a profile completion percentage ring/circle that updates dynamically
+    as the candidate fills in each field — visible throughout the wizard.
+  · After wizard completion, show a "Your profile is ready!" celebration screen
+    (a micro-animation with confetti or a checkmark pulse) before redirecting
+    to the dashboard. This small moment of delight significantly improves
+    first-session engagement.
+  · In Step 4, consider adding a "Skills Match Preview" — a subtle badge that
+    shows how many jobs on the platform currently match the entered skills.
+    This creates immediate motivation and curiosity.
+  · Allow candidates to go back to any step freely using the progress bar as
+    a navigation element (click Step 2 to jump directly back to Step 2).
+
+================================================================================
+MODULE 4 — CANDIDATE DASHBOARD & CANDIDATE PAGES
+Routes: /candidate/dashboard | /candidate/jobs | /candidate/applications
+        /candidate/interviews | /candidate/profile
+================================================================================
+
+Once a candidate completes their onboarding (or skips it and returns later),
+they land on the Candidate Dashboard. The candidate experience is anchored by a
+top navigation bar — clean, horizontal, minimal — with links to the four primary
+sections: Profile, Jobs, Applications, and Interviews. There is no sidebar here.
+The layout is airy, with generous white space, and the visual hierarchy guides
+the candidate's attention to what matters most in each view.
+
+The candidate's journey through this platform is a continuous loop: build profile
+→ find jobs → apply → track applications → attend interviews → receive outcome.
+Every page in the candidate view is designed to support one step in this loop.
+
+--- CANDIDATE DASHBOARD ---
+  The main dashboard page serves as an overview hub.
+  Key UI Elements:
+    · Profile Completion Bar: A horizontal progress bar with percentage.
+      If below 80%, a prompt card urges the candidate to complete their profile.
+    · Recent Applications: A horizontal scroll or stacked card list showing the
+      3 most recent job applications with their current pipeline status
+      (Applied, Screening, Interview, Offer, etc.)
+    · Upcoming Interviews: A card panel showing the next 1-2 scheduled
+      interviews with date, time, round type, and a "Join Interview" button
+      (visible when interview is within 30 minutes of scheduled time)
+    · Recommended Jobs: 3-4 job cards surfaced based on the candidate's
+      listed skills and preferences
+    · Quick Stats Row:
+        - Total Applications Submitted
+        - Active Applications (not rejected/withdrawn)
+        - Interviews Scheduled
+        - Profile Strength Score
+
+--- CANDIDATE JOBS PAGE (/candidate/jobs) ---
+  A full job listing page where candidates browse and discover open positions.
+  Layout: Grid of job cards (2-3 per row on desktop, 1 per row on mobile)
+
+  Each Job Card Displays:
+    · Job Title
+    · Company Name + Company Logo/Avatar
+    · Location (or "Remote")
+    · Employment Type (Full-Time / Part-Time / Contract)
+    · Required Skills (shown as tags, max 4 visible, "+N more" overflow)
+    · Date Posted (relative: "3 days ago")
+    · A subtle "Apply Now" button or "Already Applied" badge
+
+  Search & Filter Panel (left sidebar or top filter bar):
+    · Keyword search (matches title, description, skills)
+    · Location filter (text input or dropdown)
+    · Job Type filter (Full-Time / Part-Time / Contract / Remote — multi-select)
+    · Experience Level filter (Entry / Mid / Senior)
+    · Skills filter (tag-based multi-select)
+    · Date Posted filter (Today / Past Week / Past Month)
+    · Salary Range slider (optional)
+
+  Pagination: Load more button or page-based pagination at bottom
+
+  Job Detail View (opens as a side drawer or full page):
+    · Full Job Title and Company Name
+    · Job Description (full text, formatted)
+    · Required Skills (tags)
+    · Department, Location, Experience Level
+    · Salary Range (if provided)
+    · Application Deadline
+    · "Apply Now" button → opens an Apply modal
+    · Apply Modal contains:
+        - Resume to use: shows uploaded resume or allows re-upload
+        - Cover Note (optional textarea, max 500 chars)
+        - Confirm & Submit button
+    · If already applied: shows application status badge instead of Apply button
+
+--- CANDIDATE APPLICATIONS PAGE (/candidate/applications) ---
+  A list view of all jobs the candidate has applied to.
+  Layout: Table-style list (not cards) with key data columns
+
+  Columns:
+    · Job Title (clickable → opens job detail)
+    · Company Name
+    · Date Applied
+    · Current Pipeline Stage (color-coded badge):
+        Applied → Screening → Shortlisted → Interview 1 → Interview 2 →
+        Offer → Hired → Rejected
+    · Last Updated (relative date)
+    · Actions: View Details | Withdraw Application
+
+  Filters:
+    · Filter by Status (dropdown)
+    · Search by job title
+    · Date range filter
+
+  Application Detail Drawer/Page:
+    · Full application details including resume snapshot
+    · Pipeline stage history (timeline view showing stage transitions with dates)
+    · Interview schedule linked to this application (if any)
+    · Withdraw button (only if status is not Hired or Rejected)
+
+--- CANDIDATE INTERVIEWS PAGE (/candidate/interviews) ---
+  A timeline-style or list view of all scheduled interviews.
+  Layout: Vertical list of interview cards, sorted by scheduled date
+
+  Each Interview Card Displays:
+    · Job Title it belongs to
+    · Company Name
+    · Round Type (Phone Screen / Technical / Behavioral / HR / Final)
+    · Scheduled Date and Time
+    · Duration (e.g., "45 minutes")
+    · Interviewer Name (if disclosed)
+    · Status (Scheduled / Completed / Cancelled)
+    · Join Interview button (active 30 minutes before scheduled time)
+    · Meeting Link (if not using the platform's built-in workspace)
+
+  Filters:
+    · Filter by status (Upcoming / Completed / Cancelled)
+    · Filter by round type
+
+--- CANDIDATE PROFILE PAGE (/candidate/profile) ---
+  A comprehensive, structured page that displays and allows editing of the full
+  candidate profile. This page is derived from the data collected in the
+  onboarding wizard but extends it further.
+
+  Page Sections:
+    · Header Section:
+        - Avatar (one of the 6 pre-selected)
+        - Full Name
+        - Current Job Preference / Target Role
+        - Profile Completion Percentage (circular progress ring)
+        - Edit Profile button (top right)
+
+    · Contact Information:
+        - Email | Phone | Location
+        - Inline edit or modal edit
+
+    · Professional Links:
+        - GitHub | LeetCode | LinkedIn | Portfolio | Other
+        - Each shown as a clickable chip with platform icon
+
+    · Resume Section:
+        - Current resume file name with download icon
+        - Upload Date
+        - Re-upload button | Delete button
+        - Drive Link (if provided)
+        - Resume Preview button (opens PDF in modal)
+
+    · Professional Summary:
+        - Displayed as a formatted paragraph
+        - Edit icon to open inline editor
+
+    · Skills:
+        - Skill tags listed in a horizontal wrap
+        - Add/Remove skill interface
+
+    · Work Experience (optional — can be populated from parsed resume data):
+        - Each entry: Company, Role, Duration, Description
+        - "Add Experience" button for manual entry
+
+    · Preferences:
+        - Salary Range displayed
+        - Job Type preferences (chips)
+        - Preferred Location
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · On the Candidate Dashboard, add a "Profile Strength Score" section with
+    a breakdown: 5 sub-categories (Profile Info, Resume, Links, Skills,
+    Preferences) each shown as a mini progress bar. This gamifies profile
+    completion and drives higher-quality candidate data.
+  · On the Jobs page, add an AI Match Score badge on each job card (e.g.,
+    "87% Match") calculated from the candidate's skills vs. job required skills.
+    This is already in the data model (ai_match_score field) and makes the
+    experience feel intelligent and personalized.
+  · Add a "Bookmarked Jobs" section — candidates can heart/bookmark jobs they
+    are interested in but not ready to apply to yet. This is a low-effort
+    feature with high engagement impact.
+  · For the Applications page, show an animated pipeline stage indicator (like
+    a stepper component) inside each application detail so candidates can
+    visually understand where they stand in the hiring process.
+  · Add push notification badges on the top nav icons (Applications, Interviews)
+    when there are status updates — even basic badge counts improve return visits.
+
+================================================================================
+MODULE 5 — COMPANY DASHBOARD & COMPANY MODULE
+Routes: /company/dashboard | /company/users | /company/jobs | /company/candidates
+        /company/applications | /company/interviews | /company/feedback
+================================================================================
+
+After a Company Admin or any internal user (Recruiter or Interviewer) logs in
+through the Internal Login, they arrive at the Company Dashboard. The company
+view is structured around a persistent left sidebar that provides navigation to
+all key sections. The sidebar is clean, icon-plus-label style, with the company
+logo or name at the top and a user avatar + role badge at the bottom.
+
+The company module is the operational heart of the platform — it is where the
+entire hiring machine runs. Recruiters post jobs, review candidates, manage
+applications, schedule interviews, and track outcomes. Interviewers view their
+assigned sessions and submit feedback. Company Admins oversee all of this and
+manage the team.
+
+--- SIDEBAR NAVIGATION ---
+  Items (in order):
+    · Dashboard (home icon)
+    · Users (people icon)
+    · Jobs (briefcase icon)
+    · Candidates (person-search icon)
+    · Applications (document-stack icon)
+    · Interviews (calendar icon)
+    · Feedback (star/comment icon)
+  Bottom:
+    · Settings (gear icon — company settings)
+    · Logout (exit icon)
+  Active state: highlighted background on the current section's nav item
+
+--- COMPANY DASHBOARD (/company/dashboard) ---
+  A minimalist statistics hub that gives a quick pulse of the hiring activity.
+  It should NOT be cluttered. Every element earns its place.
+
+  Top Row — Key Metric Cards (4 cards):
+    · Total Jobs Posted
+    · Active Jobs (status = published)
+    · Total Candidates (who applied to this company's jobs)
+    · Total Applications
+
+  Mid Row — Interview Summary Row (3 cards):
+    · Total Interviews Scheduled
+    · Completed Interviews
+    · Interview Conversion Rate (Interviewed → Hired %)
+
+  Bottom Row — Hiring Summary (2 cards):
+    · Total Hires
+    · Rejection Rate
+
+  Charts Section (2-3 charts, not more):
+    · Bar Chart: Applications per Job (top 5-6 jobs by applicant count)
+    · Donut/Pie Chart: Pipeline Stage Distribution
+      (how many candidates are at Applied / Screening / Interview / Offer / Hired)
+    · Line Chart: Applications over time (past 30 days, weekly)
+
+  Recent Activity Feed (optional right column):
+    · Last 5 actions in the system (e.g., "Jane applied to Frontend Engineer",
+      "Interview scheduled for Mark — Technical Round")
+
+--- COMPANY USERS PAGE (/company/users) ---
+  A list of all internal users (Recruiters and Interviewers) belonging to
+  this company. This page is accessible only to Company Admins.
+
+  Layout: Table/list format (Excel-style rows)
+
+  Columns:
+    · Name
+    · Email
+    · Role (Recruiter / Interviewer)
+    · Date Invited
+    · Status (Active / Pending / Deactivated)
+    · Actions (Edit | Deactivate | Remove)
+
+  Search: Search by name or email
+  Filter: Filter by Role (Recruiter / Interviewer) | Filter by Status
+
+  "Invite User" Button (top right):
+    Opens a modal with:
+      · Full Name (required)
+      · Email (required)
+      · Role Dropdown: Recruiter | Interviewer (required)
+      · Password (required — temporary password set by admin)
+      · Confirm Password (required)
+    On submit:
+      - System sends an invite email to the provided email address
+      - Email contains login credentials and a link to the internal login page
+      - User appears in the list with "Pending" status until they first log in
+
+--- COMPANY JOBS PAGE (/company/jobs) ---
+  A grid of job cards representing all jobs posted by the company.
+  Layout: Square card grid (3 per row on desktop, 2 on tablet, 1 on mobile)
+
+  Each Job Card Displays:
+    · Job Title (bold, prominent)
+    · Department
+    · Location
+    · Employment Type
+    · Status Badge: Draft (grey) | Published (green) | Closed (red)
+    · Number of Applicants
+    · Date Created
+    · Action icons: Edit (pencil) | View (eye) | Delete (trash)
+
+  Search: Keyword search bar
+  Filter: Status filter (Draft / Published / Closed) | Department filter
+
+  "Create Job" Button (top right):
+    Opens a full form (modal or new page) with:
+      · Job Title (required)
+      · Job Description (rich text editor — required)
+      · Department (dropdown or free text)
+      · Location (text input + "Remote" toggle)
+      · Employment Type (dropdown: Full-Time / Part-Time / Contract / Internship)
+      · Experience Level (dropdown: Entry / Mid / Senior)
+      · Required Skills (tag input)
+      · Salary Range Min (number)
+      · Salary Range Max (number)
+      · Application Deadline (date picker)
+      · Job Status (Draft / Published)
+    On save:
+      - Job appears in the grid
+      - If Published, it immediately appears on the candidate job board
+
+--- COMPANY CANDIDATES PAGE (/company/candidates) ---
+  A list of all candidates who have applied to at least one job at this company.
+  Layout: Table/list (Excel-style with rows and columns)
+
+  Columns:
+    · Candidate Name
+    · Email
+    · Phone
+    · Applied Jobs (count or list of job titles)
+    · Skills (top 3 skills, "+N more" overflow)
+    · Overall Status (most advanced pipeline stage across all applications)
+    · AI Match Score (if computed)
+    · Date First Applied
+    · Actions: View Profile
+
+  Search: Name, email, skill keyword
+  Filter: By status | By job | By skill
+
+  Note: There is NO "Add Candidate" button here. Candidates are only added
+  through self-application or through the Applications module.
+
+  Candidate Detail View (opens as drawer or new page):
+    · Full profile card (avatar, name, contact, links)
+    · All applications from this candidate to this company
+    · Resume download link
+    · Skills list
+    · AI Match Score
+
+--- COMPANY APPLICATIONS PAGE (/company/applications) ---
+  The central pipeline management page. This is where the hiring action happens.
+  Layout: Table list view (primary) with optional Kanban board toggle
+
+  Table Columns:
+    · Candidate Name
+    · Job Title
+    · Current Pipeline Stage (color-coded badge)
+    · Assigned Recruiter
+    · Assigned Interviewer
+    · AI Score
+    · Date Applied
+    · Last Updated
+    · Actions: View | Move Stage | Schedule Interview | Reject
+
+  Pipeline Stages (in order):
+    Applied → Screening → Shortlisted → Interview 1 → Interview 2 →
+    Offer → Hired / Rejected
+
+  Search: Candidate name or job title
+  Filter: By stage | By job | By recruiter | By date range
+
+  Kanban Board Toggle (optional enhanced view):
+    - Columns represent each pipeline stage
+    - Candidate cards can be dragged between stages
+    - Each card shows: Candidate name, Job title, Applied date, AI score
+
+  "Add Application" Button (top right):
+    Opens a modal with:
+      · Select Candidate (searchable dropdown of existing candidates or new entry)
+      · Select Job (searchable dropdown of published jobs)
+      · Cover Note (optional)
+      · Initial Pipeline Stage (defaults to "Applied")
+      · Assign Recruiter (dropdown of company's recruiters)
+      · Assign Interviewer (dropdown of company's interviewers)
+
+  Application Detail View:
+    · Full candidate profile snapshot
+    · Pipeline stage history (timestamped transitions)
+    · Interview history linked to this application
+    · Feedback history from interviewers
+    · Move to next stage / Reject buttons
+    · Notes section (recruiter internal notes — not visible to candidate)
+
+--- COMPANY INTERVIEWS PAGE (/company/interviews) ---
+  A list of all interviews scheduled across all jobs and candidates.
+  Layout: Table/list with rows
+
+  Columns:
+    · Candidate Name
+    · Job Title
+    · Round Type (Phone / Screening / Technical / Behavioral / HR / Final)
+    · Assigned Interviewer
+    · Scheduled Date & Time
+    · Duration
+    · Status (Scheduled / Completed / Cancelled)
+    · Actions: View | Reschedule | Cancel | Join
+
+  Search: By candidate name or job title
+  Filter: By status | By round type | By interviewer | By date range
+
+  "Schedule Interview" Button (top right):
+    Opens a modal with:
+      · Select Application (searchable — links to a specific candidate+job pair)
+      · Round Type (dropdown)
+      · Select Interviewer (dropdown of company's interviewers)
+      · Date (date picker)
+      · Time (time picker)
+      · Duration (dropdown: 30 min / 45 min / 60 min / 90 min)
+      · Meeting Link (optional — Zoom/Meet URL; if blank, platform workspace used)
+      · Status (defaults to "Scheduled")
+    On save:
+      - Interview is created
+      - Notification email sent to candidate and interviewer
+
+  Interview Workspace Link:
+    - Clicking "Join" on an interview row opens the Live Interview Workspace
+      (see Module 6 extension — Live Interview Workspace)
+
+--- COMPANY FEEDBACK PAGE (/company/feedback) ---
+  A consolidated view of all feedback submitted by interviewers.
+  Layout: Table/list
+
+  Columns:
+    · Candidate Name
+    · Job Title
+    · Round Type
+    · Interviewer Name
+    · Rating (1-5 star display)
+    · Recommendation (Strong Hire / Hire / No Hire / Strong No Hire)
+    · Date Submitted
+    · Actions: View Full Feedback
+
+  Feedback Detail View (drawer or modal):
+    · Candidate + Interview details at top
+    · Rating (star display)
+    · Strengths (text)
+    · Weaknesses (text)
+    · Recommendation badge
+    · Submitted by (interviewer name + date)
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · On the Company Dashboard, add a "Today's Schedule" widget in the right
+    column showing all interviews scheduled for today — date, time, candidate
+    name, round type, and Join button. This gives the team an at-a-glance
+    agenda view first thing in the morning.
+  · On the Jobs page, show an "Applicant Trend" sparkline on each job card —
+    a tiny line chart showing application volume over the past 7 days. This
+    tells recruiters at a glance which roles are getting traction.
+  · On the Applications page, add a "Top Candidates" smart filter that surfaces
+    the top 5 candidates by AI Score for any selected job. Recruiters often
+    want to quickly shortlist from the best — this makes that one click.
+  · Consider adding color-coded row backgrounds on the Applications table based
+    on pipeline stage — a very subtle tint (e.g., light blue for Screening,
+    light yellow for Shortlisted, light green for Offer) that lets recruiters
+    scan the pipeline state without reading every badge.
+  · For the Interviews page, add a "Feedback Pending" highlight — visually
+    flag interviews that are in "Completed" status but have no feedback yet,
+    with a "Remind Interviewer" button that sends a nudge email.
+
+================================================================================
+MODULE 6 — INTERVIEWER MODULE
+Routes: /interviewer/dashboard | /interviewer/interviews | /interviewer/feedback
+================================================================================
+
+When a user with the Interviewer role logs into the Internal Login, they are
+taken to a focused, minimal version of the company portal. The interviewer
+does not see jobs, candidates in full, or applications broadly. They only see
+what they need: their assigned interviews and the feedback they need to submit.
+
+This experience is intentionally stripped down. The interviewer's job is to
+conduct interviews and submit structured feedback — nothing more. The navigation
+reflects this focused scope.
+
+--- INTERVIEWER DASHBOARD ---
+  Key Metrics (compact cards):
+    · Total Assigned Interviews
+    · Upcoming Interviews (next 7 days)
+    · Completed Interviews
+    · Pending Feedback (interviews completed but feedback not yet submitted)
+
+  Upcoming Interview Cards:
+    - 3-5 most recent upcoming interviews displayed as preview cards
+    - Each card: Candidate Name, Job Title, Round Type, Date/Time, Join button
+
+--- INTERVIEWER INTERVIEWS PAGE (/interviewer/interviews) ---
+  Full list of all interviews assigned to this interviewer.
+  Layout: Table/list
+
+  Columns:
+    · Candidate Name
+    · Job Title
+    · Round Type
+    · Date & Time
+    · Duration
+    · Status (Scheduled / Completed / Cancelled)
+    · Feedback Status (Submitted / Pending)
+    · Actions: View | Join Interview | Submit Feedback
+
+  Filters: By status | By date range
+
+--- INTERVIEWER FEEDBACK PAGE (/interviewer/feedback) ---
+  List of all interviews where feedback has been or needs to be submitted.
+
+  Feedback Submission Form (opens on "Submit Feedback" click):
+    · Interview details at top (read-only): Candidate, Job, Round, Date
+    · Rating: 1-5 star selector (required)
+    · Strengths: Textarea (required)
+    · Weaknesses: Textarea (required)
+    · Recommendation: Radio buttons
+        - Strong Hire
+        - Hire
+        - No Hire
+        - Strong No Hire
+    · Additional Comments: Textarea (optional)
+    · Submit Feedback button
+
+  Once submitted:
+    - Feedback is locked (read-only for interviewer)
+    - Recruiter sees feedback in the Applications detail view
+    - Candidate pipeline stage may be updated based on recommendation
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Add a "Preparation Notes" section visible to the interviewer on the
+    interview detail page — the recruiter can pre-fill context about the
+    candidate, areas to probe, or specific skills to assess. This improves
+    interview quality significantly and gives interviewers confidence.
+  · Show the candidate's profile snapshot (avatar, skills, resume link) on
+    the Interview detail view so the interviewer doesn't need to ask for it
+    separately.
+  · After feedback is submitted, show a brief confirmation animation and then
+    auto-redirect back to the interviews list — reduce the clicks needed
+    after form submission.
+
+================================================================================
+MODULE 7 — LIVE INTERVIEW WORKSPACE (EXTENSION)
+Route: /interview/:id/workspace
+================================================================================
+
+The Live Interview Workspace is the most technically sophisticated page in the
+platform. It is accessed via a "Join Interview" button that becomes active for
+both candidates and interviewers 30 minutes before the scheduled interview time.
+The workspace experience differs based on role and round type.
+
+--- CANDIDATE VIEW — TECHNICAL ROUND ---
+  Layout: Split-screen (two equal panels side by side)
+
+  Left Panel — Video Call:
+    · Jitsi Meet embedded in an iframe
+    · Room name: interview_{interview_id} (unique per interview)
+    · Auto-joins on page load — no lobby screen
+    · Audio and video enabled by default
+    · Controls visible: Microphone toggle | Camera toggle | Chat | Hang Up
+    · Jitsi branding and unnecessary toolbar items hidden
+    · The panel is resizable (drag the divider)
+
+  Right Panel — Code Editor:
+    · Monaco Editor (same engine as VS Code) embedded
+    · Language selector dropdown at top (50+ languages)
+    · Line numbers and minimap enabled
+    · Light/Dark theme toggle
+    · Auto-save every 5 seconds (code persisted server-side per session)
+    · Run Code button at bottom right
+    · Output Console below the editor:
+        - Shows stdout, stderr
+        - Supports STDIN input (text field for providing input)
+        - Execution time and memory usage shown
+    · Code execution powered by JDoodle API via backend proxy
+    · Rate limit: 10 executions per minute per session
+    · Max execution time: 15 seconds | Memory: 256 MB
+
+--- INTERVIEWER VIEW — TECHNICAL ROUND ---
+  Layout: Full-screen Jitsi Meet video call
+  · Same room as the candidate (interview_{interview_id})
+  · The code editor is NOT visible to the interviewer
+  · Interviewer focuses purely on verbal conversation and problem discussion
+  · Preparation notes (pre-filled by recruiter) shown in a small collapsible
+    panel below the video — reference only, doesn't distract from the call
+
+--- CANDIDATE VIEW — APTITUDE / MCQ ROUND ---
+  Layout: Full-screen assessment panel
+
+  Components:
+    · Question counter: "Question 4 of 20"
+    · Countdown timer (prominent, top right — color changes to red below 10%)
+    · Question text displayed clearly
+    · Answer options (MCQ radio buttons or checkbox for multi-select)
+    · Previous / Next navigation buttons
+    · Question navigator (mini grid showing answered/unanswered/flagged)
+    · Flag for Review button (marks question to revisit)
+    · Auto-submit when timer reaches zero
+    · Manual Submit button (with confirmation modal to prevent accidental submit)
+
+  Post-submission:
+    · "Assessment Submitted" confirmation screen
+    · Score not shown to candidate immediately (shown after interviewer reviews)
+
+--- INTERVIEWER VIEW — APTITUDE ROUND ---
+  · After candidate submits, the interviewer sees the full results
+  · Auto-graded MCQ score (correct / total)
+  · Each question shown with candidate's answer and correct answer highlighted
+  · Manual review section for any short-answer questions
+  · Grading interface for manual answers (score input + comment)
+  · Overall score and pass/fail threshold indicator
+  · This view feeds directly into the feedback submission flow
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Add a session reconnect handler — if the candidate loses connection during
+    a technical round, their code is auto-restored from the last 5-second
+    autosave when they rejoin. Show a "Session restored" toast message.
+  · For technical rounds, add a "Problem Statement" panel that the interviewer
+    can toggle — it shows a pre-set coding problem description that both parties
+    can see. This standardizes technical interviews and removes the need for
+    screen sharing external documents.
+  · For aptitude rounds, add a tab-switch warning — if the candidate switches
+    to another browser tab, show a warning modal and log the event. Three
+    tab-switch events trigger a notification to the interviewer.
+  · Post-interview, auto-prompt the interviewer to submit feedback immediately
+    after the workspace session ends — "Your interview ended. Submit feedback
+    while it's fresh?" with a one-click shortcut to the feedback form.
+
+================================================================================
+MODULE 8 — NOTIFICATIONS SYSTEM
+(Background Service — Visible via Email & Platform Toasts)
+================================================================================
+
+The Notifications System is the connective tissue of the platform. It ensures
+every stakeholder is informed at every meaningful event. Notifications manifest
+in two forms: email notifications (sent via SMTP) and in-platform toast/banner
+notifications (real-time feedback on actions taken).
+
+--- EMAIL NOTIFICATION TRIGGERS ---
+
+  For Candidates:
+    · Welcome email on signup confirmation
+    · Onboarding wizard reminder (if not completed within 48 hours)
+    · Application confirmation: "You have successfully applied to [Job Title]
+      at [Company Name]"
+    · Application status update: "Your application for [Job Title] has moved
+      to [New Stage]"
+    · Interview scheduled: "An interview has been scheduled for you — [Date],
+      [Time], [Round Type]"
+    · Interview rescheduled: New date/time notification
+    · Interview cancelled: Cancellation with reason (if provided)
+    · Application outcome: "Congratulations" (Offer/Hire) or "Thank you for
+      your time" (Rejection) based on final pipeline stage
+
+  For Internal Users (Recruiter / Interviewer):
+    · Welcome/invite email with login credentials and login link
+    · Interview assigned: "You have been assigned an interview — [Candidate],
+      [Job], [Date], [Time]"
+    · Interview rescheduled: Updated schedule notification
+    · Interview cancelled: Cancellation notice
+    · Feedback reminder: Sent 2 hours after interview completion if feedback
+      is not yet submitted
+    · New application alert: (optional, configurable) "A new candidate applied
+      to [Job Title]"
+
+  For Company Admin:
+    · Company approved by Super Admin: "Your company workspace is ready"
+    · Company rejected: Rejection reason email
+    · New user invite confirmation: "Invite sent to [email]"
+
+  For Super Admin:
+    · New company registration pending approval
+
+--- EMAIL TEMPLATE REQUIREMENTS ---
+  · All emails use branded, clean HTML templates
+  · Templates include: Platform logo, company name, action summary, CTA button,
+    footer with unsubscribe/contact link
+  · Dynamic content injected at send time (candidate name, job title, dates,
+    status, etc.)
+  · No plain-text emails — all HTML formatted
+
+--- IN-APP TOAST NOTIFICATIONS ---
+  · Success toasts (green): "Application submitted successfully"
+  · Error toasts (red): "Failed to upload resume — please try again"
+  · Info toasts (blue): "Interview scheduled successfully"
+  · Warning toasts (yellow): "Your session is about to expire"
+  · Position: Top-right corner, auto-dismiss after 5 seconds
+  · All toasts are also dismissable via a close button
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Add an in-app notification bell icon in the top navbar for both candidate
+    and company views. Clicking it opens a notification drawer showing the
+    last 15 notification events with timestamps. Unread count shown as a
+    badge. This dramatically improves engagement and reduces email fatigue.
+  · Implement email preference settings — allow candidates and internal users
+    to opt out of non-critical email types (e.g., opt out of application
+    confirmation emails but keep interview schedule emails mandatory).
+  · Add WhatsApp / SMS notification integration as a future enhancement for
+    interview reminders — especially impactful for mobile-first candidates.
+
+================================================================================
+MODULE 9 — ANALYTICS DASHBOARD
+Routes: /company/analytics | /superadmin/analytics
+================================================================================
+
+The Analytics Dashboard exists at two levels: a company-level analytics view
+accessible to Company Admins and Recruiters, and a system-level analytics view
+accessible only to the Super Admin. Both views are data-rich but visually
+restrained — the design philosophy is "data that informs, not data that
+overwhelms."
+
+--- COMPANY-LEVEL ANALYTICS (/company/analytics) ---
+  Top Summary Cards (6 KPIs):
+    · Total Jobs Posted
+    · Total Applications Received
+    · Total Candidates in Pipeline
+    · Total Interviews Conducted
+    · Hire Rate (% of applications resulting in hire)
+    · Average Time to Hire (days from application to offer stage)
+
+  Chart 1 — Pipeline Funnel Chart:
+    · A funnel visualization showing candidate drop-off at each stage
+    · Applied (N) → Screening → Shortlisted → Interview → Offer → Hired
+    · Shows both absolute numbers and conversion % between each stage
+    · Identifies the biggest drop-off point visually
+
+  Chart 2 — Applications Over Time (Line Chart):
+    · X-axis: Daily/weekly dates (last 30 or 90 days — toggleable)
+    · Y-axis: Number of applications received
+    · Multiple job series (filterable — show all or one specific job)
+
+  Chart 3 — Applications by Job (Horizontal Bar Chart):
+    · Top 10 jobs by total applications received
+    · Sorted descending
+    · Bar colored by job status (Published = green, Closed = grey)
+
+  Chart 4 — Pipeline Stage Distribution (Donut Chart):
+    · Current snapshot of all active applications by stage
+    · Color-coded per stage
+
+  Chart 5 — Interview Outcome Distribution (Pie Chart):
+    · Feedback recommendations breakdown:
+        Strong Hire / Hire / No Hire / Strong No Hire
+
+  Filters (global for all charts):
+    · Date Range picker (preset: Last 7 days / 30 days / 90 days / Custom)
+    · Job filter (specific job or all jobs)
+    · Department filter
+
+--- SUPER ADMIN — SYSTEM ANALYTICS (/superadmin/analytics) ---
+  Platform-wide metrics (aggregated across all companies):
+    · Total Companies (Active / Pending / Rejected)
+    · Total Internal Users (all roles)
+    · Total Candidates registered
+    · Total Jobs Posted platform-wide
+    · Total Applications submitted
+    · Total Interviews Scheduled
+    · Total Feedbacks Submitted
+
+  Charts:
+    · Companies registered over time (line chart — monthly)
+    · Active vs. Pending vs. Rejected companies (donut)
+    · Top companies by jobs posted and applications received (bar chart)
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Add a "Download Report" button on the company analytics page that exports
+    a PDF or CSV of the current chart data — useful for quarterly hiring reviews
+    and stakeholder presentations.
+  · Add a "Comparison Period" toggle — show this period vs. last period side
+    by side on the metric cards (e.g., "+23% applications vs last month")
+    with green/red trend arrows.
+  · The pipeline funnel chart is the most important visualization in the
+    system. Consider making it interactive — clicking on a funnel stage
+    navigates to the Applications page pre-filtered to that stage.
+
+================================================================================
+MODULE 10 — SUPER ADMIN MODULE
+Routes: /superadmin/dashboard | /superadmin/companies | /superadmin/users
+        /superadmin/analytics
+================================================================================
+
+The Super Admin module is intentionally minimal. The Super Admin does not manage
+hiring operations — they manage the platform itself. Their responsibilities are
+three: oversee the companies using the platform, manage all user accounts at a
+system level, and review platform-wide analytics.
+
+The Super Admin logs in through the same Internal Login page as company users.
+After authentication, the system detects the Super Admin role and routes to the
+super admin portal, which has its own clean sidebar with just four items:
+Dashboard, Companies, Users, Analytics.
+
+--- SUPER ADMIN DASHBOARD (/superadmin/dashboard) ---
+  Clean summary page:
+    · Total Companies (Active / Pending)
+    · Platform-wide Users count
+    · Platform-wide Jobs count
+    · Platform-wide Applications count
+    · Platform-wide Interviews count
+    · Pending Approvals banner (if any companies are in Pending status,
+      show a prominent "N companies awaiting approval" alert card at top)
+
+--- SUPER ADMIN COMPANIES PAGE (/superadmin/companies) ---
+  A table of all registered companies.
+
+  Columns:
+    · Company Name
+    · Domain
+    · Industry
+    · Company Size
+    · Status (Pending / Active / Rejected)
+    · Date Registered
+    · Actions: View | Edit | Approve | Reject
+
+  Search: By company name or domain
+  Filter: By status
+
+  "Create Company" Button:
+    Opens a modal with all company fields (same as signup form)
+    Allows Super Admin to manually create a company account
+
+  Company Detail View (opens on "View" click):
+    · All company profile fields (name, domain, size, industry, address,
+      contact, status, created date)
+    · List of all internal users in that company (name, email, role, status)
+    · Applications and jobs summary (counts only)
+    · Edit button (allows editing company name and domain)
+    · Approve button (changes status to Active, triggers approval email)
+    · Reject button (opens a reason textarea → changes status to Rejected,
+      triggers rejection email)
+
+--- SUPER ADMIN USERS PAGE (/superadmin/users) ---
+  A comprehensive list of all users in the entire system.
+
+  Columns:
+    · Name
+    · Email
+    · Role (Super Admin / Admin / Recruiter / Interviewer / Candidate)
+    · Company (company name, or "Platform" for Super Admin)
+    · Status (Active / Pending / Deactivated)
+    · Date Created
+    · Actions: View | Deactivate
+
+  Search: By name, email
+  Filter: By role | By company | By status
+
+--- ENHANCEMENT SUGGESTIONS ---
+  · Add a "Company Health Score" on the Companies list — a simple calculated
+    metric (e.g., based on: jobs posted, applications received, interviews
+    conducted, last activity date) that gives the Super Admin a quick signal
+    about which companies are actively using the platform vs. dormant.
+  · Add a "Send Announcement" feature for Super Admin — a broadcast email
+    tool to send a system-wide message to all company admins (e.g., for
+    maintenance windows, new feature announcements, policy updates).
+  · On the Company Detail page, add an Activity Timeline showing the 10 most
+    recent actions taken by that company's users — gives the Super Admin
+    context without needing to dive into individual modules.
+
+================================================================================
+CROSS-CUTTING CONCERNS & GLOBAL UI PATTERNS
+================================================================================
+
+These are platform-wide UI principles that apply across all modules and all
+user types. They establish consistency and ensure the application feels cohesive
+regardless of which page the user is on.
+
+--- GLOBAL NAVIGATION PATTERNS ---
+  · Company/Internal View: Left sidebar (collapsible on smaller screens)
+  · Candidate View: Top horizontal navbar (minimal, 4-5 items)
+  · Super Admin View: Left sidebar (minimal, 4 items)
+  · Breadcrumb navigation on all detail pages (e.g., Jobs → Frontend Engineer →
+    Edit)
+
+--- ERROR & EMPTY STATES ---
+  Every list page and data visualization must have a thoughtful empty state:
+  · No jobs posted yet: Illustration + "Create your first job posting" CTA
+  · No candidates yet: Illustration + "Share your job to attract candidates"
+  · No interviews scheduled: "Schedule your first interview" prompt
+  · Empty analytics: "No data available yet. Activity will appear here as
+    you post jobs and receive applications"
+  All empty states include an appropriate icon/illustration, a headline,
+  a short explanation sentence, and a CTA where applicable.
+
+--- LOADING STATES ---
+  · All data tables show skeleton loaders (grey animated rows) while fetching
+  · All charts show a spinner or shimmer placeholder while loading
+  · Buttons show a spinner icon + disabled state during async actions
+  · No page should ever show a blank white screen during loading
+
+--- FORM VALIDATION PATTERNS ---
+  · All required fields show a red asterisk (*)
+  · Validation runs on blur (when field loses focus), not on every keystroke
+  · Error messages appear below the relevant field in red text
+  · On form submit, all errors are shown simultaneously and the page scrolls
+    to the first errored field
+  · Success actions show a green toast notification
+
+--- RESPONSIVE DESIGN ---
+  · All pages are designed mobile-first
+  · Tables on mobile collapse to a card-based stacked view
+  · Sidebars on mobile collapse to a slide-out drawer triggered by a hamburger
+    menu icon
+  · Charts on mobile show a simplified version (e.g., donut replaces funnel,
+    horizontal bar replaces grouped bar)
+  · Wizard forms stack vertically on mobile, full-width inputs
+
+--- ROLE-BASED ACCESS CONTROL (UI LEVEL) ---
+  · Routes are protected at both the API and UI level
+  · If a user tries to access a URL they don't have permission for, they see
+    a clean 403 "Access Denied" page with a "Go Back" button
+  · Navigation items not accessible to a role are not rendered in the sidebar
+    (not just hidden — removed from DOM)
+  · Role is decoded from the JWT token and stored in client-side state
+  · Token expiry triggers an automatic logout with a "Session expired" message
+
+================================================================================
+DATA MODEL SUMMARY (FOR REFERENCE)
+================================================================================
+
+The following tables form the database foundation of the entire application.
+All UI data flows originate from and write back to these structures.
+
+  companies:     id, name, domain, company_size, industry, address fields,
+                 contact_email, contact_phone, status (pending/active/rejected),
+                 active (boolean), admin_user_id (FK → users)
+
+  users:         id, email, password_digest, name, company_id (FK → companies)
+
+  roles:         id, name (Super Admin / Admin / Recruiter / Interviewer)
+  memberships:   user_id + role_id (many-to-many bridge)
+
+  jobs:          id, title, description, status (draft/published/closed),
+                 department, location, experience_level, required_skills[],
+                 company_id, created_by_id
+
+  candidates:    id, name, email, phone, password_digest, location, resume_url,
+                 linkedin_url, github_url, portfolio_url, status, resume_text,
+                 skills[], ai_match_score, summary, resume_data (jsonb),
+                 experience (jsonb), preferences (jsonb), current_step (1-4),
+                 onboarding_completed (boolean), profile_completion (0-100),
+                 profile_strength_score
+
+  applications:  id, job_id, candidate_id, user_id (recruiter), status,
+                 applied_at, resume_url (snapshot), cover_note, ai_score,
+                 parsed_skills[]
+
+  interviews:    id, application_id, round_type, interviewer_id, scheduled_at,
+                 status (scheduled/completed/cancelled), meeting_link
+
+  feedbacks:     id, interview_id, rating (1-5), strengths, weaknesses,
+                 recommendation (strong_hire/hire/no_hire/strong_no_hire)
+
+Pipeline Status Progression:
+  applied → screening → shortlisted → interview_1 → interview_2 →
+  offer → hired | rejected
+
+================================================================================
+FINAL NOTES FOR UI AGENTS BUILDING FROM THIS STORY
+================================================================================
+
+This document is the single source of truth for all UI design and development
+on this platform. When building any page:
+
+  1. Every page has a defined purpose. Do not add decorative sections or
+     modules that are not described here. Minimalism is intentional.
+
+  2. Every form field has a reason. The data model is tight and normalized.
+     Do not add fields that do not map to the schema above.
+
+  3. Role determines experience. Before rendering any page, resolve the user's
+     role and render accordingly. The same URL may behave differently for
+     a Recruiter vs. a Company Admin.
+
+  4. Empty states matter. Every list, table, and chart needs an empty state.
+     Blank screens are not acceptable.
+
+  5. The Wizard flows (Candidate Onboarding + Company Onboarding) are
+     resumable. Store step progress server-side. Do not rely on localStorage
+     alone — a user switching devices should pick up where they left off.
+
+  6. The Live Interview Workspace is the premium differentiator. It should
+     feel polished, fast, and focused. Code editor, video call, and assessment
+     panel are all first-class experiences within this workspace.
+
+  7. Notifications are invisible infrastructure. They must fire reliably for
+     every listed trigger event. Email delivery failures must be logged and
+     retried. The user should never feel "abandoned" after an action.
+
+  8. Analytics tell a story. Charts are not decorative. Every chart should
+     answer a real question a recruiter or admin would have about their
+     hiring performance.
+
+  9. This is a hackathon-grade, portfolio-quality application built to
+     production standards. Every screen should be something you would be
+     proud to show in a live demo.
+
+================================================================================
+END OF DOCUMENT
+Total Modules Covered: 10 (including Live Interview Workspace Extension)
+Total User Roles Addressed: 5 (Candidate, Recruiter, Interviewer, Company Admin,
+Super Admin)
+Primary Design Philosophy: Lean, intentional, role-specific, data-driven
+================================================================================
