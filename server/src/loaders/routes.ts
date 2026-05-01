@@ -1,5 +1,6 @@
 import { Application, Request, Response } from 'express';
 import { sendResponse } from '../shared/utils/response';
+import interviewRoutes from '../modules/interview/interview.routes';
 
 export default (app: Application) => {
   app.get('/api/health', (req: Request, res: Response) => {
