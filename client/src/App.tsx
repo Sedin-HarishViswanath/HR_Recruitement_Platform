@@ -7,6 +7,8 @@ import { CompaniesPage } from './features/admin/pages/CompaniesPage';
 import { RoleGuard } from './shared/components/RoleGuard';
 import { CompanyLayout } from './features/company/components/CompanyLayout';
 import { UsersPage } from './features/company/pages/UsersPage';
+import { AdminLayout } from './features/admin/components/AdminLayout';
+import { AdminDashboard } from './features/admin/pages/AdminDashboard';
 
 const router = createBrowserRouter([
   {
@@ -55,18 +57,13 @@ const router = createBrowserRouter([
       {
         element: (
           <RoleGuard allowedRoles={['Super Admin']}>
-            <div className="flex">
-              {/* Sidebar will go here */}
-              <main className="flex-1 p-8">
-                <Outlet />
-              </main>
-            </div>
+            <AdminLayout />
           </RoleGuard>
         ),
         children: [
           {
             path: 'dashboard',
-            element: <div>Admin Dashboard</div>,
+            element: <AdminDashboard />,
           },
           {
             path: 'companies',
