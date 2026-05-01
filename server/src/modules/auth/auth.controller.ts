@@ -62,6 +62,47 @@ export class AuthController {
       return sendResponse(res, 500, false, 'Internal server error during login');
     }
   }
+
+  async refresh(req: Request, res: Response) {
+    try {
+      // Get token from cookie or body
+      const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+
+      if (!refreshToken) {
+        return sendResponse(res, 401, false, 'No refresh token provided');
+      }
+
+      const result = await authService.refresh(refreshToken);
+      return sendResponse(res, 200, true, 'Token refreshed successfully', result);
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        return sendResponse(res, error.statusCode, false, error.message);
+      }
+      console.error('Refresh Error:', error);
+      return sendResponse(res, 401, false, 'Invalid refresh token');
+    }
+  }
+
+  async logout(req: Request, res: Response) {
+    try {
+      const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+
+      if (refreshToken) {
+        await authService.logout(refreshToken);
+      }
+
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
+
+      return sendResponse(res, 200, true, 'Logged out successfully');
+    } catch (error: any) {
+      console.error('Logout Error:', error);
+      return sendResponse(res, 500, false, 'Internal server error during logout');
+    }
+  }
 }
 
 export const authController = new AuthController();

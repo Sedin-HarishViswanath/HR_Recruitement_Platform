@@ -2,8 +2,9 @@ import bcrypt from 'bcryptjs';
 import { db } from '../../config/db';
 import { SignupInput, LoginInput } from './auth.schema';
 import { AppError } from '../../shared/errors/AppError';
-import { generateAccessToken, generateRefreshToken } from '../../shared/utils/jwt';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt';
 import crypto from 'crypto';
+import knex from 'knex';
 
 const SALT_ROUNDS = 12;
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -191,6 +192,67 @@ export class AuthService {
       failed_login_attempts: 0,
       lock_until: null,
     });
+  }
+
+  async refresh(token: string) {
+    // 1. Verify token signature and expiry
+    const decoded = verifyRefreshToken(token);
+    
+    // 2. Hash token to check in DB
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    
+    // 3. Find token in DB
+    const tokenRecord = await db('refresh_tokens')
+      .where({ token_hash: tokenHash })
+      .first();
+
+    if (!tokenRecord) {
+      throw new AppError('Invalid refresh token', 401);
+    }
+
+    if (tokenRecord.revoked_at) {
+      throw new AppError('Refresh token revoked. Please login again.', 401);
+    }
+
+    // 4. Fetch user details to generate new access token
+    const isCandidate = !!tokenRecord.candidate_id;
+    const userId = isCandidate ? tokenRecord.candidate_id : tokenRecord.user_id;
+    
+    let userRecord;
+    if (isCandidate) {
+      userRecord = await db('candidates').where({ id: userId }).first();
+      userRecord.role_name = 'Candidate';
+    } else {
+      userRecord = await db('users')
+        .leftJoin('memberships', 'users.id', 'memberships.user_id')
+        .leftJoin('roles', 'memberships.role_id', 'roles.id')
+        .select('users.*', 'roles.name as role_name')
+        .where('users.id', userId)
+        .first();
+    }
+
+    if (!userRecord) {
+      throw new AppError('User not found', 404);
+    }
+
+    // 5. Generate new access token
+    const accessToken = generateAccessToken({
+      userId: userRecord.id.toString(),
+      role: userRecord.role_name,
+      companyId: userRecord.company_id?.toString(),
+      email: userRecord.email,
+    });
+
+    // Optional: Rotate refresh token here. Keeping it simple as per prompt.
+    
+    return { accessToken };
+  }
+
+  async logout(token: string) {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    await db('refresh_tokens')
+      .where({ token_hash: tokenHash })
+      .update({ revoked_at: db.fn.now() });
   }
 }
 
