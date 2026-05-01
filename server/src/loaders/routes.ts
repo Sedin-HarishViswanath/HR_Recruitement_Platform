@@ -5,6 +5,7 @@ import authRoutes from '../modules/auth/auth.routes';
 import companyRoutes from '../modules/company/company.routes';
 import adminRoutes from '../modules/admin/admin.routes';
 import jobRoutes from '../modules/job/job.routes';
+import applicationRoutes from '../modules/application/application.routes';
 
 export default (app: Application) => {
   app.get('/api/health', (req: Request, res: Response) => {
@@ -18,6 +19,7 @@ export default (app: Application) => {
   app.use('/api/companies', companyRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/jobs', jobRoutes);
+  app.use('/api/applications', applicationRoutes);
   app.use('/api/code', interviewRoutes);
 
   // Future modules will be registered here

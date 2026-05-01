@@ -8,6 +8,7 @@ import { RoleGuard } from './shared/components/RoleGuard';
 import { CompanyLayout } from './features/company/components/CompanyLayout';
 import { UsersPage } from './features/company/pages/UsersPage';
 import { CompanyJobsPage } from './features/job/pages/CompanyJobsPage';
+import { CandidateJobBoard } from './features/job/pages/CandidateJobBoard';
 import { AdminLayout } from './features/admin/components/AdminLayout';
 import { AdminDashboard } from './features/admin/pages/AdminDashboard';
 
@@ -92,6 +93,10 @@ const router = createBrowserRouter([
           {
             path: 'dashboard',
             element: <div>Candidate Dashboard</div>,
+          },
+          {
+            path: 'jobs',
+            element: <CandidateJobBoard />,
           },
         ],
       },

@@ -86,6 +86,29 @@ export class JobController {
       return sendResponse(res, 500, false, 'Internal server error');
     }
   }
+
+  // PUBLIC / CANDIDATE METHODS
+  async getPublicJobs(req: Request, res: Response) {
+    try {
+      const candidateId = req.user?.role === 'Candidate' ? req.user.userId : undefined;
+      const result = await jobService.getPublicJobs(req.query, candidateId);
+      return sendResponse(res, 200, true, 'Public jobs retrieved successfully', result);
+    } catch (error: any) {
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async getPublicJobDetail(req: Request, res: Response) {
+    try {
+      const candidateId = req.user?.role === 'Candidate' ? req.user.userId : undefined;
+      const { id } = req.params;
+      const job = await jobService.getPublicJobDetail(id, candidateId);
+      return sendResponse(res, 200, true, 'Job details retrieved successfully', job);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
 }
 
 export const jobController = new JobController();

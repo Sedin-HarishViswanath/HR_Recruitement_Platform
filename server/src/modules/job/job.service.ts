@@ -132,6 +132,93 @@ export class JobService {
     await db('jobs').where({ id: jobId }).update({ deleted_at: new Date() });
     return { success: true };
   }
+
+  // PUBLIC / CANDIDATE METHODS
+  async getPublicJobs(query: any, candidateId?: string) {
+    const page = parseInt(query.page || '1');
+    const limit = parseInt(query.limit || '12');
+    const offset = (page - 1) * limit;
+
+    let dbQuery = db('jobs')
+      .join('companies', 'jobs.company_id', 'companies.id')
+      .where({ 'jobs.status': 'published', 'jobs.deleted_at': null })
+      .andWhere(function() {
+        this.whereNull('jobs.deadline').orWhere('jobs.deadline', '>', new Date());
+      });
+
+    if (query.search) {
+      dbQuery = dbQuery.andWhere(function() {
+        this.where('jobs.title', 'ilike', `%${query.search}%`)
+            .orWhere('companies.name', 'ilike', `%${query.search}%`);
+      });
+    }
+    if (query.location) {
+      dbQuery = dbQuery.where('jobs.location', 'ilike', `%${query.location}%`);
+    }
+    if (query.type) {
+      const types = query.type.split(',');
+      dbQuery = dbQuery.whereIn('jobs.employment_type', types);
+    }
+    if (query.experience) {
+      dbQuery = dbQuery.where('jobs.experience_level', query.experience);
+    }
+    if (query.skills) {
+      const skills = query.skills.split(',');
+      dbQuery = dbQuery.whereRaw('jobs.required_skills && ?::text[]', [skills]);
+    }
+    if (query.salary_min) {
+      dbQuery = dbQuery.where('jobs.salary_max', '>=', query.salary_min);
+    }
+    if (query.salary_max) {
+      dbQuery = dbQuery.where('jobs.salary_min', '<=', query.salary_max);
+    }
+
+    const countQuery = dbQuery.clone().count('jobs.id as count').first();
+
+    // Select fields and optionally apply status if candidate authenticated
+    dbQuery = dbQuery
+      .select('jobs.*', 'companies.name as company_name', 'companies.domain as company_domain')
+      .orderBy('jobs.created_at', 'desc')
+      .limit(limit)
+      .offset(offset);
+
+    if (candidateId) {
+      dbQuery = dbQuery.select(
+        db.raw(`EXISTS (SELECT 1 FROM applications WHERE applications.job_id = jobs.id AND applications.candidate_id = ?) as already_applied`, [candidateId])
+      );
+    }
+
+    const [jobs, totalCountResult] = await Promise.all([dbQuery, countQuery]);
+    const total = parseInt(totalCountResult?.count as string || '0');
+
+    return {
+      jobs,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      }
+    };
+  }
+
+  async getPublicJobDetail(jobId: string, candidateId?: string) {
+    let dbQuery = db('jobs')
+      .join('companies', 'jobs.company_id', 'companies.id')
+      .select('jobs.*', 'companies.name as company_name', 'companies.domain as company_domain')
+      .where({ 'jobs.id': jobId, 'jobs.status': 'published', 'jobs.deleted_at': null });
+
+    if (candidateId) {
+      dbQuery = dbQuery.select(
+        db.raw(`EXISTS (SELECT 1 FROM applications WHERE applications.job_id = jobs.id AND applications.candidate_id = ?) as already_applied`, [candidateId])
+      );
+    }
+
+    const job = await dbQuery.first();
+    if (!job) throw new AppError('Job not found or no longer available', 404);
+
+    return job;
+  }
 }
 
 export const jobService = new JobService();
