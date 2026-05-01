@@ -1,10 +1,12 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { Providers } from './app/providers';
 import { AuthPage } from './features/auth/pages/AuthPage';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
 import { OnboardingWizard } from './features/company/pages/OnboardingWizard';
 import { CompaniesPage } from './features/admin/pages/CompaniesPage';
 import { RoleGuard } from './shared/components/RoleGuard';
+import { CompanyLayout } from './features/company/components/CompanyLayout';
+import { UsersPage } from './features/company/pages/UsersPage';
 
 const router = createBrowserRouter([
   {
@@ -13,51 +15,83 @@ const router = createBrowserRouter([
   },
   {
     path: '/verify-email',
-    element: <div>Verify Email Page</div>, // Placeholder
+    element: <div>Verify Email Page</div>,
   },
   {
     path: '/forgot-password',
-    element: <div>Forgot Password Page</div>, // Placeholder
-  },
-  {
-    path: '/candidate',
-    element: <ProtectedRoute />,
-    children: [
-      {
-        path: 'dashboard',
-        element: <div>Candidate Dashboard</div>, // Placeholder
-      },
-    ],
+    element: <div>Forgot Password Page</div>,
   },
   {
     path: '/company',
     element: <ProtectedRoute />,
     children: [
       {
-        path: 'dashboard',
-        element: <div>Company Dashboard</div>, // Placeholder
-      },
-      {
-        path: 'onboarding',
-        element: <OnboardingWizard />,
+        element: (
+          <RoleGuard allowedRoles={['Admin', 'Recruiter', 'Interviewer']}>
+            <CompanyLayout />
+          </RoleGuard>
+        ),
+        children: [
+          {
+            path: 'dashboard',
+            element: <div>Company Dashboard</div>,
+          },
+          {
+            path: 'onboarding',
+            element: <OnboardingWizard />,
+          },
+          {
+            path: 'users',
+            element: <UsersPage />,
+          },
+        ],
       },
     ],
   },
   {
     path: '/superadmin',
-    element: (
-      <RoleGuard allowedRoles={['Super Admin']}>
-        <ProtectedRoute />
-      </RoleGuard>
-    ),
+    element: <ProtectedRoute />,
     children: [
       {
-        path: 'dashboard',
-        element: <div>Admin Dashboard</div>, // Placeholder
+        element: (
+          <RoleGuard allowedRoles={['Super Admin']}>
+            <div className="flex">
+              {/* Sidebar will go here */}
+              <main className="flex-1 p-8">
+                <Outlet />
+              </main>
+            </div>
+          </RoleGuard>
+        ),
+        children: [
+          {
+            path: 'dashboard',
+            element: <div>Admin Dashboard</div>,
+          },
+          {
+            path: 'companies',
+            element: <CompaniesPage />,
+          },
+        ],
       },
+    ],
+  },
+  {
+    path: '/candidate',
+    element: <ProtectedRoute />,
+    children: [
       {
-        path: 'companies',
-        element: <CompaniesPage />,
+        element: (
+          <RoleGuard allowedRoles={['Candidate']}>
+            <Outlet />
+          </RoleGuard>
+        ),
+        children: [
+          {
+            path: 'dashboard',
+            element: <div>Candidate Dashboard</div>,
+          },
+        ],
       },
     ],
   },

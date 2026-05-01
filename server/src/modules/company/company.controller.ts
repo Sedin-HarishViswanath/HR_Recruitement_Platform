@@ -82,6 +82,66 @@ export class CompanyController {
       return sendResponse(res, 500, false, 'Internal server error');
     }
   }
+
+  async getDashboardStats(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      if (!companyId) throw new AppError('No company associated with this user', 400);
+
+      const stats = await companyService.getDashboardStats(companyId);
+      return sendResponse(res, 200, true, 'Dashboard stats retrieved', stats);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  // User Management
+  async listUsers(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      const { role, search } = req.query;
+      const users = await companyService.listCompanyUsers(companyId!, { role: role as string, search: search as string });
+      return sendResponse(res, 200, true, 'Users retrieved', users);
+    } catch (error) {
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async updateUser(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      const { userId } = req.params;
+      await companyService.updateCompanyUser(companyId!, userId, req.body);
+      return sendResponse(res, 200, true, 'User updated successfully');
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async deactivateUser(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      const { userId } = req.params;
+      await companyService.deactivateCompanyUser(companyId!, userId);
+      return sendResponse(res, 200, true, 'User deactivated successfully');
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async inviteUser(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      const user = await companyService.inviteUser(companyId!, req.body);
+      return sendResponse(res, 201, true, 'User invited successfully', user);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
 }
 
 export const companyController = new CompanyController();

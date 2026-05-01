@@ -8,6 +8,13 @@ const router = Router();
 // Onboarding endpoints for company admins
 router.get('/me/profile', authenticate, companyController.getMyProfile.bind(companyController));
 router.patch('/me/profile', authenticate, companyController.updateMyProfile.bind(companyController));
+router.get('/me/dashboard', authenticate, companyController.getDashboardStats.bind(companyController));
+
+// User Management for companies
+router.get('/me/users', authenticate, authorize('Admin'), companyController.listUsers.bind(companyController));
+router.post('/me/users/invite', authenticate, authorize('Admin'), companyController.inviteUser.bind(companyController));
+router.patch('/me/users/:userId', authenticate, authorize('Admin'), companyController.updateUser.bind(companyController));
+router.patch('/me/users/:userId/deactivate', authenticate, authorize('Admin'), companyController.deactivateUser.bind(companyController));
 
 // Super Admin endpoints (prefixed with /admin in the main routes loader if needed, but here we define the relative paths)
 // Actually, I'll put admin routes in a separate section or prefix them.
