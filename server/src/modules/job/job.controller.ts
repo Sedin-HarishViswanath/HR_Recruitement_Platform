@@ -35,7 +35,7 @@ export class JobController {
     try {
       const companyId = req.user.companyId;
       const { id } = req.params;
-      const job = await jobService.getJobDetail(id, companyId!);
+      const job = await jobService.getJobDetail(id as string, companyId!);
       return sendResponse(res, 200, true, 'Job details retrieved', job);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -51,7 +51,7 @@ export class JobController {
       const parsed = updateJobSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
 
-      const job = await jobService.updateJob(id, companyId!, parsed.data);
+      const job = await jobService.updateJob(id as string, companyId!, parsed.data);
       return sendResponse(res, 200, true, 'Job updated successfully', job);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -67,7 +67,7 @@ export class JobController {
       const parsed = changeJobStatusSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
 
-      const job = await jobService.changeJobStatus(id, companyId!, parsed.data.status);
+      const job = await jobService.changeJobStatus(id as string, companyId!, parsed.data.status);
       return sendResponse(res, 200, true, 'Job status updated successfully', job);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -79,7 +79,7 @@ export class JobController {
     try {
       const companyId = req.user.companyId;
       const { id } = req.params;
-      await jobService.deleteJob(id, companyId!);
+      await jobService.deleteJob(id as string, companyId!);
       return sendResponse(res, 200, true, 'Job deleted successfully');
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -102,7 +102,7 @@ export class JobController {
     try {
       const candidateId = req.user?.role === 'Candidate' ? req.user.userId : undefined;
       const { id } = req.params;
-      const job = await jobService.getPublicJobDetail(id, candidateId);
+      const job = await jobService.getPublicJobDetail(id as string, candidateId);
       return sendResponse(res, 200, true, 'Job details retrieved successfully', job);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);

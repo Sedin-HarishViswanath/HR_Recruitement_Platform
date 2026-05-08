@@ -1,15 +1,12 @@
-import { formatDistanceToNow } from 'date-fns';
 import { 
   MapPin, 
-  Users, 
-  Briefcase, 
-  Edit, 
-  Eye, 
-  Trash2, 
-  MoreVertical 
+  Users,
+  BriefcaseBusiness,
+  MoreHorizontal,
+  Edit,
+  Eye,
+  Trash2
 } from 'lucide-react';
-import { Badge } from '../../../components/ui/badge';
-import { Button } from '../../../components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,82 +35,83 @@ interface JobCardProps {
 }
 
 export const JobCard = ({ job, onEdit, onView, onDelete, onChangeStatus }: JobCardProps) => {
-  const getStatusBadge = () => {
-    switch (job.status) {
-      case 'published': return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none">Published</Badge>;
-      case 'draft': return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-none">Draft</Badge>;
-      case 'closed': return <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-none">Closed</Badge>;
-      default: return null;
-    }
-  };
-
-  const getEmploymentType = (type: string) => {
-    const format: Record<string, string> = {
-      full_time: 'Full-Time',
-      part_time: 'Part-Time',
-      contract: 'Contract',
-      internship: 'Internship'
-    };
-    return format[type] || type;
-  };
+  const isClosed = job.status === 'closed';
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col h-full group relative">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex-1 pr-4">
-          <div className="flex items-center gap-2 mb-1">
-            {getStatusBadge()}
-            {job.department && (
-              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                {job.department}
-              </span>
-            )}
-          </div>
-          <h3 className="text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer" onClick={() => onView(job.id)}>
-            {job.title}
-          </h3>
+    <div className="bg-white rounded-xl border border-slate-100 p-5 flex flex-col shadow-sm hover:shadow-md transition-all group">
+      {/* Top Row: Icon + Status */}
+      <div className="flex items-start justify-between mb-4">
+        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+          isClosed ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-blue-500'
+        }`}>
+          <BriefcaseBusiness size={18} />
         </div>
-        
+        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+          isClosed
+            ? 'bg-slate-50 text-slate-500 border-slate-200'
+            : 'bg-green-50 text-green-600 border-green-200'
+        }`}>
+          {isClosed ? 'Closed' : 'Open'}
+        </span>
+      </div>
+
+      {/* Title + Department */}
+      <div className="mb-4">
+        <h3 className="text-[14px] font-bold text-slate-900 leading-tight group-hover:text-blue-700 transition-colors">
+          {job.title}
+        </h3>
+        <p className="text-[11px] text-blue-600 font-medium mt-0.5">{job.department}</p>
+      </div>
+
+      {/* Meta Info */}
+      <div className="flex items-center gap-4 mb-5 text-[11px] text-slate-500 font-medium">
+        <span className="flex items-center gap-1">
+          <MapPin size={11} className="text-slate-400" />
+          {job.remote ? 'Remote' : job.location || 'Remote'}
+        </span>
+        <span className="flex items-center gap-1">
+          <Users size={11} className="text-slate-400" />
+          {job.applicant_count || 0} applicants
+        </span>
+      </div>
+
+      {/* Actions */}
+      <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-50">
+        <button
+          onClick={() => onView(job.id)}
+          className="text-[12px] font-semibold text-slate-700 border border-slate-200 rounded-lg px-3 py-1.5 hover:border-blue-300 hover:text-blue-600 transition-colors"
+        >
+          View Pipeline
+        </button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 text-slate-400 hover:text-slate-900">
-              <MoreVertical size={16} />
-            </Button>
+            <button className="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100">
+              <MoreHorizontal size={16} />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => onView(job.id)}><Eye className="mr-2" size={14}/> View Details</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onEdit(job.id)}><Edit className="mr-2" size={14}/> Edit Job</DropdownMenuItem>
-            
-            {job.status === 'draft' && <DropdownMenuItem onClick={() => onChangeStatus(job.id, 'published')}>Publish Job</DropdownMenuItem>}
-            {job.status === 'published' && <DropdownMenuItem onClick={() => onChangeStatus(job.id, 'closed')}>Close Job</DropdownMenuItem>}
-            {job.status === 'closed' && <DropdownMenuItem onClick={() => onChangeStatus(job.id, 'published')}>Reopen Job</DropdownMenuItem>}
-            
-            <DropdownMenuItem onClick={() => onDelete(job.id)} className="text-red-600 focus:text-red-600 border-t mt-1 pt-1">
-              <Trash2 className="mr-2" size={14}/> Delete
+          <DropdownMenuContent align="end" className="w-44 rounded-xl p-1.5 border-slate-200 shadow-lg">
+            <DropdownMenuItem onClick={() => onView(job.id)} className="rounded-lg text-[12px] font-semibold">
+              <Eye className="mr-2" size={14} /> View Details
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEdit(job.id)} className="rounded-lg text-[12px] font-semibold">
+              <Edit className="mr-2" size={14} /> Edit Job
+            </DropdownMenuItem>
+            <div className="h-px bg-slate-100 my-1" />
+            <DropdownMenuItem
+              onClick={() => onChangeStatus(job.id, isClosed ? 'published' : 'closed')}
+              className="rounded-lg text-[12px] font-semibold"
+            >
+              {isClosed ? 'Reopen Job' : 'Close Job'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete(job.id)}
+              className="rounded-lg text-[12px] font-semibold text-red-600 focus:text-red-600"
+            >
+              <Trash2 className="mr-2" size={14} /> Delete Job
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-
-      <div className="space-y-2 mt-auto">
-        <div className="flex items-center text-sm text-slate-500">
-          <MapPin size={14} className="mr-2 text-slate-400" />
-          <span className="line-clamp-1">{job.remote ? 'Remote' : job.location || 'Location unassigned'}</span>
-        </div>
-        <div className="flex items-center text-sm text-slate-500">
-          <Briefcase size={14} className="mr-2 text-slate-400" />
-          <span>{getEmploymentType(job.employment_type)}</span>
-        </div>
-      </div>
-
-      <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-sm">
-        <div className="flex items-center text-slate-600 font-medium bg-slate-50 px-2 py-1 rounded-md">
-          <Users size={14} className="mr-1.5 text-slate-400" />
-          {job.applicant_count || 0} applicants
-        </div>
-        <span className="text-slate-400 text-xs">
-          Created {formatDistanceToNow(new Date(job.created_at), { addSuffix: true })}
-        </span>
       </div>
     </div>
   );

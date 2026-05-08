@@ -6,6 +6,8 @@ import companyRoutes from '../modules/company/company.routes';
 import adminRoutes from '../modules/admin/admin.routes';
 import jobRoutes from '../modules/job/job.routes';
 import applicationRoutes from '../modules/application/application.routes';
+import candidateRoutes from '../modules/candidate/candidate.routes';
+import analyticsRoutes from '../modules/analytics/analytics.routes';
 
 export default (app: Application) => {
   app.get('/api/health', (req: Request, res: Response) => {
@@ -20,7 +22,9 @@ export default (app: Application) => {
   app.use('/api/admin', adminRoutes);
   app.use('/api/jobs', jobRoutes);
   app.use('/api/applications', applicationRoutes);
-  app.use('/api/code', interviewRoutes);
+  app.use('/api/interviews', interviewRoutes);
+  app.use('/api/candidate', candidateRoutes);
+  app.use('/api/analytics', analyticsRoutes);
 
   // Future modules will be registered here
 };

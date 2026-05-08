@@ -24,20 +24,36 @@ export class CompanyService {
     const { status, search, page, limit } = params;
     const offset = (page - 1) * limit;
 
-    let query = db('companies').select('*');
+    // Start with a base query
+    const baseQuery = db('companies');
 
     if (status) {
-      query = query.where({ status });
+      baseQuery.where('companies.status', status);
     }
 
     if (search) {
-      query = query.where('name', 'ilike', `%${search}%`).orWhere('domain', 'ilike', `%${search}%`);
+      baseQuery.where((qb) => {
+        qb.where('companies.name', 'ilike', `%${search}%`)
+          .orWhere('companies.domain', 'ilike', `%${search}%`);
+      });
     }
 
-    const totalCountResult = await query.clone().count('id as count').first();
+    // Get total count using a clean clone
+    const totalCountResult = await baseQuery.clone().count('id as count').first();
     const totalCount = parseInt(totalCountResult?.count as string || '0');
 
-    const companies = await query.limit(limit).offset(offset).orderBy('created_at', 'desc');
+    // Fetch data with joins to get admin details as expected by the frontend
+    const companies = await baseQuery
+      .clone()
+      .leftJoin('users', 'companies.admin_user_id', 'users.id')
+      .select(
+        'companies.*',
+        'users.name as admin_name',
+        'users.email as admin_email'
+      )
+      .limit(limit)
+      .offset(offset)
+      .orderBy('companies.created_at', 'desc');
 
     return {
       companies,

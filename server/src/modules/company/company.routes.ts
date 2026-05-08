@@ -16,6 +16,9 @@ router.post('/me/users/invite', authenticate, authorize('Admin'), companyControl
 router.patch('/me/users/:userId', authenticate, authorize('Admin'), companyController.updateUser.bind(companyController));
 router.patch('/me/users/:userId/deactivate', authenticate, authorize('Admin'), companyController.deactivateUser.bind(companyController));
 
+import { candidateController } from '../candidate/candidate.controller';
+router.get('/me/candidates', authenticate, authorize('Admin', 'Recruiter'), candidateController.getCompanyCandidates.bind(candidateController));
+
 // Super Admin endpoints (prefixed with /admin in the main routes loader if needed, but here we define the relative paths)
 // Actually, I'll put admin routes in a separate section or prefix them.
 router.get('/admin/list', authenticate, authorize('Super Admin'), companyController.adminListCompanies.bind(companyController));

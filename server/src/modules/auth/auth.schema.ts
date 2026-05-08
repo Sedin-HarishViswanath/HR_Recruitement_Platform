@@ -3,13 +3,27 @@ import { z } from 'zod';
 export const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email format'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
   role: z.enum(['candidate', 'company']),
+  companyDetails: z.object({
+    companyName: z.string().optional(),
+    domain: z.string().optional(),
+    size: z.string().optional(),
+    industry: z.string().optional(),
+    address1: z.string().optional(),
+    address2: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    country: z.string().optional(),
+    zip: z.string().optional(),
+    contactEmail: z.string().optional(),
+    contactPhone: z.string().optional(),
+  }).optional(),
+  candidateDetails: z.object({
+    phone: z.string().optional(),
+    location: z.string().optional(),
+    skills: z.string().optional(),
+  }).optional(),
 });
 
 export type SignupInput = z.infer<typeof signupSchema>;

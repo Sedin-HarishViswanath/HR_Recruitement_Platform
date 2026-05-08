@@ -5,9 +5,14 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "migrate:latest": "knex migrate:latest --knexfile knexfile.ts",
+    "migrate:rollback": "knex migrate:rollback --knexfile knexfile.ts",
+    "migrate:make": "knex migrate:make --knexfile knexfile.ts",
+    "seed:run": "knex seed:run --knexfile knexfile.ts",
+    "seed:make": "knex seed:make --knexfile knexfile.ts"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +44,7 @@
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.1.0",
     "@types/node": "^25.6.0",
     "@types/nodemailer": "^8.0.0",
     "@types/supertest": "^7.2.0",

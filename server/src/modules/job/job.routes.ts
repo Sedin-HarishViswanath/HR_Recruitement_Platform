@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { jobController } from './job.controller';
 import { authenticate } from '../../shared/middlewares/auth.middleware';
-import { authenticate } from '../../shared/middlewares/auth.middleware';
 import { authorize } from '../../shared/middlewares/role.middleware';
 import { extractUserIfPresent } from '../../shared/middlewares/optional-auth.middleware';
 

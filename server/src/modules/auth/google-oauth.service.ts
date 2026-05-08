@@ -28,12 +28,25 @@ export class GoogleOAuthService {
       let existingUser = await db('users')
         .leftJoin('memberships', 'users.id', 'memberships.user_id')
         .leftJoin('roles', 'memberships.role_id', 'roles.id')
-        .select('users.*', 'roles.name as role_name')
+        .select('users.*', 'roles.name as role_name', 'companies.status as company_status')
+        .leftJoin('companies', 'users.company_id', 'companies.id')
         .where('users.email', email)
         .first();
 
       if (existingUser) {
         userRecord = existingUser;
+        // Auto-assign Admin role if missing for existing company users
+        if (!userRecord.role_name && userRecord.company_id) {
+          console.log(`GoogleOAuthService: Auto-assigning Admin role to existing user ${userRecord.id}`);
+          const adminRole = await db('roles').where({ name: 'Admin' }).first();
+          if (adminRole) {
+            await db('memberships').insert({
+              user_id: userRecord.id,
+              role_id: adminRole.id,
+            }).catch(() => {});
+            userRecord.role_name = 'Admin';
+          }
+        }
       } else {
         const existingCandidate = await db('candidates').where({ email }).first();
         if (existingCandidate) {
@@ -126,6 +139,7 @@ export class GoogleOAuthService {
           email: userRecord.email,
           role: userRecord.role_name,
           companyId: userRecord.company_id?.toString(),
+          companyStatus: userRecord.company_status || (userRecord.id && !isCandidate ? 'active' : undefined),
         },
       };
     } catch (error) {

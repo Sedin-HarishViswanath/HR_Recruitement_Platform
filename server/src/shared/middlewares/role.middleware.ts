@@ -6,7 +6,6 @@ const roleHierarchy: Record<string, number> = {
   'Super Admin': 50,
   'Admin': 40,
   'Recruiter': 30,
-  'Hiring Manager': 20,
   'Interviewer': 10,
   'Candidate': 0,
 };

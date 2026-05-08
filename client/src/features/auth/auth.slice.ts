@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 interface User {
   id: string;
@@ -6,6 +7,7 @@ interface User {
   email: string;
   role: string;
   companyId?: string;
+  companyStatus?: string;
 }
 
 interface AuthState {

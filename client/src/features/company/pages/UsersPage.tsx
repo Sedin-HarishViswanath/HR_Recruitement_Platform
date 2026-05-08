@@ -100,17 +100,17 @@ export const UsersPage = () => {
   };
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="flex justify-between items-end">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in bg-[#f4f5f7] min-h-screen">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">User Management</h1>
-          <p className="text-slate-500 mt-1">Manage your team members and their access levels.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>User Management</h1>
+          <p className="text-slate-500 mt-1 text-[13px]">Manage your team members and their access levels.</p>
         </div>
         
         <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus size={18} className="mr-2" /> Invite User
+            <Button className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-sm btn-premium">
+              <Plus size={16} className="mr-1.5" /> Invite User
             </Button>
           </DialogTrigger>
           <DialogContent>

@@ -4,6 +4,8 @@ import { AuthPage } from './features/auth/pages/AuthPage';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
 import { OnboardingWizard } from './features/company/pages/OnboardingWizard';
 import { CompaniesPage } from './features/admin/pages/CompaniesPage';
+import { SuperAdminUsersPage } from './features/admin/pages/UsersPage';
+import { SuperAdminAnalyticsPage } from './features/admin/pages/AnalyticsPage';
 import { RoleGuard } from './shared/components/RoleGuard';
 import { CompanyLayout } from './features/company/components/CompanyLayout';
 import { UsersPage } from './features/company/pages/UsersPage';
@@ -11,11 +13,42 @@ import { CompanyJobsPage } from './features/job/pages/CompanyJobsPage';
 import { CandidateJobBoard } from './features/job/pages/CandidateJobBoard';
 import { AdminLayout } from './features/admin/components/AdminLayout';
 import { AdminDashboard } from './features/admin/pages/AdminDashboard';
+import { CandidateLayout } from './features/candidate/components/CandidateLayout';
+import { CandidateOnboardingWizard } from './features/candidate/pages/OnboardingWizard';
+import { CandidateDashboard as RealCandidateDashboard } from './features/candidate/pages/CandidateDashboard';
+import { CandidateProfile } from './features/candidate/pages/CandidateProfile';
+import { CandidateApplicationsPage } from './features/candidate/pages/ApplicationsPage';
+import { CandidateInterviewsPage } from './features/candidate/pages/InterviewsPage';
+import { CompanyCandidatesPage } from './features/company/pages/CandidatesPage';
+import { FeedbackPage } from './features/company/pages/FeedbackPage';
+import { RegisterPage } from './features/auth/pages/RegisterPage';
+import { UnauthorizedPage } from './shared/pages/UnauthorizedPage';
+import { PendingApproval } from './features/company/pages/PendingApproval';
+import { CompanyApplicationsPage } from './features/company/pages/ApplicationsPage';
+import { CompanyInterviewsPage } from './features/company/pages/InterviewsPage';
+import { CompanyDashboard } from './features/company/pages/CompanyDashboard';
+import { CompanyAnalyticsPage } from './features/analytics/CompanyAnalyticsPage';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <AuthPage />,
+  },
+  {
+    path: '/unauthorized',
+    element: <UnauthorizedPage />,
+  },
+  {
+    path: '/pending-approval',
+    element: <PendingApproval />,
+  },
+  {
+    path: '/login',
+    element: <AuthPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
   },
   {
     path: '/verify-email',
@@ -38,7 +71,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <div>Company Dashboard</div>,
+            element: <CompanyDashboard />,
           },
           {
             path: 'onboarding',
@@ -51,6 +84,26 @@ const router = createBrowserRouter([
           {
             path: 'jobs',
             element: <CompanyJobsPage />,
+          },
+          {
+            path: 'candidates',
+            element: <CompanyCandidatesPage />,
+          },
+          {
+            path: 'applications',
+            element: <CompanyApplicationsPage />,
+          },
+          {
+            path: 'interviews',
+            element: <CompanyInterviewsPage />,
+          },
+          {
+            path: 'feedback',
+            element: <FeedbackPage />,
+          },
+          {
+            path: 'analytics',
+            element: <CompanyAnalyticsPage />,
           },
         ],
       },
@@ -75,6 +128,14 @@ const router = createBrowserRouter([
             path: 'companies',
             element: <CompaniesPage />,
           },
+          {
+            path: 'users',
+            element: <SuperAdminUsersPage />,
+          },
+          {
+            path: 'analytics',
+            element: <SuperAdminAnalyticsPage />,
+          },
         ],
       },
     ],
@@ -84,19 +145,39 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
+        path: 'onboarding',
         element: (
           <RoleGuard allowedRoles={['Candidate']}>
-            <Outlet />
+            <CandidateOnboardingWizard />
+          </RoleGuard>
+        ),
+      },
+      {
+        element: (
+          <RoleGuard allowedRoles={['Candidate']}>
+            <CandidateLayout />
           </RoleGuard>
         ),
         children: [
           {
             path: 'dashboard',
-            element: <div>Candidate Dashboard</div>,
+            element: <RealCandidateDashboard />,
           },
           {
             path: 'jobs',
             element: <CandidateJobBoard />,
+          },
+          {
+            path: 'profile',
+            element: <CandidateProfile />,
+          },
+          {
+            path: 'applications',
+            element: <CandidateApplicationsPage />,
+          },
+          {
+            path: 'interviews',
+            element: <CandidateInterviewsPage />,
           },
         ],
       },

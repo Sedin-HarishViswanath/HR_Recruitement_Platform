@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { db } from '../../config/db';
+import { notificationService } from '../notification/notification.service';
 import { SignupInput, LoginInput } from './auth.schema';
 import { AppError } from '../../shared/errors/AppError';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt';
@@ -12,7 +13,8 @@ const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
 export class AuthService {
   async signup(data: SignupInput) {
-    const { name, email, password, role } = data;
+    console.log('Signup Attempt Data:', JSON.stringify(data, null, 2));
+    const { name, email, password, role, companyDetails, candidateDetails } = data;
 
     // Check for duplicate email in both tables
     const existingUser = await db('users').where({ email }).first();
@@ -31,22 +33,25 @@ export class AuthService {
             name,
             email,
             password_digest,
+            phone: candidateDetails?.phone,
+            location: candidateDetails?.location,
+            skills: candidateDetails?.skills ? candidateDetails.skills.split(',').map(s => s.trim()) : [],
             current_step: 1,
             onboarding_completed: false,
             profile_completion: 0,
           })
           .returning(['id', 'name', 'email']);
 
-        return { user: candidate, role: 'Candidate' };
+        const result = { user: candidate, role: 'Candidate' };
+        void notificationService.notifyWelcome(candidate.name, candidate.email);
+        return result;
       } else {
         // Company role
-        // 1. Get Admin role
         const adminRole = await trx('roles').where({ name: 'Admin' }).first();
         if (!adminRole) {
           throw new AppError('Admin role not found. Seed the database.', 500);
         }
 
-        // 2. Create User
         const [user] = await trx('users')
           .insert({
             name,
@@ -55,25 +60,42 @@ export class AuthService {
           })
           .returning(['id', 'name', 'email']);
 
-        // 3. Create Membership
         await trx('memberships').insert({
           user_id: user.id,
           role_id: adminRole.id,
         });
 
-        // 4. Create Pending Company
         const [company] = await trx('companies')
           .insert({
-            name: `${name}'s Company`, // Placeholder, will be updated in onboarding
+            name: companyDetails?.companyName || `${name}'s Company`,
+            domain: companyDetails?.domain,
+            company_size: companyDetails?.size,
+            industry: companyDetails?.industry,
+            address_line1: companyDetails?.address1,
+            address_line2: companyDetails?.address2,
+            city: companyDetails?.city,
+            state: companyDetails?.state,
+            country: companyDetails?.country,
+            postal_code: companyDetails?.zip,
+            contact_email: companyDetails?.contactEmail,
+            contact_phone: companyDetails?.contactPhone,
             status: 'pending',
             admin_user_id: user.id,
           })
           .returning(['id']);
 
-        // 5. Update user with company_id
         await trx('users').where({ id: user.id }).update({ company_id: company.id });
 
-        return { user: { ...user, company_id: company.id }, role: 'Admin' };
+        const result = { 
+          user: { 
+            ...user, 
+            companyId: company.id.toString(),
+            companyStatus: 'pending'
+          },
+          role: 'Admin'
+        };
+        void notificationService.notifyWelcome(user.name, user.email);
+        return result;
       }
     });
   }
@@ -127,6 +149,19 @@ export class AuthService {
       throw new AppError('Invalid email or password', 401);
     }
 
+    // Auto-assign Admin role if missing for company users
+    if (!isCandidate && !userRecord.role_name && userRecord.company_id) {
+      console.log(`AuthService: Auto-assigning Admin role to user ${userRecord.id}`);
+      const adminRole = await db('roles').where({ name: 'Admin' }).first();
+      if (adminRole) {
+        await db('memberships').insert({
+          user_id: userRecord.id,
+          role_id: adminRole.id,
+        }).catch(() => {}); // Ignore if already exists (race condition)
+        userRecord.role_name = 'Admin';
+      }
+    }
+
     // For company users, check company status
     if (!isCandidate && userRecord.company_status === 'pending') {
       // Allow them to login to complete onboarding, but maybe restrict access
@@ -139,6 +174,7 @@ export class AuthService {
     // Generate tokens
     const accessToken = generateAccessToken({
       userId: userRecord.id.toString(),
+      candidateId: isCandidate ? userRecord.id.toString() : undefined,
       role: userRecord.role_name,
       companyId: userRecord.company_id?.toString(),
       email: userRecord.email,
@@ -167,6 +203,7 @@ export class AuthService {
         email: userRecord.email,
         role: userRecord.role_name,
         companyId: userRecord.company_id?.toString(),
+        companyStatus: userRecord.company_status,
       },
     };
   }
@@ -238,6 +275,7 @@ export class AuthService {
     // 5. Generate new access token
     const accessToken = generateAccessToken({
       userId: userRecord.id.toString(),
+      candidateId: isCandidate ? userRecord.id.toString() : undefined,
       role: userRecord.role_name,
       companyId: userRecord.company_id?.toString(),
       email: userRecord.email,

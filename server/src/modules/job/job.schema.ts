@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createJobSchema = z.object({
+const jobBaseSchema = z.object({
   title: z.string().min(3).max(200),
   description: z.string().min(50),
   department: z.string().optional(),
@@ -13,7 +13,9 @@ export const createJobSchema = z.object({
   deadline: z.string().optional(),
   remote: z.boolean().optional(),
   status: z.enum(['draft', 'published']).default('draft'),
-}).refine(data => !data.salary_min || !data.salary_max || data.salary_max >= data.salary_min, {
+});
+
+export const createJobSchema = jobBaseSchema.refine(data => !data.salary_min || !data.salary_max || data.salary_max >= data.salary_min, {
   message: "Maximum salary must be greater than or equal to minimum salary",
   path: ["salary_max"],
 }).refine(data => {
@@ -26,7 +28,7 @@ export const createJobSchema = z.object({
   path: ["deadline"],
 });
 
-export const updateJobSchema = createJobSchema.partial();
+export const updateJobSchema = jobBaseSchema.partial();
 
 export const changeJobStatusSchema = z.object({
   status: z.enum(['draft', 'published', 'closed']),

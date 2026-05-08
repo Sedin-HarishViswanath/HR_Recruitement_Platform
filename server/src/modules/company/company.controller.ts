@@ -45,6 +45,7 @@ export class CompanyController {
       const result = await companyService.listCompaniesForAdmin({ status, search, page, limit });
       return sendResponse(res, 200, true, 'Companies retrieved', result);
     } catch (error) {
+      console.error('Error in adminListCompanies:', error);
       return sendResponse(res, 500, false, 'Internal server error');
     }
   }
@@ -52,7 +53,7 @@ export class CompanyController {
   async adminGetCompany(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const company = await companyService.getCompanyProfile(id);
+      const company = await companyService.getCompanyProfile(id as string);
       return sendResponse(res, 200, true, 'Company details retrieved', company);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -63,7 +64,7 @@ export class CompanyController {
   async adminApproveCompany(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const company = await companyService.approveCompany(id);
+      const company = await companyService.approveCompany(id as string);
       return sendResponse(res, 200, true, 'Company approved successfully', company);
     } catch (error: any) {
       return sendResponse(res, 500, false, 'Internal server error');
@@ -76,7 +77,7 @@ export class CompanyController {
       const { reason } = req.body;
       if (!reason) return sendResponse(res, 400, false, 'Reason is required for rejection');
 
-      const company = await companyService.rejectCompany(id, reason);
+      const company = await companyService.rejectCompany(id as string, reason);
       return sendResponse(res, 200, true, 'Company rejected successfully', company);
     } catch (error: any) {
       return sendResponse(res, 500, false, 'Internal server error');
@@ -112,7 +113,7 @@ export class CompanyController {
     try {
       const companyId = req.user.companyId;
       const { userId } = req.params;
-      await companyService.updateCompanyUser(companyId!, userId, req.body);
+      await companyService.updateCompanyUser(companyId!, userId as string, req.body);
       return sendResponse(res, 200, true, 'User updated successfully');
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -124,7 +125,7 @@ export class CompanyController {
     try {
       const companyId = req.user.companyId;
       const { userId } = req.params;
-      await companyService.deactivateCompanyUser(companyId!, userId);
+      await companyService.deactivateCompanyUser(companyId!, userId as string);
       return sendResponse(res, 200, true, 'User deactivated successfully');
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);

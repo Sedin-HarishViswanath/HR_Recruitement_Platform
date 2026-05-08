@@ -14,8 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../components/ui/select';
-import { X, Plus } from 'lucide-react';
-import { toast } from 'sonner';
+import { X } from 'lucide-react';
 
 const jobFormSchema = z.object({
   title: z.string().min(3, 'Title is required (min 3 characters)').max(200),
@@ -25,8 +24,8 @@ const jobFormSchema = z.object({
   employment_type: z.enum(['full_time', 'part_time', 'contract', 'internship']).default('full_time'),
   experience_level: z.enum(['entry', 'mid', 'senior']).default('mid'),
   required_skills: z.array(z.string()).default([]),
-  salary_min: z.number().positive().optional().or(z.literal('')),
-  salary_max: z.number().positive().optional().or(z.literal('')),
+  salary_min: z.number().positive().optional(),
+  salary_max: z.number().positive().optional(),
   deadline: z.string().optional(),
   remote: z.boolean().default(false),
   status: z.enum(['draft', 'published']).default('draft'),
@@ -84,8 +83,8 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
       // Clean up empty strings for numbers
       const cleanedData = {
         ...data,
-        salary_min: data.salary_min === '' ? undefined : Number(data.salary_min),
-        salary_max: data.salary_max === '' ? undefined : Number(data.salary_max),
+        salary_min: data.salary_min || undefined,
+        salary_max: data.salary_max || undefined,
       };
       await onSubmit(cleanedData);
     } catch (error) {
@@ -157,9 +156,9 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
           <Label>Required Skills</Label>
           <div className="flex gap-2 mb-3 flex-wrap">
             {skills.map(skill => (
-              <span key={skill} className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded-md flex items-center gap-1">
+              <span key={skill} className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
                 {skill}
-                <button type="button" onClick={() => handleRemoveSkill(skill)} className="hover:text-blue-900">
+                <button type="button" onClick={() => handleRemoveSkill(skill)} className="hover:text-amber-900">
                   <X size={14} />
                 </button>
               </span>
@@ -189,9 +188,9 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
         <div className="space-y-2">
           <Label>Salary Range (Optional)</Label>
           <div className="flex items-center gap-2">
-            <Input type="number" {...register('salary_min')} placeholder="Min" />
+            <Input type="number" {...register('salary_min', { setValueAs: v => v === '' || isNaN(v) ? undefined : parseInt(v, 10) })} placeholder="Min" />
             <span className="text-slate-400">-</span>
-            <Input type="number" {...register('salary_max')} placeholder="Max" />
+            <Input type="number" {...register('salary_max', { setValueAs: v => v === '' || isNaN(v) ? undefined : parseInt(v, 10) })} placeholder="Max" />
           </div>
           {errors.salary_max && <p className="text-red-500 text-sm">{errors.salary_max.message as string}</p>}
         </div>
@@ -218,11 +217,11 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
         </Button>
         <Button 
           type="submit" 
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-sm transition-all btn-premium"
           onClick={() => setValue('status', 'published')}
           disabled={isSubmitting}
         >
-          Publish Job
+          Publish Job Position
         </Button>
       </div>
     </form>

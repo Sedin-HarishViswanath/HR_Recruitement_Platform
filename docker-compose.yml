@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:15-alpine
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_DB: hr_recruitment_dev
       POSTGRES_USER: postgres
@@ -16,6 +16,44 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  backend:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/hr_recruitment_dev
+      - PORT=5000
+      - NODE_ENV=development
+      - JWT_SECRET=your_jwt_secret_here
+      - JWT_REFRESH_SECRET=your_refresh_token_secret_here
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    command: >
+      sh -c "npm run migrate:latest && 
+             npm run seed:run && 
+             npm run dev"
+
+  frontend:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_TARGET=http://backend:5000
+    depends_on:
+      - backend
 
 volumes:
   pgdata:

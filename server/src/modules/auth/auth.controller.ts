@@ -9,9 +9,11 @@ import { recoveryService } from './recovery.service';
 export class AuthController {
   async signup(req: Request, res: Response) {
     try {
+      console.log('Signup Request Body:', JSON.stringify(req.body, null, 2));
       const parsedBody = signupSchema.safeParse(req.body);
       
       if (!parsedBody.success) {
+        console.warn('Signup Validation Failed:', JSON.stringify(parsedBody.error.flatten().fieldErrors, null, 2));
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
@@ -21,11 +23,27 @@ export class AuthController {
 
       const result = await authService.signup(parsedBody.data);
       
-      // Send verification email
-      const isCandidate = parsedBody.data.role === 'candidate';
-      await recoveryService.sendVerificationEmail(result.user.id, isCandidate, result.user.email);
+      // Auto-login after signup for immediate onboarding
+      const loginResult = await authService.login({
+        email: parsedBody.data.email,
+        password: parsedBody.data.password
+      });
 
-      return sendResponse(res, 201, true, 'User registered successfully. Please check your email to verify your account.', result);
+      // Send verification email (fire and forget)
+      const isCandidate = parsedBody.data.role === 'candidate';
+      void recoveryService.sendVerificationEmail(result.user.id, isCandidate, result.user.email);
+
+      res.cookie('refreshToken', loginResult.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      return sendResponse(res, 201, true, 'User registered successfully.', {
+        accessToken: loginResult.accessToken,
+        user: loginResult.user,
+      });
     } catch (error: any) {
       if (error instanceof AppError) {
         return sendResponse(res, error.statusCode, false, error.message);

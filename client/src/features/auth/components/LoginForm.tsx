@@ -12,7 +12,7 @@ import { Label } from '../../../components/ui/label';
 import { GoogleLogin } from '@react-oauth/google';
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -25,19 +25,31 @@ export const LoginForm = ({ role, onToggleMode }: { role: 'internal' | 'candidat
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true);
+    setError('');
     try {
       const res = await api.post('/auth/login', data);
       dispatch(setCredentials({ user: res.data.data.user, accessToken: res.data.data.accessToken }));
       
-      if (res.data.data.user.role === 'Candidate') {
+      const user = res.data.data.user;
+      const userRole = (user.role || '').toLowerCase().trim();
+      
+      if (userRole === 'candidate') {
         navigate('/candidate/dashboard');
+      } else if (userRole === 'super admin' || userRole === 'superadmin') {
+        navigate('/superadmin/dashboard');
+      } else if (user.companyStatus?.toLowerCase() === 'pending') {
+        navigate('/pending-approval');
       } else {
-        navigate('/company/dashboard'); // Or superadmin based on role
+        navigate('/company/dashboard');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -48,61 +60,86 @@ export const LoginForm = ({ role, onToggleMode }: { role: 'internal' | 'candidat
          role: role === 'candidate' ? 'candidate' : 'company'
        });
        dispatch(setCredentials({ user: res.data.data.user, accessToken: res.data.data.accessToken }));
-       navigate(res.data.data.user.role === 'Candidate' ? '/candidate/dashboard' : '/company/dashboard');
+       
+       const user = res.data.data.user;
+       if (user.role === 'Candidate') {
+         navigate('/candidate/dashboard');
+       } else if (user.role === 'Super Admin') {
+         navigate('/superadmin/dashboard');
+       } else {
+         navigate('/company/dashboard');
+       }
      } catch (err: any) {
        setError(err.response?.data?.message || 'Google login failed');
      }
   };
 
   return (
-    <div className="w-full max-w-md space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold">Welcome back</h2>
-        <p className="text-muted-foreground text-sm mt-2">
-          Log in to your {role === 'internal' ? 'company' : 'candidate'} account
+    <div className="w-full space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {error && (
+          <div className="p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold animate-in fade-in zoom-in duration-300">
+            {error}
+          </div>
+        )}
+        
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-[11px] font-black uppercase text-slate-500 ml-1">Email</Label>
+          <Input 
+            id="email" 
+            type="email" 
+            placeholder="you@company.com" 
+            className="h-10 rounded-xl bg-white border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all font-medium text-sm"
+            {...register('email')} 
+          />
+          {errors.email && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.email.message}</p>}
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="password" className="text-[11px] font-black uppercase text-slate-500 ml-1">Password</Label>
+          <Input 
+            id="password" 
+            type="password" 
+            placeholder="••••••••"
+            className="h-10 rounded-xl bg-white border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all text-sm"
+            {...register('password')} 
+          />
+          {errors.password && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.password.message}</p>}
+        </div>
+
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className="w-full h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black tracking-tight text-base shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]"
+        >
+          {isLoading ? 'Signing In...' : 'Sign In'}
+        </Button>
+      </form>
+
+      <div className="text-center pt-1">
+        <p className="text-[13px] font-bold text-slate-400">
+          Don't have an account?{' '}
+          <button onClick={() => navigate('/register')} className="text-blue-600 hover:underline">
+            Register
+          </button>
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {error && <div className="text-red-500 text-sm text-center font-medium">{error}</div>}
-        
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="john@example.com" {...register('email')} />
-          {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <a href="/forgot-password" className="text-xs text-blue-600 hover:underline">Forgot password?</a>
-          </div>
-          <Input id="password" type="password" {...register('password')} />
-          {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
-        </div>
-
-        <Button type="submit" className="w-full font-semibold">Log in</Button>
-      </form>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
+      <div className="relative pt-2">
+        <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100" /></div>
+        <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
+          <span className="bg-white px-4 text-slate-400">Or continue with</span>
         </div>
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center scale-105">
          <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => setError('Google Login Failed')}
+            theme="outline"
+            shape="pill"
+            width="100%"
          />
-      </div>
-
-      <div className="text-center text-sm">
-        Don't have an account?{' '}
-        <button onClick={onToggleMode} className="text-blue-600 font-medium hover:underline">
-          Sign up
-        </button>
       </div>
     </div>
   );
