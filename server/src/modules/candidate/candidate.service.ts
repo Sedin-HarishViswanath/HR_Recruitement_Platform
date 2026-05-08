@@ -1,0 +1,106 @@
+import { candidateRepository } from './candidate.repository';
+import { AppError } from '../../shared/errors/AppError';
+
+export class CandidateService {
+  async getProfile(candidateId: string) {
+    const profile = await candidateRepository.findById(candidateId);
+    if (!profile) throw new AppError('Candidate profile not found', 404);
+    return profile;
+  }
+
+  async updateProfileStep(candidateId: string, step: number, data: any) {
+    const profile = await this.getProfile(candidateId);
+    
+    // We only bump the step if they're progressing linearly
+    let nextStep = profile.current_step;
+    if (profile.current_step === step && step < 4) {
+      nextStep = step + 1;
+    }
+
+    const updatedData = { ...data, current_step: nextStep };
+
+    if (step === 4) {
+      updatedData.onboarding_completed = true;
+    }
+
+    // Recalculate completeness
+    const profileCompleteness = this.calculateCompleteness({ ...profile, ...data });
+    updatedData.profile_completion = profileCompleteness;
+
+    return candidateRepository.updateProfile(candidateId, updatedData);
+  }
+
+  async updateProfile(candidateId: string, data: any) {
+    const profile = await this.getProfile(candidateId);
+    const updatedData = { ...data };
+    
+    // Recalculate completeness
+    const profileCompleteness = this.calculateCompleteness({ ...profile, ...data });
+    updatedData.profile_completion = profileCompleteness;
+
+    return candidateRepository.updateProfile(candidateId, updatedData);
+  }
+
+  async deleteResume(candidateId: string) {
+    // In a real app, delete from storage here
+    return candidateRepository.updateProfile(candidateId, { resume_url: null });
+  }
+
+  calculateCompleteness(profile: any): number {
+    let score = 0;
+    if (profile.name) score += 10;
+    if (profile.phone) score += 10;
+    if (profile.location) score += 5;
+    if (profile.resume_url || profile.resume_drive_link) score += 20;
+    if (profile.summary) score += 10;
+    if (profile.skills && profile.skills.length > 0) score += 15;
+    if (profile.linkedin_url || profile.github_url || profile.portfolio_url) score += 10;
+    if (profile.preferences && Object.keys(profile.preferences).length > 0) score += 20;
+    
+    return Math.min(100, score);
+  }
+
+  async getDashboard(candidateId: string) {
+    const profile = await this.getProfile(candidateId);
+    const recentApplications = await candidateRepository.getRecentApplications(candidateId);
+    const upcomingInterviews = await candidateRepository.getUpcomingInterviews(candidateId);
+    const recommendedJobs = await candidateRepository.getRecommendedJobs(profile.skills || []);
+    const stats = await candidateRepository.getStats(candidateId);
+
+    return {
+      profileCompletion: profile.profile_completion,
+      recentApplications,
+      upcomingInterviews,
+      recommendedJobs,
+      stats,
+    };
+  }
+
+  async getApplications(candidateId: string, query: any) {
+    return candidateRepository.getApplications(candidateId, query);
+  }
+
+  async getApplicationById(candidateId: string, applicationId: string) {
+    const app = await candidateRepository.getApplicationById(candidateId, applicationId);
+    if (!app) throw new AppError('Application not found', 404);
+    return app;
+  }
+
+  async withdrawApplication(candidateId: string, applicationId: string) {
+    const updated = await candidateRepository.withdrawApplication(candidateId, applicationId);
+    if (!updated || updated.length === 0) {
+      throw new AppError('Cannot withdraw application in its current state', 400);
+    }
+    return updated[0];
+  }
+
+  async getInterviews(candidateId: string, query: any) {
+    return candidateRepository.getInterviews(candidateId, query);
+  }
+
+  async getCompanyCandidates(companyId: string, query: any) {
+    return candidateRepository.getCompanyCandidates(companyId, query);
+  }
+}
+
+export const candidateService = new CandidateService();
