@@ -62,7 +62,7 @@ export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalPr
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button className="bg-blue-600 hover:bg-blue-700 w-full">Apply Now</Button>}
+        {trigger || <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-sm transition-all btn-premium w-full">Apply Now</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
@@ -83,10 +83,10 @@ export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalPr
             {errors.cover_note && <p className="text-red-500 text-sm">{errors.cover_note.message}</p>}
           </div>
 
-          <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg flex items-center justify-between">
+          <div className="bg-amber-50 border border-amber-100 p-4 rounded-lg flex items-center justify-between">
             <div className="text-sm">
-              <p className="font-semibold text-blue-900">Resume Attached</p>
-              <p className="text-blue-700">Using resume from your candidate profile.</p>
+              <p className="font-bold text-amber-900">Resume Attached</p>
+              <p className="text-amber-700 font-medium">Using resume from your candidate profile.</p>
             </div>
           </div>
 
@@ -94,8 +94,8 @@ export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalPr
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700">
-              {isSubmitting ? 'Submitting...' : 'Confirm & Submit'}
+            <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-sm transition-all btn-premium">
+              {isSubmitting ? 'Submitting...' : 'Confirm & Submit Application'}
             </Button>
           </div>
         </form>
