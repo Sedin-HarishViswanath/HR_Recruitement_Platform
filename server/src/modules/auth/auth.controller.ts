@@ -5,6 +5,7 @@ import { sendResponse } from '../../shared/utils/response';
 import { AppError } from '../../shared/errors/AppError';
 import { googleOAuthService } from './google-oauth.service';
 import { recoveryService } from './recovery.service';
+import { otpService } from './otp.service';
 
 export class AuthController {
   async signup(req: Request, res: Response) {
@@ -29,9 +30,9 @@ export class AuthController {
         password: parsedBody.data.password
       });
 
-      // Send verification email (fire and forget)
+      // Send OTP for email verification
       const isCandidate = parsedBody.data.role === 'candidate';
-      void recoveryService.sendVerificationEmail(result.user.id, isCandidate, result.user.email);
+      void otpService.sendOtp(parsedBody.data.email, isCandidate);
 
       res.cookie('refreshToken', loginResult.refreshToken, {
         httpOnly: true,
@@ -208,6 +209,35 @@ export class AuthController {
         return sendResponse(res, error.statusCode, false, error.message);
       }
       return sendResponse(res, 500, false, 'Internal server error during password reset');
+    }
+  }
+  async verifyOtp(req: Request, res: Response) {
+    try {
+      const { email, otp } = req.body;
+      if (!email || !otp) return sendResponse(res, 400, false, 'Email and OTP are required');
+
+      await otpService.verifyOtp(email.toLowerCase(), otp);
+      return sendResponse(res, 200, true, 'Email verified successfully');
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        return sendResponse(res, error.statusCode, false, error.message);
+      }
+      return sendResponse(res, 500, false, 'Verification failed');
+    }
+  }
+
+  async resendOtp(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      if (!email) return sendResponse(res, 400, false, 'Email is required');
+
+      await otpService.resendOtp(email.toLowerCase());
+      return sendResponse(res, 200, true, 'New verification code sent');
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        return sendResponse(res, error.statusCode, false, error.message);
+      }
+      return sendResponse(res, 500, false, 'Failed to resend OTP');
     }
   }
 }

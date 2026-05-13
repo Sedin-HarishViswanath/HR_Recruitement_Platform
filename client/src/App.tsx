@@ -28,6 +28,10 @@ import { CompanyApplicationsPage } from './features/company/pages/ApplicationsPa
 import { CompanyInterviewsPage } from './features/company/pages/InterviewsPage';
 import { CompanyDashboard } from './features/company/pages/CompanyDashboard';
 import { CompanyAnalyticsPage } from './features/analytics/CompanyAnalyticsPage';
+import { InterviewWorkspace } from './features/interview/pages/InterviewWorkspace';
+import { PublicCareersPage } from './features/company/pages/PublicCareersPage';
+import { VerifyOtpPage } from './features/auth/pages/VerifyOtpPage';
+
 
 const router = createBrowserRouter([
   {
@@ -53,6 +57,14 @@ const router = createBrowserRouter([
   {
     path: '/verify-email',
     element: <div>Verify Email Page</div>,
+  },
+  {
+    path: '/verify-otp',
+    element: <VerifyOtpPage />,
+  },
+  {
+    path: '/careers/:companyId',
+    element: <PublicCareersPage />,
   },
   {
     path: '/forgot-password',
@@ -182,6 +194,14 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: '/interview/:id',
+    element: (
+      <ProtectedRoute>
+        <InterviewWorkspace />
+      </ProtectedRoute>
+    ),
   },
 ]);
 

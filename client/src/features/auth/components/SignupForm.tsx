@@ -86,15 +86,10 @@ export const SignupForm = ({ role, onToggleMode }: { role: 'internal' | 'candida
       const { accessToken, user } = res.data.data;
       dispatch(setCredentials({ user, accessToken }));
       
-      toast.success('Registration successful!');
+      toast.success('Account created! Please verify your email.');
       
-      const userRole = (user.role || '').toLowerCase().trim();
-      
-      if (userRole === 'candidate') {
-        navigate('/candidate/onboarding');
-      } else {
-        navigate('/pending-approval');
-      }
+      // Redirect to OTP verification page with email
+      navigate('/verify-otp', { state: { email: data.email } });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Signup failed. Please try again.');
     } finally {

@@ -12,5 +12,7 @@ router.post('/google', authLimiter, authController.googleOAuth.bind(authControll
 router.get('/verify-email', authController.verifyEmail.bind(authController));
 router.post('/forgot-password', forgotPasswordLimiter, authController.forgotPassword.bind(authController));
 router.post('/reset-password', authController.resetPassword.bind(authController));
+router.post('/verify-otp', authController.verifyOtp.bind(authController));
+router.post('/resend-otp', authController.resendOtp.bind(authController));
 
 export default router;
