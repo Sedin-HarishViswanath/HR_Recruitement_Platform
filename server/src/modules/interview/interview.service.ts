@@ -1,9 +1,10 @@
-import axios from 'axios';
 import { db } from '../../config/db';
 import { env } from '../../config/env';
 import { notificationService } from '../notification/notification.service';
 import { interviewRepository } from './interview.repository';
 import { AppError } from '../../shared/errors/AppError';
+import { executeWithPiston } from './code-execution.service';
+import { dailyCoService } from './daily-co.service';
 import { 
   ScheduleInterviewInput, 
   RescheduleInterviewInput, 
@@ -19,8 +20,6 @@ export class InterviewService {
     const conflict = await interviewRepository.checkConflict(interviewer_id, date, duration);
     if (conflict) throw new AppError('Interviewer has a scheduling conflict at this time', 400);
 
-    const meeting_link = `https://meet.recruitai.com/${Math.random().toString(36).substring(2, 12)}`;
-
     return await db.transaction(async (trx) => {
       const [interview] = await trx('interviews')
         .insert({
@@ -30,9 +29,13 @@ export class InterviewService {
           duration: duration || 60,
           scheduled_at: date,
           status: 'scheduled',
-          meeting_link
+          meeting_link: ''
         })
         .returning('*');
+
+      const meeting_link = `${env.FRONTEND_URL}/interview/${interview.id}`;
+      await trx('interviews').where({ id: interview.id }).update({ meeting_link });
+      interview.meeting_link = meeting_link;
 
       // Update application status to 'interview' if it's not already
       await trx('applications')
@@ -52,10 +55,30 @@ export class InterviewService {
         .select('jobs.title')
         .first();
 
-      void notificationService.notifyInterviewScheduled(candidate, job, interview);
+      void notificationService.notifyInterviewScheduled(candidate, job, interview).catch(err => console.error('Failed to send interview notification email:', err));
       
       return interview;
     });
+  }
+
+  async getInterviewById(id: string) {
+    return db('interviews')
+      .select(
+        'interviews.*',
+        'candidates.name as candidate_name',
+        'candidates.email as candidate_email',
+        'jobs.title as job_title',
+        'companies.name as company_name',
+        'users.name as interviewer_name',
+        'users.email as interviewer_email',
+      )
+      .join('applications', 'interviews.application_id', 'applications.id')
+      .join('candidates', 'applications.candidate_id', 'candidates.id')
+      .join('jobs', 'applications.job_id', 'jobs.id')
+      .join('companies', 'jobs.company_id', 'companies.id')
+      .leftJoin('users', 'interviews.interviewer_id', 'users.id')
+      .where('interviews.id', id)
+      .first();
   }
 
   async listCompanyInterviews(companyId: string, query: any) {
@@ -110,19 +133,31 @@ export class InterviewService {
       });
   }
 
-  async executeCode(data: any) {
-    const { script, language, versionIndex, stdin } = data;
+  async submitAptitudeResult(id: string, result: any) {
+    const interview = await db('interviews').where({ id }).first();
+    if (!interview) throw new AppError('Interview not found', 404);
+    if (interview.round_type !== 'aptitude') throw new AppError('This is not an aptitude round', 400);
     
-    const response = await axios.post('https://api.jdoodle.com/v1/execute', {
-      clientId: env.JDOODLE_CLIENT_ID,
-      clientSecret: env.JDOODLE_CLIENT_SECRET,
-      script,
-      language,
-      versionIndex,
-      stdin
-    });
+    return db('interviews')
+      .where({ id })
+      .update({
+        status: 'completed',
+        aptitude_score: result.score,
+        updated_at: db.fn.now()
+      })
+      .returning('*');
+  }
 
-    return response.data;
+  async getMeetingRoom(interviewId: string, participantName: string, isOwner: boolean) {
+    const room = await dailyCoService.getOrCreateRoom(interviewId);
+    const token = await dailyCoService.createParticipantToken(room.name, participantName, isOwner);
+    return { roomUrl: room.url, token };
+  }
+
+  async executeCode(data: any) {
+    const { script, language, stdin } = data;
+    const result = await executeWithPiston({ language, code: script, stdin });
+    return result;
   }
 }
 
