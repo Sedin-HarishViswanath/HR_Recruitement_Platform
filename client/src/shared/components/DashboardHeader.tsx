@@ -1,7 +1,8 @@
-import { Search, Bell, Menu } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
 import type { RootState } from '../../app/store';
+import { NotificationBell } from './NotificationBell';
 
 interface DashboardHeaderProps {
   title: string;
@@ -47,10 +48,7 @@ export const DashboardHeader = ({ title, subtitle, showSearch = true }: Dashboar
           </div>
         )}
 
-        <button className="text-slate-400 hover:text-amber-500 transition-colors relative p-2 rounded-xl hover:bg-slate-50">
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full border-2 border-white" />
-        </button>
+        <NotificationBell />
 
         <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200/60">
           <div className="text-right hidden sm:block">

@@ -2,6 +2,7 @@ import { db } from '../../config/db';
 import { CompanyProfileInput } from './company.schema';
 import { AppError } from '../../shared/errors/AppError';
 import bcrypt from 'bcryptjs';
+import { inAppNotificationService } from '../notification/inapp-notification.service';
 
 export class CompanyService {
   async getCompanyProfile(companyId: string) {
@@ -72,7 +73,16 @@ export class CompanyService {
       .update({ status: 'active', active: true })
       .returning('*');
     
-    // TODO: Send approval email
+    // Notify the company admin
+    if (company?.admin_user_id) {
+      await inAppNotificationService.create({
+        userId: company.admin_user_id,
+        title: '🎉 Company Approved!',
+        body: `Your company "${company.name}" has been approved by the Super Admin. You now have full access to the platform.`,
+        type: 'success',
+        link: '/company/dashboard',
+      });
+    }
     return company;
   }
 
@@ -82,7 +92,16 @@ export class CompanyService {
       .update({ status: 'rejected', active: false })
       .returning('*');
     
-    // TODO: Send rejection email with reason
+    // Notify the company admin
+    if (company?.admin_user_id) {
+      await inAppNotificationService.create({
+        userId: company.admin_user_id,
+        title: 'Company Registration Rejected',
+        body: reason ? `Your company registration was rejected. Reason: ${reason}` : 'Your company registration was not approved. Please contact support for more information.',
+        type: 'error',
+        link: '/pending-approval',
+      });
+    }
     return company;
   }
 

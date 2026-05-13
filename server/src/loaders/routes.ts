@@ -8,6 +8,7 @@ import jobRoutes from '../modules/job/job.routes';
 import applicationRoutes from '../modules/application/application.routes';
 import candidateRoutes from '../modules/candidate/candidate.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
+import notificationRoutes from '../modules/notification/notification.routes';
 
 export default (app: Application) => {
   app.get('/api/health', (req: Request, res: Response) => {
@@ -25,6 +26,7 @@ export default (app: Application) => {
   app.use('/api/interviews', interviewRoutes);
   app.use('/api/candidate', candidateRoutes);
   app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/notifications', notificationRoutes);
 
   // Future modules will be registered here
 };
