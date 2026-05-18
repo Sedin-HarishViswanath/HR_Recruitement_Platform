@@ -112,6 +112,7 @@ export class GoogleOAuthService {
       // 3. Generate Tokens (Same logic as login)
       const accessToken = generateAccessToken({
         userId: userRecord.id.toString(),
+        candidateId: isCandidate ? userRecord.id.toString() : undefined,
         role: userRecord.role_name,
         companyId: userRecord.company_id?.toString(),
         email: userRecord.email,

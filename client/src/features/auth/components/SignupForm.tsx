@@ -10,6 +10,7 @@ import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { toast } from 'sonner';
+import { GoogleLogin } from '@react-oauth/google';
 
 const signupSchema = z.object({
   // Common
@@ -102,6 +103,33 @@ export const SignupForm = ({ role, onToggleMode }: { role: 'internal' | 'candida
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+     try {
+       setIsLoading(true);
+       setError('');
+       const res = await api.post('/auth/google', {
+         idToken: credentialResponse.credential,
+         role: role === 'candidate' ? 'candidate' : 'company'
+       });
+       dispatch(setCredentials({ user: res.data.data.user, accessToken: res.data.data.accessToken }));
+       
+       toast.success('Sign up successful!');
+       
+       const user = res.data.data.user;
+       if (user.role === 'Candidate') {
+         navigate('/candidate/onboarding');
+       } else if (user.role === 'Super Admin') {
+         navigate('/superadmin/dashboard');
+       } else {
+         navigate('/company/dashboard');
+       }
+     } catch (err: any) {
+       setError(err.response?.data?.message || 'Google signup failed');
+     } finally {
+       setIsLoading(false);
+     }
+  };
+
   if (role === 'candidate') {
     return (
       <div className="w-full space-y-5">
@@ -152,6 +180,23 @@ export const SignupForm = ({ role, onToggleMode }: { role: 'internal' | 'candida
             {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
+
+        <div className="relative pt-2">
+          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100" /></div>
+          <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
+            <span className="bg-white px-4 text-slate-400">Or continue with</span>
+          </div>
+        </div>
+
+        <div className="flex justify-center scale-105">
+           <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Sign Up Failed')}
+              theme="outline"
+              shape="pill"
+              width="100%"
+           />
+        </div>
 
         <p className="text-center text-[12px] font-medium text-slate-500">
           Already have an account? <button onClick={() => navigate('/login')} className="text-blue-600 font-bold hover:underline">Sign in</button>
