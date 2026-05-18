@@ -15,7 +15,7 @@ export const CompanyInterviewsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchInterviews = async () => {
-    try { setLoading(true); const { data } = await api.get('/interview/company'); setInterviews(data.data || []); }
+    try { setLoading(true); const { data } = await api.get('/interviews'); setInterviews(data.data?.data || data.data || []); }
     catch (err) { console.error(err); toast.error('Failed to load interviews'); }
     finally { setLoading(false); }
   };

@@ -48,7 +48,7 @@ export const CompanyApplicationsPage = () => {
     try {
       setLoading(true);
       const { data } = await api.get('/applications');
-      setApplications(data.data || []);
+      setApplications(data.data?.data || data.data || []);
     } catch (err) {
       console.error('Failed to load applications:', err);
       toast.error('Failed to load applications');

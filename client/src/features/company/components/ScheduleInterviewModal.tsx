@@ -51,7 +51,7 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
         api.get('/applications'),
         api.get('/companies/me/users')
       ]);
-      setApplications(appsRes.data.data || []);
+      setApplications(appsRes.data.data?.data || appsRes.data.data || []);
       setInterviewers(usersRes.data.data || []);
     } catch (err) {
       toast.error('Failed to load form data');
@@ -70,7 +70,7 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
       
       const scheduled_at = new Date(`${formData.date}T${formData.time}`).toISOString();
 
-      await api.post('/interview', {
+      await api.post('/interviews', {
         application_id: formData.application_id,
         round_type: formData.round_type,
         interviewer_id: formData.interviewer_id,
