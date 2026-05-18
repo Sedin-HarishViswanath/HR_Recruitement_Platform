@@ -11,7 +11,8 @@ import {
   ExternalLink,
   Users,
   Clock,
-  Calendar
+  Calendar,
+  Trash2
 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
@@ -83,6 +84,19 @@ export const CompaniesPage = () => {
       fetchCompanies();
     } catch (err) {
       toast.error('Failed to reject company');
+    }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Are you absolutely sure you want to delete company "${name}"?\nThis will permanently delete all associated users, jobs, candidates, applications, and interviews.`)) {
+      return;
+    }
+    try {
+      await api.delete(`/companies/admin/${id}`);
+      toast.success('Company deleted successfully');
+      fetchCompanies();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to delete company');
     }
   };
 
@@ -258,7 +272,7 @@ export const CompaniesPage = () => {
                       </td>
                       <td className="px-8 py-5 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {company.status === 'pending' ? (
+                          {company.status === 'pending' && (
                             <>
                               <Button 
                                 onClick={() => handleApprove(company.id)}
@@ -274,11 +288,16 @@ export const CompaniesPage = () => {
                                 Reject
                               </Button>
                             </>
-                          ) : (
-                            <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-                               <MoreVertical size={18} />
-                            </Button>
                           )}
+                          <Button 
+                            onClick={() => handleDelete(company.id, company.name)}
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-xl text-red-400 hover:bg-red-50 hover:text-red-600 active:scale-95 transition-all"
+                            title="Delete Company"
+                          >
+                             <Trash2 size={16} />
+                          </Button>
                         </div>
                       </td>
                     </tr>

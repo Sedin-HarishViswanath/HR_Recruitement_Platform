@@ -25,5 +25,6 @@ router.get('/admin/list', authenticate, authorize('Super Admin'), companyControl
 router.get('/admin/:id', authenticate, authorize('Super Admin'), companyController.adminGetCompany.bind(companyController));
 router.patch('/admin/:id/approve', authenticate, authorize('Super Admin'), companyController.adminApproveCompany.bind(companyController));
 router.patch('/admin/:id/reject', authenticate, authorize('Super Admin'), companyController.adminRejectCompany.bind(companyController));
+router.delete('/admin/:id', authenticate, authorize('Super Admin'), companyController.adminDeleteCompany.bind(companyController));
 
 export default router;

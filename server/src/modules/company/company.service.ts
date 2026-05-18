@@ -86,6 +86,20 @@ export class CompanyService {
     return company;
   }
 
+  async deleteCompany(companyId: string) {
+    return await db.transaction(async (trx) => {
+      // 1. Clear circular FK reference admin_user_id
+      await trx('companies').where({ id: companyId }).update({ admin_user_id: null });
+
+      // 2. Delete all users belonging to this company (cascades to memberships)
+      await trx('users').where({ company_id: companyId }).delete();
+
+      // 3. Delete the company (cascades to jobs, candidates, applications, interviews, feedbacks)
+      const deletedCount = await trx('companies').where({ id: companyId }).delete();
+      if (!deletedCount) throw new AppError('Company not found', 404);
+    });
+  }
+
   async getDashboardStats(companyId: string) {
     const [totalJobs, activeJobs, totalApps, totalHires] = await Promise.all([
       db('jobs').where({ company_id: companyId }).count('id as count').first(),

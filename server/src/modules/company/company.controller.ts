@@ -84,6 +84,17 @@ export class CompanyController {
     }
   }
 
+  async adminDeleteCompany(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await companyService.deleteCompany(id as string);
+      return sendResponse(res, 200, true, 'Company deleted successfully');
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
   async getDashboardStats(req: Request, res: Response) {
     try {
       const companyId = req.user.companyId;
