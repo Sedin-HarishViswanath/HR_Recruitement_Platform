@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
-import { Calendar, Clock, User, Video, RotateCcw, X, Plus } from 'lucide-react';
+import { Calendar, Clock, User, Video, RotateCcw, X, Plus, Award, Brain } from 'lucide-react';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { ScheduleInterviewModal } from '../components/ScheduleInterviewModal';
+import { SubmitFeedbackModal } from '../components/SubmitFeedbackModal';
 import { unwrapArray } from '../../../shared/lib/response';
 
 const getInitials = (name: string) => { if (!name) return 'U'; const p = name.trim().split(' '); return ((p[0]?.[0] || '') + (p[1]?.[0] || '')).toUpperCase(); };
@@ -16,6 +17,7 @@ export const CompanyInterviewsPage = () => {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'upcoming' | 'completed'>('upcoming');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{ isOpen: boolean; interview: any }>({ isOpen: false, interview: null });
 
   const fetchInterviews = async () => {
     try { 
@@ -71,8 +73,10 @@ export const CompanyInterviewsPage = () => {
             {displayed.map((iv, i) => {
               const date = iv.scheduled_at ? new Date(iv.scheduled_at) : null;
               const isCompleted = iv.status === 'completed' || iv.status === 'feedback_submitted';
+              const isAptitude = (iv.round_type || '').toLowerCase() === 'aptitude';
+              const hasScore = iv.aptitude_score != null;
               return (
-                <div key={iv.id || i} className="card-premium p-5 group cursor-pointer">
+                <div key={iv.id || i} className="card-premium p-5 group">
                   <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-3">
                     <div className="flex items-center gap-3">
                       <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${avatarGradients[i % avatarGradients.length]} flex items-center justify-center text-white font-bold text-[12px] shrink-0 group-hover:scale-105 group-hover:shadow-md transition-all duration-300`}>
@@ -83,10 +87,18 @@ export const CompanyInterviewsPage = () => {
                         <p className="text-[11px] text-slate-400 font-medium leading-tight">{iv.job_title}</p>
                       </div>
                     </div>
-                    <span className={`tag-pill ${isCompleted ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                      {isCompleted ? 'Completed' : 'Scheduled'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {isAptitude && hasScore && (
+                        <span className="tag-pill bg-indigo-50 text-indigo-700 border-indigo-200 flex items-center gap-1">
+                          <Award size={11} />
+                          Score: {iv.aptitude_score}/20
+                        </span>
+                      )}
+                      <span className={`tag-pill ${isCompleted ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        {isCompleted ? 'Completed' : 'Scheduled'}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Meta grid */}
@@ -94,7 +106,7 @@ export const CompanyInterviewsPage = () => {
                     {[
                       { icon: Calendar, label: 'Date', value: date ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—' },
                       { icon: Clock, label: 'Time', value: date ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—' },
-                      { icon: Video, label: 'Type', value: iv.interview_type || 'Technical' },
+                      { icon: isAptitude ? Brain : Video, label: 'Type', value: (iv.round_type || 'Technical').charAt(0).toUpperCase() + (iv.round_type || 'Technical').slice(1) },
                       { icon: User, label: 'Interviewer', value: iv.interviewer_name || '—' },
                     ].map((m, j) => (
                       <div key={j} className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50/60 border border-slate-100/60 group-hover:border-amber-100 transition-colors">
@@ -124,6 +136,29 @@ export const CompanyInterviewsPage = () => {
                       </button>
                     </div>
                   )}
+
+                  {/* Completed interview actions: show "Give Feedback" for aptitude rounds that are completed */}
+                  {isCompleted && (
+                    <div className="flex gap-2 pt-1">
+                      {isAptitude && hasScore && (
+                        <div className="flex items-center gap-2 px-3 py-2 bg-indigo-50 rounded-xl border border-indigo-200 text-[12px]">
+                          <Award size={14} className="text-indigo-600" />
+                          <span className="font-bold text-indigo-700">
+                            Aptitude Score: {iv.aptitude_score}/20 ({Math.round((iv.aptitude_score / 20) * 100)}%)
+                          </span>
+                          <span className={`ml-1 font-bold ${(iv.aptitude_score / 20) >= 0.7 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                            — {(iv.aptitude_score / 20) >= 0.7 ? 'Passed' : 'Below Threshold'}
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => setFeedbackModal({ isOpen: true, interview: iv })}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[12px] font-bold rounded-lg hover:shadow-md transition-all"
+                      >
+                        Give Feedback
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -131,6 +166,17 @@ export const CompanyInterviewsPage = () => {
         )}
       </main>
       <ScheduleInterviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchInterviews} />
+      {feedbackModal.interview && (
+        <SubmitFeedbackModal
+          isOpen={feedbackModal.isOpen}
+          onClose={() => setFeedbackModal({ isOpen: false, interview: null })}
+          onSuccess={() => {
+            fetchInterviews();
+            setFeedbackModal({ isOpen: false, interview: null });
+          }}
+          interview={feedbackModal.interview}
+        />
+      )}
     </div>
   );
 };

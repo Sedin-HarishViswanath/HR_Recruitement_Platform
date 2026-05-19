@@ -155,7 +155,7 @@ export class InterviewService {
     if (!interview) throw new AppError('Interview not found', 404);
     if (interview.round_type !== 'aptitude') throw new AppError('This is not an aptitude round', 400);
     
-    return db('interviews')
+    const [updated] = await db('interviews')
       .where({ id })
       .update({
         status: 'completed',
@@ -163,6 +163,8 @@ export class InterviewService {
         updated_at: db.fn.now()
       })
       .returning('*');
+
+    return updated;
   }
 
   async getMeetingRoom(interviewId: string, participantName: string, isOwner: boolean) {
@@ -185,6 +187,66 @@ export class InterviewService {
     const { script, language, stdin } = data;
     const result = await executeWithPiston({ language, code: script, stdin });
     return result;
+  }
+
+  // ─── Transcript Methods ───
+
+  async saveTranscriptEntries(interviewId: string, entries: Array<{ speaker: string; text: string; timestamp: string }>) {
+    const interview = await db('interviews').where({ id: interviewId }).first();
+    if (!interview) throw new AppError('Interview not found', 404);
+
+    const rows = entries.map(e => ({
+      interview_id: interviewId,
+      speaker: e.speaker,
+      text: e.text,
+      timestamp: e.timestamp,
+    }));
+
+    return db('interview_transcripts').insert(rows).returning('*');
+  }
+
+  async getTranscriptEntries(interviewId: string) {
+    return db('interview_transcripts')
+      .where({ interview_id: interviewId })
+      .orderBy('created_at', 'asc');
+  }
+
+  async getCandidateTranscripts(candidateId: string, companyId: string) {
+    const interviews = await db('interviews')
+      .select(
+        'interviews.id',
+        'interviews.round_type',
+        'interviews.round_number',
+        'interviews.scheduled_at',
+        'interviews.status',
+        'interviews.aptitude_score',
+        'interviews.recording_url',
+        'users.name as interviewer_name',
+        'jobs.title as job_title',
+      )
+      .join('applications', 'interviews.application_id', 'applications.id')
+      .join('candidates', 'applications.candidate_id', 'candidates.id')
+      .join('jobs', 'applications.job_id', 'jobs.id')
+      .leftJoin('users', 'interviews.interviewer_id', 'users.id')
+      .where('candidates.id', candidateId)
+      .where('jobs.company_id', companyId)
+      .orderBy('interviews.scheduled_at', 'asc');
+
+    // For each interview, check if transcript entries exist
+    const results = await Promise.all(
+      interviews.map(async (iv: any) => {
+        const [countRow] = await db('interview_transcripts')
+          .where({ interview_id: iv.id })
+          .count('id as count');
+        return {
+          ...iv,
+          has_transcript: Number(countRow?.count || 0) > 0,
+          transcript_count: Number(countRow?.count || 0),
+        };
+      })
+    );
+
+    return results;
   }
 }
 

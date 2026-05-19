@@ -1,5 +1,6 @@
 import { Server as SocketIOServer } from 'socket.io';
 import { Server as HTTPServer } from 'http';
+import { db } from './config/db';
 
 let io: SocketIOServer;
 
@@ -33,6 +34,27 @@ export const setupSocket = (server: HTTPServer) => {
       const { interviewId, code } = data;
       interviewCode[interviewId] = { code, language: data.language || '' };
       socket.to(`interview_${interviewId}`).emit('code-update', data);
+    });
+
+    // ── Real-time transcript entry ──
+    socket.on('transcript-entry', async (data: { interviewId: string; speaker: string; text: string; timestamp: string }) => {
+      const { interviewId, speaker, text, timestamp } = data;
+      if (!interviewId || !text) return;
+
+      // Broadcast to everyone else in the interview room
+      socket.to(`interview_${interviewId}`).emit('transcript-entry', { speaker, text, timestamp });
+
+      // Persist to database
+      try {
+        await db('interview_transcripts').insert({
+          interview_id: interviewId,
+          speaker,
+          text,
+          timestamp,
+        });
+      } catch (err) {
+        console.error('[Socket] Failed to persist transcript entry:', err);
+      }
     });
 
     socket.on('disconnect', () => {

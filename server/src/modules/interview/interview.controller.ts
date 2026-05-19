@@ -138,6 +138,63 @@ export class InterviewController {
       return sendResponse(res, 500, false, 'Failed to submit aptitude result');
     }
   }
+
+  // ── Transcript endpoints ──
+
+  async saveTranscript(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { entries } = req.body;
+      if (!entries || !Array.isArray(entries) || entries.length === 0) {
+        return sendResponse(res, 400, false, 'entries[] is required');
+      }
+      const saved = await interviewService.saveTranscriptEntries(id as string, entries);
+      return sendResponse(res, 201, true, 'Transcript saved', saved);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to save transcript');
+    }
+  }
+
+  async getTranscript(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const entries = await interviewService.getTranscriptEntries(id as string);
+      return sendResponse(res, 200, true, 'Transcript retrieved', entries);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to retrieve transcript');
+    }
+  }
+
+  async getCandidateTranscripts(req: Request, res: Response) {
+    try {
+      const { candidateId } = req.params;
+      const companyId = req.user.companyId;
+      const transcripts = await interviewService.getCandidateTranscripts(candidateId, companyId);
+      return sendResponse(res, 200, true, 'Candidate transcripts retrieved', transcripts);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to retrieve candidate transcripts');
+    }
+  }
+
+  async uploadRecording(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const file = req.file;
+      if (!file) throw new AppError('No recording file provided', 400);
+
+      const recordingUrl = `/uploads/recordings/${file.filename}`;
+      const db = require('../../config/db').db;
+      await db('interviews').where({ id }).update({ recording_url: recordingUrl });
+
+      return sendResponse(res, 200, true, 'Recording uploaded', { recordingUrl });
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to upload recording');
+    }
+  }
 }
 
 export const interviewController = new InterviewController();

@@ -114,6 +114,31 @@ export class ApplicationController {
       return sendResponse(res, 500, false, 'Internal server error');
     }
   }
+
+  async getApplicationFeedback(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { db } = await import('../../config/db');
+      const feedback = await db('feedbacks')
+        .select(
+          'feedbacks.*',
+          'interviews.round_type',
+          'interviews.round_number',
+          'interviews.scheduled_at',
+          'interviews.aptitude_score',
+          'interviews.status as interview_status',
+          'users.name as interviewer_name'
+        )
+        .join('interviews', 'feedbacks.interview_id', 'interviews.id')
+        .leftJoin('users', 'interviews.interviewer_id', 'users.id')
+        .where('interviews.application_id', id)
+        .orderBy('interviews.scheduled_at', 'asc');
+      return sendResponse(res, 200, true, 'Application feedback retrieved', feedback);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to retrieve application feedback');
+    }
+  }
 }
 
 export const applicationController = new ApplicationController();

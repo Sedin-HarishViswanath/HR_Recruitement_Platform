@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
-import { Search, MapPin, ExternalLink, X, Mail, Phone, BriefcaseBusiness } from 'lucide-react';
+import { Search, MapPin, ExternalLink, X, Mail, Phone, BriefcaseBusiness, FileText, Loader2, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { unwrapArray } from '../../../shared/lib/response';
+import { TranscriptViewerModal } from '../components/TranscriptViewerModal';
 
 const getInitials = (name: string) => {
   if (!name) return 'U';
@@ -28,11 +29,35 @@ const getSkillStyle = (_skill: string, i: number) => {
   return colors[i % colors.length];
 };
 
+const roundTypeColor: Record<string, string> = {
+  aptitude: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  technical: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  hr: 'bg-amber-50 text-amber-700 border-amber-200',
+  behavioral: 'bg-pink-50 text-pink-700 border-pink-200',
+  screening: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  phone: 'bg-sky-50 text-sky-700 border-sky-200',
+  final: 'bg-violet-50 text-violet-700 border-violet-200',
+};
+
 export const CompanyCandidatesPage = () => {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);
+
+  // Transcript state
+  const [candidateInterviews, setCandidateInterviews] = useState<any[]>([]);
+  const [loadingInterviews, setLoadingInterviews] = useState(false);
+  const [transcriptModal, setTranscriptModal] = useState<{
+    isOpen: boolean;
+    interviewId: string;
+    roundType: string;
+    roundNumber?: number;
+    candidateName: string;
+    interviewerName?: string;
+    scheduledAt?: string;
+    recordingUrl?: string;
+  }>({ isOpen: false, interviewId: '', roundType: '', candidateName: '' });
 
   const fetchCandidates = async (searchQuery = '') => {
     try {
@@ -49,6 +74,26 @@ export const CompanyCandidatesPage = () => {
   useEffect(() => {
     fetchCandidates();
   }, []);
+
+  // Fetch candidate interviews/transcripts when a candidate is selected
+  useEffect(() => {
+    if (!selectedCandidate) {
+      setCandidateInterviews([]);
+      return;
+    }
+    const fetchInterviews = async () => {
+      setLoadingInterviews(true);
+      try {
+        const { data } = await api.get(`/companies/me/candidates/${selectedCandidate.id}/transcripts`);
+        setCandidateInterviews(Array.isArray(data?.data) ? data.data : []);
+      } catch {
+        setCandidateInterviews([]);
+      } finally {
+        setLoadingInterviews(false);
+      }
+    };
+    fetchInterviews();
+  }, [selectedCandidate?.id]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,8 +229,8 @@ export const CompanyCandidatesPage = () => {
 
       {selectedCandidate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm" onClick={() => setSelectedCandidate(null)}>
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
-            <div className="flex items-start justify-between border-b border-slate-100 p-5">
+          <div className="w-full max-w-2xl max-h-[90vh] rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-start justify-between border-b border-slate-100 p-5 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center text-white font-bold text-[13px] shrink-0">
                   {getInitials(selectedCandidate.name)}
@@ -200,60 +245,146 @@ export const CompanyCandidatesPage = () => {
               </button>
             </div>
 
-            <div className="grid gap-4 p-5 md:grid-cols-[1fr_220px]">
-              <div className="space-y-4">
-                <div className="grid gap-2 text-[13px] font-medium text-slate-600">
-                  <a href={`mailto:${selectedCandidate.email}`} className="flex items-center gap-2 text-amber-600 hover:underline">
-                    <Mail size={14} /> {selectedCandidate.email}
-                  </a>
-                  {selectedCandidate.phone && (
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid gap-4 p-5 md:grid-cols-[1fr_220px]">
+                <div className="space-y-4">
+                  <div className="grid gap-2 text-[13px] font-medium text-slate-600">
+                    <a href={`mailto:${selectedCandidate.email}`} className="flex items-center gap-2 text-amber-600 hover:underline">
+                      <Mail size={14} /> {selectedCandidate.email}
+                    </a>
+                    {selectedCandidate.phone && (
+                      <span className="flex items-center gap-2">
+                        <Phone size={14} className="text-slate-400" /> {selectedCandidate.phone}
+                      </span>
+                    )}
+                    {selectedCandidate.location && (
+                      <span className="flex items-center gap-2">
+                        <MapPin size={14} className="text-slate-400" /> {selectedCandidate.location}
+                      </span>
+                    )}
                     <span className="flex items-center gap-2">
-                      <Phone size={14} className="text-slate-400" /> {selectedCandidate.phone}
+                      <BriefcaseBusiness size={14} className="text-slate-400" /> {selectedCandidate.applied_jobs_count || 0} application(s)
                     </span>
+                  </div>
+
+                  {selectedCandidate.skills?.length > 0 && (
+                    <div>
+                      <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Skills</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedCandidate.skills.map((skill: string, i: number) => (
+                          <span key={skill} className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${getSkillStyle(skill, i)}`}>
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                  {selectedCandidate.location && (
-                    <span className="flex items-center gap-2">
-                      <MapPin size={14} className="text-slate-400" /> {selectedCandidate.location}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-2">
-                    <BriefcaseBusiness size={14} className="text-slate-400" /> {selectedCandidate.applied_jobs_count || 0} application(s)
-                  </span>
                 </div>
 
-                {selectedCandidate.skills?.length > 0 && (
-                  <div>
-                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Skills</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedCandidate.skills.map((skill: string, i: number) => (
-                        <span key={skill} className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${getSkillStyle(skill, i)}`}>
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Profile</p>
+                  <p className="mt-2 text-3xl font-black text-slate-900">{selectedCandidate.profile_completion || 0}%</p>
+                  <p className="mt-1 text-[12px] font-medium text-slate-500">completion</p>
+                  <div className="mt-4 space-y-2">
+                    {selectedCandidate.resume_url && (
+                      <a href={selectedCandidate.resume_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-amber-300 hover:text-amber-600">
+                        View Resume
+                      </a>
+                    )}
+                    {selectedCandidate.linkedin_url && (
+                      <a href={selectedCandidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600">
+                        LinkedIn
+                      </a>
+                    )}
+                    {selectedCandidate.github_url && (
+                      <a href={selectedCandidate.github_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600">
+                        GitHub
+                      </a>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
 
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Profile</p>
-                <p className="mt-2 text-3xl font-black text-slate-900">{selectedCandidate.profile_completion || 0}%</p>
-                <p className="mt-1 text-[12px] font-medium text-slate-500">completion</p>
-                <div className="mt-4 space-y-2">
-                  {selectedCandidate.resume_url && (
-                    <a href={selectedCandidate.resume_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-amber-300 hover:text-amber-600">
-                      View Resume
-                    </a>
-                  )}
-                  {selectedCandidate.linkedin_url && (
-                    <a href={selectedCandidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600">
-                      LinkedIn
-                    </a>
-                  )}
-                  {selectedCandidate.github_url && (
-                    <a href={selectedCandidate.github_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600">
-                      GitHub
-                    </a>
+              {/* ── Interview Transcripts Section ── */}
+              <div className="px-5 pb-5">
+                <div className="border-t border-slate-100 pt-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileText size={14} className="text-amber-500" />
+                    <p className="text-[12px] font-bold uppercase tracking-wider text-slate-700">Interview Rounds & Transcripts</p>
+                  </div>
+
+                  {loadingInterviews ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 size={20} className="text-amber-400 animate-spin mr-2" />
+                      <span className="text-[12px] text-slate-400 font-medium">Loading interviews...</span>
+                    </div>
+                  ) : candidateInterviews.length === 0 ? (
+                    <div className="py-6 text-center rounded-xl border border-slate-100 bg-slate-50/50">
+                      <p className="text-[12px] text-slate-400 font-medium">No interviews scheduled for this candidate yet.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {candidateInterviews.map((iv: any) => {
+                        const dateStr = iv.scheduled_at
+                          ? new Date(iv.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                          : '';
+                        const typeStyle = roundTypeColor[iv.round_type?.toLowerCase()] || 'bg-slate-100 text-slate-600';
+                        const isCompleted = iv.status === 'completed';
+                        return (
+                          <div
+                            key={iv.id}
+                            className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-white hover:border-amber-200 transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${typeStyle}`}>
+                                  {iv.round_type || 'Interview'}
+                                </span>
+                                {iv.round_number && (
+                                  <span className="text-[10px] text-slate-400 font-medium">Round {iv.round_number}</span>
+                                )}
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                  isCompleted ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-600'
+                                }`}>
+                                  {isCompleted ? 'Completed' : iv.status}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
+                                {dateStr && (
+                                  <span className="flex items-center gap-1">
+                                    <Calendar size={10} className="text-slate-400" /> {dateStr}
+                                  </span>
+                                )}
+                                {iv.interviewer_name && <span>· {iv.interviewer_name}</span>}
+                                {iv.aptitude_score != null && (
+                                  <span className="text-indigo-600 font-bold">Score: {iv.aptitude_score}/20</span>
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => setTranscriptModal({
+                                isOpen: true,
+                                interviewId: iv.id,
+                                roundType: iv.round_type,
+                                roundNumber: iv.round_number,
+                                candidateName: selectedCandidate.name,
+                                interviewerName: iv.interviewer_name,
+                                scheduledAt: iv.scheduled_at,
+                                recordingUrl: iv.recording_url,
+                              })}
+                              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-bold transition-all shrink-0 ${
+                                iv.has_transcript || iv.recording_url
+                                  ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                                  : 'bg-slate-50 text-slate-400 border border-slate-200'
+                              }`}
+                            >
+                              <FileText size={12} />
+                              {iv.has_transcript || iv.recording_url ? 'View Details' : 'No Details'}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
               </div>
@@ -261,6 +392,19 @@ export const CompanyCandidatesPage = () => {
           </div>
         </div>
       )}
+
+      {/* Transcript Viewer Modal */}
+      <TranscriptViewerModal
+        isOpen={transcriptModal.isOpen}
+        onClose={() => setTranscriptModal(prev => ({ ...prev, isOpen: false }))}
+        interviewId={transcriptModal.interviewId}
+        roundType={transcriptModal.roundType}
+        roundNumber={transcriptModal.roundNumber}
+        candidateName={transcriptModal.candidateName}
+        interviewerName={transcriptModal.interviewerName}
+        scheduledAt={transcriptModal.scheduledAt}
+        recordingUrl={transcriptModal.recordingUrl}
+      />
     </div>
   );
 };

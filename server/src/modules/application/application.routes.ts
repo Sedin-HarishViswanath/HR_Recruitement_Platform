@@ -13,6 +13,7 @@ router.get('/', authenticate, authorize('Admin', 'Recruiter'), applicationContro
 router.post('/bulk-move', authenticate, authorize('Admin', 'Recruiter'), applicationController.bulkMove.bind(applicationController));
 
 router.get('/:id/history', authenticate, authorize('Admin', 'Recruiter'), applicationController.getHistory.bind(applicationController));
+router.get('/:id/feedback', authenticate, authorize('Admin', 'Recruiter'), applicationController.getApplicationFeedback.bind(applicationController));
 router.patch('/:id/stage', authenticate, authorize('Admin', 'Recruiter'), applicationController.updateStage.bind(applicationController));
 router.patch('/:id/notes', authenticate, authorize('Admin', 'Recruiter'), applicationController.updateNotes.bind(applicationController));
 
