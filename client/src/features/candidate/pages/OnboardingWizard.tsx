@@ -8,13 +8,6 @@ import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Textarea } from '../../../components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../../components/ui/select';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
 
@@ -57,7 +50,7 @@ export const CandidateOnboardingWizard = () => {
 
   const { register: reg1, handleSubmit: handle1, setValue: set1, formState: { errors: err1 } } = useForm({ resolver: zodResolver(step1Schema) });
   const { register: reg2, handleSubmit: handle2, setValue: set2, formState: { errors: err2 } } = useForm({ resolver: zodResolver(step2Schema) });
-  const { register: reg3, handleSubmit: handle3, setValue: set3, formState: { errors: err3 } } = useForm({ resolver: zodResolver(step3Schema) });
+  const { register: reg3, handleSubmit: handle3, setValue: set3 } = useForm({ resolver: zodResolver(step3Schema) });
   const { register: reg4, handleSubmit: handle4, setValue: set4, formState: { errors: err4 } } = useForm({ resolver: zodResolver(step4Schema) });
 
   useEffect(() => {

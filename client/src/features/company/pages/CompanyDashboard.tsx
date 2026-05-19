@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { Users, Briefcase, Calendar, TrendingUp, ArrowUpRight, ArrowDownRight, ChevronRight, Activity } from 'lucide-react';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
+import { unwrapArray } from '../../../shared/lib/response';
 
 const BarChart = ({ data }: { data: { label: string; value: number }[] }) => {
   const max = Math.max(...data.map((d) => d.value), 1);
@@ -64,7 +65,17 @@ export const CompanyDashboard = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      try { const { data: res } = await api.get('/analytics/company/stats'); setData(res.data); }
+      try {
+        const { data: res } = await api.get('/analytics/company/stats');
+        const dashboard = res.data || {};
+        setData({
+          ...dashboard,
+          stats: dashboard.stats || {},
+          pipelineData: unwrapArray(dashboard.pipelineData),
+          jobSegments: unwrapArray(dashboard.jobSegments),
+          recentApplications: unwrapArray(dashboard.recentApplications),
+        });
+      }
       catch { console.error('Failed to fetch dashboard data'); }
       finally { setLoading(false); }
     };
@@ -80,7 +91,7 @@ export const CompanyDashboard = () => {
   if (!data) return <div className="p-8 text-center font-bold text-red-500">Failed to load dashboard.</div>;
 
   const { stats, pipelineData, jobSegments, recentApplications } = data;
-  const statValues = [stats.applications, stats.jobs, stats.interviews, stats.candidates];
+  const statValues = [stats.applications || 0, stats.jobs || 0, stats.interviews || 0, stats.candidates || 0];
 
   const getStatusStyle = (status: string) => {
     const s = status?.toLowerCase();

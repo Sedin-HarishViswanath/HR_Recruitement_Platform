@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
-import { Search, MapPin, ExternalLink } from 'lucide-react';
+import { Search, MapPin, ExternalLink, X, Mail, Phone, BriefcaseBusiness } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
+import { unwrapArray } from '../../../shared/lib/response';
 
 const getInitials = (name: string) => {
   if (!name) return 'U';
@@ -31,12 +32,13 @@ export const CompanyCandidatesPage = () => {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);
 
   const fetchCandidates = async (searchQuery = '') => {
     try {
       setLoading(true);
       const { data } = await api.get(`/companies/me/candidates?search=${searchQuery}`);
-      setCandidates(data.data || []);
+      setCandidates(unwrapArray(data, ['candidates']));
     } catch (err) {
       toast.error('Failed to load candidates');
     } finally {
@@ -94,6 +96,7 @@ export const CompanyCandidatesPage = () => {
               return (
                 <div
                   key={candidate.id}
+                  onClick={() => setSelectedCandidate(candidate)}
                   className="card-premium p-5 cursor-pointer group"
                 >
                   {/* Header */}
@@ -154,6 +157,7 @@ export const CompanyCandidatesPage = () => {
                         href={candidate.linkedin_url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(event) => event.stopPropagation()}
                         className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-lg px-2.5 py-1 hover:border-blue-300 hover:text-blue-600 transition-colors"
                       >
                         <ExternalLink size={10} /> LinkedIn
@@ -164,6 +168,7 @@ export const CompanyCandidatesPage = () => {
                         href={candidate.github_url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(event) => event.stopPropagation()}
                         className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-lg px-2.5 py-1 hover:border-blue-300 hover:text-blue-600 transition-colors"
                       >
                         <ExternalLink size={10} /> GitHub
@@ -176,6 +181,86 @@ export const CompanyCandidatesPage = () => {
           </div>
         )}
       </main>
+
+      {selectedCandidate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm" onClick={() => setSelectedCandidate(null)}>
+          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-start justify-between border-b border-slate-100 p-5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center text-white font-bold text-[13px] shrink-0">
+                  {getInitials(selectedCandidate.name)}
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-black text-slate-900 truncate">{selectedCandidate.name}</h2>
+                  <p className="text-[12px] text-slate-500 font-medium truncate">{selectedCandidate.summary || 'Candidate profile'}</p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedCandidate(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="grid gap-4 p-5 md:grid-cols-[1fr_220px]">
+              <div className="space-y-4">
+                <div className="grid gap-2 text-[13px] font-medium text-slate-600">
+                  <a href={`mailto:${selectedCandidate.email}`} className="flex items-center gap-2 text-amber-600 hover:underline">
+                    <Mail size={14} /> {selectedCandidate.email}
+                  </a>
+                  {selectedCandidate.phone && (
+                    <span className="flex items-center gap-2">
+                      <Phone size={14} className="text-slate-400" /> {selectedCandidate.phone}
+                    </span>
+                  )}
+                  {selectedCandidate.location && (
+                    <span className="flex items-center gap-2">
+                      <MapPin size={14} className="text-slate-400" /> {selectedCandidate.location}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-2">
+                    <BriefcaseBusiness size={14} className="text-slate-400" /> {selectedCandidate.applied_jobs_count || 0} application(s)
+                  </span>
+                </div>
+
+                {selectedCandidate.skills?.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Skills</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedCandidate.skills.map((skill: string, i: number) => (
+                        <span key={skill} className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${getSkillStyle(skill, i)}`}>
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Profile</p>
+                <p className="mt-2 text-3xl font-black text-slate-900">{selectedCandidate.profile_completion || 0}%</p>
+                <p className="mt-1 text-[12px] font-medium text-slate-500">completion</p>
+                <div className="mt-4 space-y-2">
+                  {selectedCandidate.resume_url && (
+                    <a href={selectedCandidate.resume_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-amber-300 hover:text-amber-600">
+                      View Resume
+                    </a>
+                  )}
+                  {selectedCandidate.linkedin_url && (
+                    <a href={selectedCandidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600">
+                      LinkedIn
+                    </a>
+                  )}
+                  {selectedCandidate.github_url && (
+                    <a href={selectedCandidate.github_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600">
+                      GitHub
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
-import { Users, Briefcase, TrendingUp, MoreVertical, BarChart3, Activity } from 'lucide-react';
+import { Users, Briefcase, MoreVertical, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { toast } from 'sonner';

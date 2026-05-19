@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
@@ -17,6 +17,12 @@ export default defineConfig({
       '/api': {
         target: process.env.VITE_API_TARGET || 'http://localhost:5000',
         changeOrigin: true,
+      },
+      // Proxy socket.io WebSocket connections to the backend
+      '/socket.io': {
+        target: process.env.VITE_API_TARGET || 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
       },
     },
   },

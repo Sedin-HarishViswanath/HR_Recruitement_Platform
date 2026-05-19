@@ -1,5 +1,6 @@
 import { candidateRepository } from './candidate.repository';
 import { AppError } from '../../shared/errors/AppError';
+import { resumeParserService } from './resume-parser.service';
 
 export class CandidateService {
   async getProfile(candidateId: string) {
@@ -37,6 +38,27 @@ export class CandidateService {
     // Recalculate completeness
     const profileCompleteness = this.calculateCompleteness({ ...profile, ...data });
     updatedData.profile_completion = profileCompleteness;
+
+    return candidateRepository.updateProfile(candidateId, updatedData);
+  }
+
+  async uploadResume(candidateId: string, resumeUrl: string, filePath: string) {
+    const profile = await this.getProfile(candidateId);
+    const parsed = await resumeParserService.parsePdf(filePath).catch(() => null);
+    const updatedData: any = { resume_url: resumeUrl };
+
+    if (parsed) {
+      if (parsed.resume_text) updatedData.resume_text = parsed.resume_text;
+      if (parsed.resume_data) updatedData.resume_data = parsed.resume_data;
+      if (parsed.experience) updatedData.experience = parsed.experience;
+      if (parsed.summary && !profile.summary) updatedData.summary = parsed.summary;
+      if (parsed.skills?.length && (!profile.skills || profile.skills.length === 0)) {
+        updatedData.skills = parsed.skills;
+      }
+    }
+
+    updatedData.profile_completion = this.calculateCompleteness({ ...profile, ...updatedData });
+    updatedData.profile_strength_score = updatedData.profile_completion;
 
     return candidateRepository.updateProfile(candidateId, updatedData);
   }

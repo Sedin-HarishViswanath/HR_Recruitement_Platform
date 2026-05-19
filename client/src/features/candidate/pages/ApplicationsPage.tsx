@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '../../../components/ui/table';
 import { toast } from 'sonner';
+import { unwrapArray } from '../../../shared/lib/response';
 
 export const CandidateApplicationsPage = () => {
   const [applications, setApplications] = useState<any[]>([]);
@@ -19,7 +20,7 @@ export const CandidateApplicationsPage = () => {
   const fetchApplications = async () => {
     try {
       const { data } = await api.get('/candidate/applications');
-      setApplications(data.data);
+      setApplications(unwrapArray(data, ['applications']));
     } catch (err) {
       toast.error('Failed to load applications');
     } finally {

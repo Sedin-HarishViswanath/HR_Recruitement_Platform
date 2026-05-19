@@ -1,8 +1,13 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import type { ReactNode } from 'react';
 import type { RootState } from '../../app/store';
 
-export const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+  children?: ReactNode;
+}
+
+export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { isAuthenticated, accessToken } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
 
@@ -10,5 +15,5 @@ export const ProtectedRoute = () => {
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
-  return <Outlet />;
+  return children ?? <Outlet />;
 };

@@ -3,6 +3,7 @@ import { api } from '../../../shared/lib/api';
 import { Link } from 'react-router-dom';
 import { Briefcase, FileText, Calendar, ChevronRight, MapPin, Clock, Video, TrendingUp, Sparkles, ArrowRight } from 'lucide-react';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
+import { unwrapArray } from '../../../shared/lib/response';
 
 export const CandidateDashboard = () => {
   const [data, setData] = useState<any>(null);
@@ -10,7 +11,17 @@ export const CandidateDashboard = () => {
 
   useEffect(() => {
     const fetchDashboard = async () => {
-      try { const res = await api.get('/candidate/dashboard'); setData(res.data.data); }
+      try {
+        const res = await api.get('/candidate/dashboard');
+        const dashboard = res.data.data || {};
+        setData({
+          ...dashboard,
+          stats: dashboard.stats || {},
+          upcomingInterviews: unwrapArray(dashboard.upcomingInterviews),
+          recentApplications: unwrapArray(dashboard.recentApplications),
+          recommendedJobs: unwrapArray(dashboard.recommendedJobs),
+        });
+      }
       catch (err) { console.error('Failed to load dashboard', err); }
       finally { setLoading(false); }
     };
@@ -61,9 +72,9 @@ export const CandidateDashboard = () => {
         {/* Stats Row — creative gradient bottom-accent cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-stagger">
           {[
-            { label: 'Applications', value: data.stats.totalApplications, trend: '+2 this week', icon: FileText, idx: 0 },
-            { label: 'Active', value: data.stats.activeApplications, trend: 'In progress', icon: Briefcase, idx: 1 },
-            { label: 'Interviews', value: data.stats.scheduledInterviews, trend: 'Upcoming', icon: Calendar, idx: 2 },
+            { label: 'Applications', value: data.stats.totalApplications || 0, trend: '+2 this week', icon: FileText, idx: 0 },
+            { label: 'Active', value: data.stats.activeApplications || 0, trend: 'In progress', icon: Briefcase, idx: 1 },
+            { label: 'Interviews', value: data.stats.scheduledInterviews || 0, trend: 'Upcoming', icon: Calendar, idx: 2 },
           ].map((s) => (
             <div key={s.idx} className="stat-card p-5 group cursor-pointer" style={{ '--stat-gradient': `linear-gradient(90deg, var(--tw-gradient-stops))` } as any}>
               <div className="flex items-center justify-between mb-3">

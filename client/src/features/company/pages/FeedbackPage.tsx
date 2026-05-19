@@ -15,6 +15,7 @@ import {
 
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { toast } from 'sonner';
+import { unwrapArray } from '../../../shared/lib/response';
 
 export const FeedbackPage = () => {
   const [loading, setLoading] = useState(true);
@@ -24,8 +25,8 @@ export const FeedbackPage = () => {
     const fetchFeedback = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get('/interview/feedback');
-        setFeedback(data.data || []);
+        const { data } = await api.get('/interviews/feedback');
+        setFeedback(unwrapArray(data, ['feedback']));
       } catch (err) {
         toast.error('Failed to load feedback');
       } finally {

@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../app/store';
 import { io, Socket } from 'socket.io-client';
+import { unwrapArray } from '../lib/response';
 
 interface Notification {
   id: string;
@@ -65,8 +66,8 @@ export const NotificationBell = () => {
     setLoading(true);
     try {
       const res = await api.get('/notifications');
-      setNotifications(res.data.data.notifications || []);
-      setUnreadCount(res.data.data.unreadCount || 0);
+      setNotifications(unwrapArray<Notification>(res.data, ['notifications']));
+      setUnreadCount(Number(res.data?.data?.unreadCount || res.data?.unreadCount || 0));
     } catch {
       // silent
     } finally {

@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Providers } from './app/providers';
 import { AuthPage } from './features/auth/pages/AuthPage';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
@@ -198,10 +198,9 @@ const router = createBrowserRouter([
   {
     path: '/interview/:id',
     element: (
-      <ProtectedRoute>
-        <InterviewWorkspace />
-      </ProtectedRoute>
+      <ProtectedRoute />
     ),
+    children: [{ index: true, element: <InterviewWorkspace /> }],
   },
 ]);
 

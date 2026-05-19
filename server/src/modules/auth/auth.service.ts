@@ -13,7 +13,7 @@ const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
 export class AuthService {
   async signup(data: SignupInput) {
-    console.log('Signup Attempt Data:', JSON.stringify(data, null, 2));
+
     const { name, email, password, role, companyDetails, candidateDetails } = data;
 
     // Check for duplicate email in both tables
@@ -43,7 +43,7 @@ export class AuthService {
           .returning(['id', 'name', 'email']);
 
         const result = { user: candidate, role: 'Candidate' };
-        void notificationService.notifyWelcome(candidate.name, candidate.email);
+        void notificationService.notifyWelcome(candidate.id, candidate.name, candidate.email);
         return result;
       } else {
         // Company role
@@ -94,7 +94,7 @@ export class AuthService {
           },
           role: 'Admin'
         };
-        void notificationService.notifyWelcome(user.name, user.email);
+        void notificationService.notifyWelcome(user.id, user.name, user.email);
         return result;
       }
     });

@@ -6,7 +6,7 @@ let io: SocketIOServer;
 export const setupSocket = (server: HTTPServer) => {
   io = new SocketIOServer(server, {
     cors: {
-      origin: "*",
+      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
       methods: ["GET", "POST"]
     }
   });
@@ -29,10 +29,10 @@ export const setupSocket = (server: HTTPServer) => {
       }
     });
 
-    socket.on('code-change', (data: { interviewId: string; code: string; language: string }) => {
-      const { interviewId, code, language } = data;
-      interviewCode[interviewId] = { code, language };
-      socket.to(`interview_${interviewId}`).emit('code-update', { code, language });
+    socket.on('code-change', (data: { interviewId: string; code: string; language?: string; langIndex?: number }) => {
+      const { interviewId, code } = data;
+      interviewCode[interviewId] = { code, language: data.language || '' };
+      socket.to(`interview_${interviewId}`).emit('code-update', data);
     });
 
     socket.on('disconnect', () => {

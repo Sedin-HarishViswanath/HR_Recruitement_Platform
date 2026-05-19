@@ -1,18 +1,41 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Search, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
+import { unwrapArray } from '../../../shared/lib/response';
 
 const STAGE_FILTERS = ['Applied', 'Screening', 'Shortlisted', 'Interview 1', 'Interview 2', 'Offer', 'Hired', 'Rejected'];
+
+const stageToApi = (stage: string) => stage.toLowerCase().replace(/\s+/g, '_');
+const formatStage = (stage: string) => {
+  const s = stage?.toLowerCase();
+  const interviewRound = s?.match(/^interview_(\d+)$/)?.[1];
+  if (interviewRound) return `Interview ${interviewRound}`;
+  return stage ? s.charAt(0).toUpperCase() + s.slice(1) : 'Applied';
+};
+
+const getInterviewRound = (app: any) => {
+  const fromStatus = String(app.status || '').match(/^interview_(\d+)$/)?.[1];
+  return Number(app.latest_interview_round || fromStatus || 0);
+};
+
+const isLastHiringRound = (app: any) => {
+  const status = String(app.status || '').toLowerCase();
+  if (status === 'offer') return true;
+  const totalRounds = Number(app.interview_rounds || 1);
+  const round = getInterviewRound(app);
+  return round > 0 && round >= totalRounds;
+};
 
 const getStageStyle = (stage: string) => {
   const s = stage?.toLowerCase();
   if (s === 'applied') return 'bg-slate-100 text-slate-600';
   if (s === 'screening') return 'bg-yellow-50 text-yellow-700 border border-yellow-200';
   if (s === 'shortlisted') return 'bg-blue-50 text-blue-700 border border-blue-200';
-  if (s === 'interview 1' || s === 'interview') return 'bg-orange-50 text-orange-700 border border-orange-200';
-  if (s === 'interview 2') return 'bg-purple-50 text-purple-700 border border-purple-200';
+  if (s === 'interview_1' || s === 'interview 1' || s === 'interview') return 'bg-orange-50 text-orange-700 border border-orange-200';
+  if (s?.startsWith('interview_') || s === 'interview 2') return 'bg-purple-50 text-purple-700 border border-purple-200';
   if (s === 'offer') return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
   if (s === 'hired') return 'bg-green-100 text-green-800 border border-green-200';
   if (s === 'rejected') return 'bg-red-50 text-red-600 border border-red-200';
@@ -38,17 +61,23 @@ const avatarColors = [
 ];
 
 export const CompanyApplicationsPage = () => {
+  const [searchParams] = useSearchParams();
   const [applications, setApplications] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeStage, setActiveStage] = useState<string | null>(null);
-  const [selectedJob, setSelectedJob] = useState('All Jobs');
+  const [selectedJob, setSelectedJob] = useState(searchParams.get('job_id') || 'all');
 
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get('/applications');
-      setApplications(data.data || []);
+      const { data } = await api.get('/applications', {
+        params: {
+          job_id: selectedJob === 'all' ? undefined : selectedJob,
+        },
+      });
+      setApplications(unwrapArray(data, ['applications']));
     } catch (err) {
       console.error('Failed to load applications:', err);
       toast.error('Failed to load applications');
@@ -59,19 +88,36 @@ export const CompanyApplicationsPage = () => {
 
   useEffect(() => {
     fetchApplications();
+  }, [selectedJob]);
+
+  useEffect(() => {
+    const jobId = searchParams.get('job_id');
+    setSelectedJob(jobId || 'all');
+  }, [searchParams]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const { data } = await api.get('/jobs', { params: { limit: 100 } });
+        setJobs(unwrapArray(data, ['jobs']));
+      } catch (err) {
+        console.error('Failed to load jobs for filter:', err);
+      }
+    };
+    fetchJobs();
   }, []);
 
   const handleStatusChange = async (id: string, status: string) => {
     let notes = '';
-    if (status === 'Rejected') {
+    if (status === 'rejected') {
       const reason = window.prompt('Please enter a rejection reason (optional):');
       if (reason === null) return; // Cancelled
       notes = reason;
     }
 
     try {
-      await api.patch(`/applications/${id}/stage`, { stage: status.toLowerCase(), notes });
-      toast.success(`Application marked as ${status}`);
+      await api.patch(`/applications/${id}/stage`, { stage: status, notes });
+      toast.success(`Application marked as ${formatStage(status)}`);
       fetchApplications();
     } catch (err) {
       toast.error('Failed to update status');
@@ -81,9 +127,10 @@ export const CompanyApplicationsPage = () => {
   const filtered = applications.filter((app) => {
     const name = (app.candidate_name || app.user_name || '').toLowerCase();
     const matchesSearch = !search || name.includes(search.toLowerCase());
-    const matchesStage = !activeStage || (app.status || '').toLowerCase() === activeStage.toLowerCase();
+    const matchesStage = !activeStage || (app.status || '').toLowerCase() === stageToApi(activeStage);
     return matchesSearch && matchesStage;
   });
+  const stageFilters = Array.from(new Set([...STAGE_FILTERS, ...applications.map((app) => formatStage(app.status)).filter(Boolean)]));
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f4f5f7]">
@@ -107,7 +154,10 @@ export const CompanyApplicationsPage = () => {
             onChange={(e) => setSelectedJob(e.target.value)}
             className="px-3 py-2.5 text-[13px] border border-slate-200 rounded-xl bg-white font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
           >
-            <option>All Jobs</option>
+            <option value="all">All Jobs</option>
+            {jobs.map((job) => (
+              <option key={job.id} value={job.id}>{job.title}</option>
+            ))}
           </select>
           <button className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[13px] font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-all btn-premium">
             <Plus size={14} /> Add Application
@@ -116,7 +166,7 @@ export const CompanyApplicationsPage = () => {
 
         {/* Stage Filter Tabs */}
         <div className="flex gap-1.5 flex-wrap">
-          {STAGE_FILTERS.map((stage) => (
+          {stageFilters.map((stage) => (
             <button
               key={stage}
               onClick={() => setActiveStage(activeStage === stage ? null : stage)}
@@ -179,7 +229,7 @@ export const CompanyApplicationsPage = () => {
                       <p className="text-[13px] font-semibold text-slate-700 truncate">{app.job_title || '—'}</p>
                       <div>
                         <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${getStageStyle(app.status)}`}>
-                          {app.status || 'Applied'}
+                          {formatStage(app.status)}
                         </span>
                       </div>
                       <p className="text-[12px] text-slate-600 font-medium truncate">{app.recruiter_name || '—'}</p>
@@ -194,14 +244,23 @@ export const CompanyApplicationsPage = () => {
                       </div>
                       <p className="text-[11px] text-slate-400 font-medium">{date}</p>
                       <div className="flex items-center gap-2">
+                        {isLastHiringRound(app) ? (
+                          <button
+                            onClick={() => handleStatusChange(app.id, 'hired')}
+                            className="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-[10px] font-bold transition-colors"
+                          >
+                            Hire
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleStatusChange(app.id, 'shortlisted')}
+                            className="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-lg text-[10px] font-bold transition-colors"
+                          >
+                            Shortlist
+                          </button>
+                        )}
                         <button
-                          onClick={() => handleStatusChange(app.id, 'Hired')}
-                          className="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-[10px] font-bold transition-colors"
-                        >
-                          Hire
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(app.id, 'Rejected')}
+                          onClick={() => handleStatusChange(app.id, 'rejected')}
                           className="px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-lg text-[10px] font-bold transition-colors"
                         >
                           Reject
@@ -220,7 +279,7 @@ export const CompanyApplicationsPage = () => {
                           <p className="text-[12px] text-slate-500 font-medium truncate">{app.job_title || 'Position'}</p>
                         </div>
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${getStageStyle(app.status)}`}>
-                          {app.status || 'Applied'}
+                          {formatStage(app.status)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -231,14 +290,23 @@ export const CompanyApplicationsPage = () => {
                         )}
                         <span className="text-[10px] text-slate-400 font-medium">{date}</span>
                         <div className="flex-1" />
+                        {isLastHiringRound(app) ? (
+                          <button
+                            onClick={() => handleStatusChange(app.id, 'hired')}
+                            className="px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-[11px] font-bold transition-colors"
+                          >
+                            Hire
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleStatusChange(app.id, 'shortlisted')}
+                            className="px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-lg text-[11px] font-bold transition-colors"
+                          >
+                            Shortlist
+                          </button>
+                        )}
                         <button
-                          onClick={() => handleStatusChange(app.id, 'Hired')}
-                          className="px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-[11px] font-bold transition-colors"
-                        >
-                          Hire
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(app.id, 'Rejected')}
+                          onClick={() => handleStatusChange(app.id, 'rejected')}
                           className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-lg text-[11px] font-bold transition-colors"
                         >
                           Reject

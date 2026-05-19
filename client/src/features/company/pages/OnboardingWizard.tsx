@@ -46,7 +46,6 @@ export const OnboardingWizard = () => {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
   } = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
@@ -83,7 +82,6 @@ export const OnboardingWizard = () => {
 
   const onNext = async () => {
     // Basic validation for Step 1
-    const fields: (keyof OnboardingValues)[] = ['name', 'domain', 'company_size', 'industry'];
     const step1Data = watch();
     if (!step1Data.name || !step1Data.domain || !step1Data.company_size || !step1Data.industry) {
       toast.error('Please fill all required fields in Step 1');

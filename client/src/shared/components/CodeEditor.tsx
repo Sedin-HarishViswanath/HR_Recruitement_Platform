@@ -1,4 +1,5 @@
-import Editor, { OnChange } from '@monaco-editor/react';
+import Editor from '@monaco-editor/react';
+import type { OnChange } from '@monaco-editor/react';
 
 interface CodeEditorProps {
   language: string;

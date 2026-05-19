@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../components/ui/select';
+import { unwrapArray } from '../../../shared/lib/response';
 
 interface ScheduleInterviewModalProps {
   isOpen: boolean;
@@ -51,8 +52,8 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
         api.get('/applications'),
         api.get('/companies/me/users')
       ]);
-      setApplications(appsRes.data.data || []);
-      setInterviewers(usersRes.data.data || []);
+      setApplications(unwrapArray(appsRes.data, ['applications']));
+      setInterviewers(unwrapArray(usersRes.data, ['users']));
     } catch (err) {
       toast.error('Failed to load form data');
     }
@@ -70,7 +71,7 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
       
       const scheduled_at = new Date(`${formData.date}T${formData.time}`).toISOString();
 
-      await api.post('/interview', {
+      await api.post('/interviews', {
         application_id: formData.application_id,
         round_type: formData.round_type,
         interviewer_id: formData.interviewer_id,
@@ -147,6 +148,7 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
               <SelectContent>
                 <SelectItem value="screening">Screening</SelectItem>
                 <SelectItem value="phone">Phone Screen</SelectItem>
+                <SelectItem value="aptitude">Aptitude</SelectItem>
                 <SelectItem value="technical">Technical</SelectItem>
                 <SelectItem value="behavioral">Behavioral</SelectItem>
                 <SelectItem value="hr">HR</SelectItem>

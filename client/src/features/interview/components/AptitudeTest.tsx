@@ -59,6 +59,7 @@ export const AptitudeTest = ({
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [result, setResult] = useState<{ score: number; total: number } | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const handleSubmitRef = useRef<((autoSubmit?: boolean) => void) | null>(null);
 
   // ── Fetch questions from Open Trivia DB
   const fetchQuestions = useCallback(async () => {
@@ -106,7 +107,6 @@ export const AptitudeTest = ({
 
   useEffect(() => { fetchQuestions(); }, [fetchQuestions]);
 
-  // ── Countdown timer
   useEffect(() => {
     if (loading || submitted || timeLimit === 0) return;
 
@@ -114,7 +114,7 @@ export const AptitudeTest = ({
       setTimeLeft(t => {
         if (t <= 1) {
           clearInterval(timerRef.current!);
-          handleSubmit(true);
+          handleSubmitRef.current?.(true);
           return 0;
         }
         return t - 1;
@@ -123,12 +123,6 @@ export const AptitudeTest = ({
 
     return () => clearInterval(timerRef.current!);
   }, [loading, submitted]);
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
-  };
 
   const handleSelect = (questionId: number, option: string) => {
     if (submitted) return;
@@ -164,6 +158,16 @@ export const AptitudeTest = ({
     } finally {
       setSubmitting(false);
     }
+  };
+
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+  });
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
   // ── Loading state

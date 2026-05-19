@@ -43,7 +43,7 @@ const signupSchema = z.object({
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
-export const SignupForm = ({ role, onToggleMode }: { role: 'internal' | 'candidate', onToggleMode: () => void }) => {
+export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleMode?: () => void }) => {
   const { register, handleSubmit, formState: { errors } } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
   });

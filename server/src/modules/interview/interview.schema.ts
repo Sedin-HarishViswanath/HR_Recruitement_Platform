@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const scheduleInterviewSchema = z.object({
   application_id: z.string(),
-  round_type: z.enum(['phone', 'screening', 'technical', 'behavioral', 'hr', 'final']),
+  round_type: z.enum(['phone', 'screening', 'aptitude', 'technical', 'behavioral', 'hr', 'final']),
   interviewer_id: z.string(),
   scheduled_at: z.string().datetime(), // ISO string
   duration: z.number().int().min(15).max(180).default(60),

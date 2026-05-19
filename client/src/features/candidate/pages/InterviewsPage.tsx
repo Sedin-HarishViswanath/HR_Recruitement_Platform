@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import { 
@@ -8,10 +9,12 @@ import {
   User, 
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { unwrapArray } from '../../../shared/lib/response';
 
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 
 export const CandidateInterviewsPage = () => {
+  const navigate = useNavigate();
   const [interviews, setInterviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
@@ -19,7 +22,7 @@ export const CandidateInterviewsPage = () => {
   const fetchInterviews = async () => {
     try {
       const { data } = await api.get('/candidate/interviews');
-      setInterviews(data.data);
+      setInterviews(unwrapArray(data, ['interviews']));
     } catch (err) {
       toast.error('Failed to load interviews');
     } finally {
@@ -114,20 +117,12 @@ export const CandidateInterviewsPage = () => {
                 {/* Actions */}
                 <div className="flex items-center gap-2">
                    {interview.status === 'scheduled' && (
-                     <>
-                        <Button variant="outline" className="rounded-xl h-10 px-4 font-black text-xs uppercase tracking-widest border-slate-200 hover:bg-slate-50 transition-all">
-                          Reschedule
-                        </Button>
-                        <Button 
-                          onClick={() => interview.meeting_link && window.open(interview.meeting_link, '_blank')}
-                          className="rounded-xl h-10 px-4 font-black text-xs uppercase tracking-widest bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-sm transition-all btn-premium border-0"
-                        >
-                          Join Meeting
-                        </Button>
-                        <Button variant="ghost" className="rounded-xl h-10 px-4 font-black text-xs uppercase tracking-widest text-red-500 hover:bg-red-50 hover:text-red-600 transition-all">
-                          Cancel
-                        </Button>
-                     </>
+                      <Button 
+                        onClick={() => navigate(`/interview/${interview.id}`)}
+                        className="rounded-xl h-10 px-4 font-black text-xs uppercase tracking-widest bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-sm transition-all btn-premium border-0"
+                      >
+                        Join Meeting
+                      </Button>
                    )}
                    
                    <div className="ml-4 px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-widest border border-amber-100">

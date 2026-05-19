@@ -4,7 +4,7 @@ import { notificationService } from '../notification/notification.service';
 import { interviewRepository } from './interview.repository';
 import { AppError } from '../../shared/errors/AppError';
 import { executeWithPiston } from './code-execution.service';
-import { dailyCoService } from './daily-co.service';
+
 import { 
   ScheduleInterviewInput, 
   RescheduleInterviewInput, 
@@ -21,11 +21,28 @@ export class InterviewService {
     if (conflict) throw new AppError('Interviewer has a scheduling conflict at this time', 400);
 
     return await db.transaction(async (trx) => {
+      const application = await trx('applications')
+        .join('jobs', 'applications.job_id', 'jobs.id')
+        .where('applications.id', application_id)
+        .select('applications.*', 'jobs.interview_rounds')
+        .first();
+
+      if (!application) throw new AppError('Application not found', 404);
+
+      const roundInfo = await trx('interviews')
+        .where({ application_id })
+        .max('round_number as max_round')
+        .first();
+      const maxRound = Number(roundInfo?.max_round || 0);
+      const totalRounds = Number(application.interview_rounds || 1);
+      const roundNumber = Math.min(maxRound + 1, totalRounds);
+
       const [interview] = await trx('interviews')
         .insert({
           application_id,
           interviewer_id,
           round_type: data.round_type,
+          round_number: roundNumber,
           duration: duration || 60,
           scheduled_at: date,
           status: 'scheduled',
@@ -37,10 +54,10 @@ export class InterviewService {
       await trx('interviews').where({ id: interview.id }).update({ meeting_link });
       interview.meeting_link = meeting_link;
 
-      // Update application status to 'interview' if it's not already
+      // Keep the application stage aligned with the current interview round.
       await trx('applications')
         .where({ id: application_id })
-        .update({ status: 'interview', updated_at: db.fn.now() });
+        .update({ status: `interview_${roundNumber}`, updated_at: db.fn.now() });
 
       // Notify candidate
       const candidate = await trx('candidates')
@@ -149,9 +166,19 @@ export class InterviewService {
   }
 
   async getMeetingRoom(interviewId: string, participantName: string, isOwner: boolean) {
-    const room = await dailyCoService.getOrCreateRoom(interviewId);
-    const token = await dailyCoService.createParticipantToken(room.name, participantName, isOwner);
-    return { roomUrl: room.url, token };
+    const interview = await db('interviews').where({ id: interviewId }).first();
+    if (!interview) throw new AppError('Interview not found', 404);
+
+    const roomName = `recruitai-interview-${interviewId}`;
+    const roomUrl = `https://meet.jit.si/${roomName}`;
+
+    if (interview.meeting_link !== roomUrl) {
+      await db('interviews')
+        .where({ id: interviewId })
+        .update({ meeting_link: roomUrl });
+    }
+
+    return { roomUrl, token: '' };
   }
 
   async executeCode(data: any) {

@@ -170,6 +170,13 @@ export class CandidateRepository {
         'candidates.name',
         'candidates.email',
         'candidates.phone',
+        'candidates.location',
+        'candidates.summary',
+        'candidates.resume_url',
+        'candidates.linkedin_url',
+        'candidates.github_url',
+        'candidates.portfolio_url',
+        'candidates.profile_completion',
         'candidates.skills',
         'candidates.ai_match_score'
       )

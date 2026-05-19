@@ -4,9 +4,6 @@ import {
   Clock, 
   Building2, 
   ShieldCheck, 
-  Mail, 
-  Phone, 
-  MapPin,
   CheckCircle2,
   LogOut,
   AlertCircle

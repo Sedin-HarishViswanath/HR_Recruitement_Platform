@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import { Plus, BriefcaseBusiness } from 'lucide-react';
@@ -7,8 +8,10 @@ import { JobCard } from '../components/JobCard';
 import type { Job } from '../components/JobCard';
 import { JobForm } from '../components/JobForm';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
+import { unwrapArray } from '../../../shared/lib/response';
 
 export const CompanyJobsPage = () => {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -24,7 +27,7 @@ export const CompanyJobsPage = () => {
           status: statusFilter === 'all' ? undefined : statusFilter,
         }
       });
-      setJobs(data.data.jobs);
+      setJobs(unwrapArray<Job>(data, ['jobs']));
     } catch (err) {
       toast.error('Failed to fetch jobs');
     } finally {
@@ -79,16 +82,34 @@ export const CompanyJobsPage = () => {
       />
 
       <main className="p-8 space-y-8 animate-in fade-in duration-500">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm font-bold text-slate-500">
             {jobs.length} total positions
           </div>
-          <Button 
-            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl h-10 px-6 shadow-sm shadow-amber-500/20 active:scale-95 transition-all btn-premium"
-            onClick={() => setShowForm(true)}
-          >
-            <Plus className="mr-2" size={18} /> Create Job
-          </Button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search jobs"
+              className="h-10 w-full sm:w-56 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none transition-colors focus:border-amber-400"
+            />
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 outline-none transition-colors focus:border-amber-400"
+            >
+              <option value="all">All statuses</option>
+              <option value="draft">Draft</option>
+              <option value="published">Open</option>
+              <option value="closed">Closed</option>
+            </select>
+            <Button 
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl h-10 px-6 shadow-sm shadow-amber-500/20 active:scale-95 transition-all btn-premium"
+              onClick={() => setShowForm(true)}
+            >
+              <Plus className="mr-2" size={18} /> Create Job
+            </Button>
+          </div>
         </div>
 
         {showForm && (
@@ -132,7 +153,7 @@ export const CompanyJobsPage = () => {
                 key={job.id} 
                 job={job} 
                 onEdit={() => console.log('Edit', job.id)}
-                onView={() => console.log('View', job.id)}
+                onView={() => navigate(`/company/applications?job_id=${job.id}`)}
                 onDelete={handleDelete}
                 onChangeStatus={handleChangeStatus}
               />

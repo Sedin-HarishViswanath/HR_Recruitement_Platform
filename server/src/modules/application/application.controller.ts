@@ -48,7 +48,7 @@ export class ApplicationController {
       const parsed = stageTransitionSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
 
-      const application = await applicationService.updateApplicationStage(id as string, userId, parsed.data);
+      const application = await applicationService.updateApplicationStage(id as string, userId, req.user.companyId, parsed.data);
       return sendResponse(res, 200, true, 'Stage updated successfully', application);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -95,7 +95,7 @@ export class ApplicationController {
       const parsed = bulkMoveSchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
 
-      const result = await applicationService.bulkMove(userId, parsed.data);
+      const result = await applicationService.bulkMove(userId, req.user.companyId, parsed.data);
       return sendResponse(res, 200, true, 'Bulk movement successful', result);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);

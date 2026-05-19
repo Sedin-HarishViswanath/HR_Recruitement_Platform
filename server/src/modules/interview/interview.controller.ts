@@ -81,6 +81,32 @@ export class InterviewController {
     }
   }
 
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const interview = await interviewService.getInterviewById(id as string);
+      if (!interview) throw new AppError('Interview not found', 404);
+      return sendResponse(res, 200, true, 'Interview details retrieved', interview);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async getMeetingRoom(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const user = req.user || {};
+      const participantName = user.name || user.email || 'Participant';
+      const isOwner = ['Admin', 'Recruiter', 'Interviewer'].includes(user.role);
+      const room = await interviewService.getMeetingRoom(id as string, participantName, isOwner);
+      return sendResponse(res, 200, true, 'Meeting room retrieved', room);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
   async joinWorkspace(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -97,7 +123,19 @@ export class InterviewController {
       const result = await interviewService.executeCode(req.body);
       return sendResponse(res, 200, true, 'Code executed successfully', result);
     } catch (error: any) {
-      return sendResponse(res, 500, false, 'Code execution failed');
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 502, false, 'Code execution service is unavailable. Please try again.');
+    }
+  }
+
+  async submitAptitudeResult(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const result = await interviewService.submitAptitudeResult(id as string, req.body);
+      return sendResponse(res, 200, true, 'Aptitude result submitted', result);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to submit aptitude result');
     }
   }
 }

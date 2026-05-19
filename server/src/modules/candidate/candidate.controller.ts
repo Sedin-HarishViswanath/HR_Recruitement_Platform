@@ -68,7 +68,11 @@ export class CandidateController {
       }
       
       const resumeUrl = `/uploads/resumes/${(req as any).file.filename}`;
-      const updated = await candidateService.updateProfile(candidateId as string, { resume_url: resumeUrl });
+      const updated = await candidateService.uploadResume(
+        candidateId as string,
+        resumeUrl,
+        (req as any).file.path
+      );
       res.json({ success: true, data: updated });
     } catch (err) {
       next(err);

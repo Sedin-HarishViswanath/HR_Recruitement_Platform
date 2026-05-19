@@ -1,21 +1,28 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
-import { Calendar, Clock, User, Video, RotateCcw, X, Plus, Sparkles } from 'lucide-react';
+import { Calendar, Clock, User, Video, RotateCcw, X, Plus } from 'lucide-react';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { ScheduleInterviewModal } from '../components/ScheduleInterviewModal';
+import { unwrapArray } from '../../../shared/lib/response';
 
 const getInitials = (name: string) => { if (!name) return 'U'; const p = name.trim().split(' '); return ((p[0]?.[0] || '') + (p[1]?.[0] || '')).toUpperCase(); };
 const avatarGradients = ['from-blue-500 to-cyan-500', 'from-violet-500 to-purple-500', 'from-amber-500 to-orange-500', 'from-emerald-500 to-teal-500', 'from-rose-500 to-pink-500', 'from-sky-500 to-blue-500'];
 
 export const CompanyInterviewsPage = () => {
+  const navigate = useNavigate();
   const [interviews, setInterviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'upcoming' | 'completed'>('upcoming');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchInterviews = async () => {
-    try { setLoading(true); const { data } = await api.get('/interview/company'); setInterviews(data.data || []); }
+    try { 
+      setLoading(true); 
+      const { data } = await api.get('/interviews'); 
+      setInterviews(unwrapArray(data, ['interviews'])); 
+    }
     catch (err) { console.error(err); toast.error('Failed to load interviews'); }
     finally { setLoading(false); }
   };
@@ -106,7 +113,10 @@ export const CompanyInterviewsPage = () => {
                       <button className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-[12px] font-semibold text-slate-600 rounded-lg hover:bg-slate-50 hover:border-amber-200 transition-all">
                         <RotateCcw size={12} /> Reschedule
                       </button>
-                      <button className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[12px] font-semibold rounded-lg hover:shadow-md transition-all btn-premium">
+                      <button
+                        onClick={() => navigate(`/interview/${iv.id}`)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[12px] font-semibold rounded-lg hover:shadow-md transition-all btn-premium"
+                      >
                         <Video size={12} /> Join
                       </button>
                       <button className="flex items-center gap-1.5 px-3 py-1.5 border border-red-200 text-[12px] font-semibold text-red-500 rounded-lg hover:bg-red-50 transition-colors">

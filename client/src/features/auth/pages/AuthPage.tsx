@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForm';
 import {
   ShieldCheck, Building2, Briefcase, UserCheck, Calendar, BarChart3,
-  BriefcaseBusiness, FileText, Users, Sparkles, Zap, Globe, Menu, X,
+  BriefcaseBusiness, FileText, Sparkles, Zap, Globe, Menu, X,
   ArrowRight, CheckCircle2, Layers, Target, TrendingUp,
 } from 'lucide-react';
 
@@ -54,7 +54,6 @@ export const AuthPage = () => {
   const [authRole, setAuthRole] = useState<'internal' | 'candidate'>('internal');
 
   const handleLoginClick = (role: 'internal' | 'candidate') => { setAuthRole(role); navigate('/login'); };
-  const handleSignupClick = () => navigate('/register?role=internal');
 
   // Scroll-reveal refs for landing sections
   const hero = useReveal();

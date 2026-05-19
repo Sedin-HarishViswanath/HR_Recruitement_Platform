@@ -14,9 +14,12 @@ router.get('/feedback', authenticate, authorize('Admin', 'Recruiter'), interview
 router.get('/dashboard', authenticate, authorize('Interviewer', 'Recruiter', 'Admin'), interviewController.getInterviewerDashboard.bind(interviewController));
 router.get('/assigned', authenticate, authorize('Interviewer', 'Recruiter', 'Admin'), interviewController.listInterviewerInterviews.bind(interviewController));
 router.post('/:id/feedback', authenticate, authorize('Interviewer', 'Recruiter', 'Admin'), interviewController.submitFeedback.bind(interviewController));
+router.get('/:id/meeting-room', authenticate, interviewController.getMeetingRoom.bind(interviewController));
+router.post('/:id/aptitude-result', authenticate, authorize('Candidate'), interviewController.submitAptitudeResult.bind(interviewController));
+router.get('/:id', authenticate, interviewController.getById.bind(interviewController));
 
 // Workspace routes (Common)
-router.post('/:id/join', authenticate, interviewController.joinWorkspace.bind(interviewController));
+
 router.post('/:id/execute', authenticate, interviewController.executeCode.bind(interviewController));
 
 export default router;

@@ -34,6 +34,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../../components/ui/dropdown-menu';
+import { unwrapArray } from '../../../shared/lib/response';
 
 interface User {
   id: string;
@@ -56,7 +57,7 @@ export const UsersPage = () => {
       const { data } = await api.get('/companies/me/users', {
         params: { search: search || undefined }
       });
-      setUsers(data.data);
+      setUsers(unwrapArray<User>(data, ['users']));
     } catch (err) {
       toast.error('Failed to fetch users');
     } finally {

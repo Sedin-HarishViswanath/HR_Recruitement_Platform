@@ -3,7 +3,7 @@ import Editor from '@monaco-editor/react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import { io, Socket } from 'socket.io-client';
-import { Play, ChevronDown, Terminal, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Play, ChevronDown, Terminal, Clock, AlertCircle, CheckCircle2, WifiOff } from 'lucide-react';
 
 interface CodeEditorProps {
   interviewId: string;
@@ -105,6 +105,11 @@ interface ExecutionResult {
   cpuTime?: string;
 }
 
+// The backend URL for socket.io.
+// In dev: Vite proxies /socket.io → backend:5000, so we connect to current origin.
+// In prod: the same server serves both frontend and backend (or use VITE_API_URL).
+const BACKEND_URL = import.meta.env.VITE_API_URL || window.location.origin;
+
 export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps) => {
   const [langIndex, setLangIndex] = useState(0);
   const [code, setCode] = useState(LANGUAGES[0].starter);
@@ -112,6 +117,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
   const [showStdin, setShowStdin] = useState(false);
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [running, setRunning] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
   const currentLang = LANGUAGES[langIndex];
@@ -119,9 +125,26 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
   const isError = result !== null && result.code !== 0;
 
   useEffect(() => {
-    const socket = io();
+    // Connect to the backend socket.io server (not the Vite dev server)
+    const socket = io(BACKEND_URL, {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
     socketRef.current = socket;
-    socket.emit('join-interview', interviewId);
+
+    socket.on('connect', () => {
+      setSocketConnected(true);
+      socket.emit('join-interview', interviewId);
+    });
+
+    socket.on('disconnect', () => {
+      setSocketConnected(false);
+    });
+
+    socket.on('connect_error', () => {
+      setSocketConnected(false);
+    });
 
     socket.on('code-update', (data: { code: string; langIndex: number }) => {
       if (isReadOnly) {
@@ -134,7 +157,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
   }, [interviewId, isReadOnly]);
 
   const emitCodeChange = (newCode: string, newLangIndex: number) => {
-    if (!isReadOnly && socketRef.current) {
+    if (!isReadOnly && socketRef.current?.connected) {
       socketRef.current.emit('code-change', {
         interviewId,
         code: newCode,
@@ -167,9 +190,22 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
         stdin: stdin || undefined,
       });
       setResult(res.data.data);
-    } catch (err) {
-      toast.error('Failed to connect to execution engine');
-      setResult({ output: '// Error: Could not reach execution service.', code: 1 });
+    } catch (err: any) {
+      const status = err?.response?.status;
+      const serverMsg = err?.response?.data?.message;
+
+      if (!err?.response) {
+        // Network error — backend not reachable
+        toast.error('Backend server is unreachable. Is the server running?');
+        setResult({ output: '// Error: Cannot connect to the backend server.\n// Make sure the server is running on port 5000.', code: 1 });
+      } else if (status === 502 || status === 504) {
+        // Backend reached, but Piston execution engine is down/slow
+        toast.error('Code execution engine is temporarily unavailable.');
+        setResult({ output: `// Error: ${serverMsg || 'Execution engine (Piston) is unavailable.'}\n// Try again in a moment.`, code: 1 });
+      } else {
+        toast.error(serverMsg || 'Failed to execute code');
+        setResult({ output: `// Error: ${serverMsg || 'Unknown execution error.'}`, code: 1 });
+      }
     } finally {
       setRunning(false);
     }
@@ -205,6 +241,15 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Socket connection indicator */}
+          <div className={`flex items-center gap-1 text-[10px] ${socketConnected ? 'text-emerald-500' : 'text-slate-600'}`} title={socketConnected ? 'Live sync active' : 'Sync disconnected'}>
+            {socketConnected ? (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            ) : (
+              <WifiOff size={10} className="text-slate-600" />
+            )}
+          </div>
+
           {!isReadOnly && (
             <>
               <button

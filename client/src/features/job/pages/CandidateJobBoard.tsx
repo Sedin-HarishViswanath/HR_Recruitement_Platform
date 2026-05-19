@@ -6,6 +6,7 @@ import { Search, MapPin, Briefcase, FilterX } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApplyModal } from '../components/ApplyModal';
 import { formatDistanceToNow } from 'date-fns';
+import { unwrapArray } from '../../../shared/lib/response';
 
 export const CandidateJobBoard = () => {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -22,7 +23,7 @@ export const CandidateJobBoard = () => {
           location: locationFilter || undefined,
         }
       });
-      setJobs(data.data.jobs);
+      setJobs(unwrapArray(data, ['jobs']));
     } catch (err) {
       toast.error('Failed to fetch jobs');
     } finally {

@@ -18,7 +18,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export const LoginForm = ({ role, onToggleMode }: { role: 'internal' | 'candidate', onToggleMode: () => void }) => {
+export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMode?: () => void }) => {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });

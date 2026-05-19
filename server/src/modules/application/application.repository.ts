@@ -21,6 +21,8 @@ export class ApplicationRepository {
         'candidates.name as candidate_name',
         'candidates.email as candidate_email',
         'jobs.title as job_title',
+        'jobs.interview_rounds',
+        db.raw('(SELECT COALESCE(MAX(interviews.round_number), 0) FROM interviews WHERE interviews.application_id = applications.id) as latest_interview_round'),
         'recruiters.name as assigned_recruiter_name'
       )
       .join('candidates', 'applications.candidate_id', 'candidates.id')
@@ -94,11 +96,15 @@ export class ApplicationRepository {
         'applications.id',
         'applications.status',
         'applications.ai_score',
+        'jobs.title as job_title',
+        'jobs.interview_rounds',
+        db.raw('(SELECT COALESCE(MAX(interviews.round_number), 0) FROM interviews WHERE interviews.application_id = applications.id) as latest_interview_round'),
         'candidates.name as candidate_name',
         'candidates.skills',
         'candidates.ai_match_score'
       )
       .join('candidates', 'applications.candidate_id', 'candidates.id')
+      .join('jobs', 'applications.job_id', 'jobs.id')
       .where('applications.job_id', jobId)
       .orderBy('applications.updated_at', 'desc');
   }

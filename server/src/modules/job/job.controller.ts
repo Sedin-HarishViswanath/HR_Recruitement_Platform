@@ -90,7 +90,7 @@ export class JobController {
   // PUBLIC / CANDIDATE METHODS
   async getPublicJobs(req: Request, res: Response) {
     try {
-      const candidateId = req.user?.role === 'Candidate' ? req.user.userId : undefined;
+      const candidateId = req.user?.role === 'Candidate' ? (req.user.candidateId || req.user.userId) : undefined;
       const result = await jobService.getPublicJobs(req.query, candidateId);
       return sendResponse(res, 200, true, 'Public jobs retrieved successfully', result);
     } catch (error: any) {
@@ -100,7 +100,7 @@ export class JobController {
 
   async getPublicJobDetail(req: Request, res: Response) {
     try {
-      const candidateId = req.user?.role === 'Candidate' ? req.user.userId : undefined;
+      const candidateId = req.user?.role === 'Candidate' ? (req.user.candidateId || req.user.userId) : undefined;
       const { id } = req.params;
       const job = await jobService.getPublicJobDetail(id as string, candidateId);
       return sendResponse(res, 200, true, 'Job details retrieved successfully', job);

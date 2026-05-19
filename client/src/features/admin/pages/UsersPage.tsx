@@ -1,5 +1,5 @@
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
-import { Users, ShieldCheck, Mail } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 export const SuperAdminUsersPage = () => {
   return (

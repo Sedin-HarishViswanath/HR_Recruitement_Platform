@@ -1,4 +1,4 @@
-import { BarChart3, TrendingUp, Users, Briefcase } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { DashboardHeader } from '../../shared/components/DashboardHeader';
 
 export const CompanyAnalyticsPage = () => {
@@ -11,7 +11,7 @@ export const CompanyAnalyticsPage = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-#f8fafc]">
+    <div className="flex flex-col min-h-screen bg-[#f8fafc]">
       <DashboardHeader title="Analytics" subtitle="Track your hiring performance and pipeline metrics" />
 
       <main className="p-6 space-y-6">
@@ -20,7 +20,7 @@ export const CompanyAnalyticsPage = () => {
             <div key={i} className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">{m.label}</p>
               <p className="text-2xl font-black text-slate-900 tracking-tight">{m.value}</p>
-              <p className={`text-[10px] font-semibold mt-1 [${m.up ? 'text-emerald-600' : 'text-red-500'}`}>{m.change}</p>
+              <p className={`text-[10px] font-semibold mt-1 ${m.up ? 'text-emerald-600' : 'text-red-500'}`}>{m.change}</p>
             </div>
           ))}
         </div>

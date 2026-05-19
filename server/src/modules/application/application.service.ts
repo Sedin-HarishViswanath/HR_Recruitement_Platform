@@ -31,7 +31,11 @@ export class ApplicationService {
       if (!finalResumeUrl) throw new AppError('A resume is required to apply', 400);
 
       // 4. Create application
-      const { ai_score, matched_skills } = await atsScreeningService.screenResume(candidate.skills || [], job);
+      const { ai_score, matched_skills } = await atsScreeningService.screenResume(
+        candidate.skills || [],
+        job,
+        candidate.resume_text || undefined,
+      );
 
       const [application] = await trx('applications')
         .insert({
@@ -75,15 +79,17 @@ export class ApplicationService {
     return applicationRepository.listApplications(companyId, query);
   }
 
-  async updateApplicationStage(id: string, userId: string, data: StageTransitionInput) {
+  async updateApplicationStage(id: string, userId: string, companyId: string, data: StageTransitionInput) {
     const { stage, notes } = data;
 
     return await db.transaction(async (trx) => {
       const application = await applicationRepository.findById(id);
       if (!application) throw new AppError('Application not found', 404);
 
-      // TODO: Verify userId belongs to the same company as the application
-      // if (application.company_id !== currentUserCompanyId) ...
+      // Verify userId belongs to the same company as the application
+      if (companyId && application.company_id && application.company_id.toString() !== companyId) {
+        throw new AppError('Unauthorized to update this application', 403);
+      }
 
       const updateData: any = { status: stage, updated_at: db.fn.now() };
       if (stage === 'rejected' && data.notes) {
@@ -145,12 +151,24 @@ export class ApplicationService {
     return applicationRepository.getPipelineSummary(jobId);
   }
 
-  async bulkMove(userId: string, data: BulkMoveInput) {
+  async bulkMove(userId: string, companyId: string, data: BulkMoveInput) {
     const { application_ids, target_stage } = data;
 
     return await db.transaction(async (trx) => {
-      // Validate all applications exist and belong to the same company (TODO)
-      
+      // Validate all applications exist and belong to the same company
+      const applications = await trx('applications')
+        .join('jobs', 'applications.job_id', 'jobs.id')
+        .whereIn('applications.id', application_ids)
+        .select('applications.id', 'jobs.company_id');
+
+      if (applications.length !== application_ids.length) {
+        throw new AppError('One or more applications not found', 404);
+      }
+
+      const unauthorized = applications.some(app => app.company_id.toString() !== companyId);
+      if (unauthorized) {
+        throw new AppError('Unauthorized to move one or more applications', 403);
+      }
       const updated = await trx('applications')
         .whereIn('id', application_ids)
         .update({ status: target_stage, updated_at: db.fn.now() })

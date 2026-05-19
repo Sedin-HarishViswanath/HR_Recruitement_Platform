@@ -14,6 +14,9 @@ const envSchema = z.object({
   JDOODLE_CLIENT_ID: z.string().optional(),
   JDOODLE_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default('gemini-2.0-flash'),
+
   SMTP_HOST: z.string().default('smtp.ethereal.email'),
   SMTP_PORT: z.string().default('587'),
   SMTP_USER: z.string().optional(),
