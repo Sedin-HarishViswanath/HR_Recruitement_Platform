@@ -26,3 +26,17 @@ export const feedbackSchema = z.object({
 export type ScheduleInterviewInput = z.infer<typeof scheduleInterviewSchema>;
 export type RescheduleInterviewInput = z.infer<typeof rescheduleInterviewSchema>;
 export type FeedbackInput = z.infer<typeof feedbackSchema>;
+
+export const candidateRescheduleRequestSchema = z.object({
+  reason: z.string().min(5, 'Reason must be at least 5 characters').max(500),
+  preferred_date: z.string(),
+});
+
+export const handleRescheduleRequestSchema = z.object({
+  action: z.enum(['approve', 'reject']),
+  new_time: z.string().optional(),
+});
+
+export type CandidateRescheduleRequestInput = z.infer<typeof candidateRescheduleRequestSchema>;
+export type HandleRescheduleRequestInput = z.infer<typeof handleRescheduleRequestSchema>;
+
