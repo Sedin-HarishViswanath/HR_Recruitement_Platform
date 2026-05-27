@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { 
   Search, 
   Building2, 
-  MoreVertical, 
   CheckCircle2, 
   XCircle,
   Filter,
@@ -85,6 +84,18 @@ export const CompaniesPage = () => {
     }
   };
 
+  const handleRevoke = async (id: string) => {
+    const reason = prompt('Reason for revoking access:');
+    if (reason === null) return;
+    try {
+      await api.patch(`/companies/admin/${id}/revoke`, { reason });
+      toast.success('Company access revoked');
+      fetchCompanies();
+    } catch (err) {
+      toast.error('Failed to revoke company access');
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active': 
@@ -103,6 +114,12 @@ export const CompaniesPage = () => {
         return (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-100 text-[11px] font-black uppercase tracking-wider">
             <XCircle size={12} /> Rejected
+          </div>
+        );
+      case 'revoked': 
+        return (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-black uppercase tracking-wider">
+            <XCircle size={12} /> Revoked
           </div>
         );
       default: return <Badge>{status}</Badge>;
@@ -129,7 +146,7 @@ export const CompaniesPage = () => {
               </div>
            </div>
            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-inner">
+              <div className="w-14 h-14 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center shadow-inner">
                  <Clock size={28} />
               </div>
               <div>
@@ -173,6 +190,7 @@ export const CompaniesPage = () => {
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="revoked">Revoked</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" className="h-12 rounded-2xl border-slate-100 bg-slate-50 px-5 text-slate-600 hover:bg-slate-100">
@@ -242,8 +260,8 @@ export const CompaniesPage = () => {
                       </td>
                       <td className="px-6 py-5">
                         <div className="space-y-1">
-                          <p className="text-xs font-bold text-slate-600">{company.industry}</p>
-                          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{company.company_size} Employees</p>
+                           <p className="text-xs font-bold text-slate-600">{company.industry}</p>
+                           <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{company.company_size} Employees</p>
                         </div>
                       </td>
                       <td className="px-6 py-5">
@@ -273,9 +291,20 @@ export const CompaniesPage = () => {
                                 Reject
                               </Button>
                             </>
+                          ) : company.status === 'active' ? (
+                            <Button 
+                              onClick={() => handleRevoke(company.id)}
+                              variant="outline"
+                              className="h-9 px-4 rounded-xl border-red-200 text-red-500 font-black text-xs hover:bg-red-50 hover:border-red-100 active:scale-95 transition-all"
+                            >
+                              Revoke Access
+                            </Button>
                           ) : (
-                            <Button variant="ghost" size="icon" className="rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-                               <MoreVertical size={18} />
+                            <Button 
+                              onClick={() => handleApprove(company.id)}
+                              className="h-9 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
+                            >
+                              Approve / Reactivate
                             </Button>
                           )}
                         </div>
