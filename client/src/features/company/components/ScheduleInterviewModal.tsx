@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import {
@@ -23,9 +23,10 @@ interface ScheduleInterviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  preselectedApplicationId?: string;
 }
 
-export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleInterviewModalProps) => {
+export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess, preselectedApplicationId }: ScheduleInterviewModalProps) => {
   const [loading, setLoading] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
   const [interviewers, setInterviewers] = useState<any[]>([]);
@@ -43,8 +44,17 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
   useEffect(() => {
     if (isOpen) {
       fetchData();
+      setFormData({
+        application_id: preselectedApplicationId || '',
+        round_type: 'technical',
+        interviewer_id: '',
+        date: '',
+        time: '',
+        duration: 60,
+        meeting_link: '',
+      });
     }
-  }, [isOpen]);
+  }, [isOpen, preselectedApplicationId]);
 
   const fetchData = async () => {
     try {
@@ -146,13 +156,9 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="screening">Screening</SelectItem>
-                <SelectItem value="phone">Phone Screen</SelectItem>
                 <SelectItem value="aptitude">Aptitude</SelectItem>
                 <SelectItem value="technical">Technical</SelectItem>
-                <SelectItem value="behavioral">Behavioral</SelectItem>
                 <SelectItem value="hr">HR</SelectItem>
-                <SelectItem value="final">Final Round</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -193,7 +199,7 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess }: ScheduleI
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-sm transition-all btn-premium">
+            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium">
               {loading ? 'Scheduling...' : 'Schedule Interview'}
             </Button>
           </div>
