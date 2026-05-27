@@ -1,10 +1,11 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
+import { Input } from '../../../components/ui/input';
 import { Textarea } from '../../../components/ui/textarea';
 import {
   Dialog,
@@ -18,7 +19,6 @@ import { toast } from 'sonner';
 
 const applyFormSchema = z.object({
   cover_note: z.string().max(500, 'Cover note must be less than 500 characters').optional(),
-  resume_url: z.string().optional(),
 });
 
 type ApplyFormValues = z.infer<typeof applyFormSchema>;
@@ -33,24 +33,41 @@ interface ApplyModalProps {
 export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ApplyFormValues>({
     resolver: zodResolver(applyFormSchema),
   });
 
   const onSubmit = async (data: ApplyFormValues) => {
+    if (!resumeFile) {
+      toast.error('Please upload a resume in PDF format');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      await api.post('/applications', {
-        job_id: jobId,
-        ...data,
+      const formData = new FormData();
+      formData.append('job_id', jobId);
+      if (data.cover_note) {
+        formData.append('cover_note', data.cover_note);
+      }
+      formData.append('resume', resumeFile);
+
+      await api.post('/applications', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       toast.success('Application submitted successfully!');
       setIsOpen(false);
+      setResumeFile(null);
+      reset();
       onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to submit application');
@@ -60,15 +77,21 @@ export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalPr
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      setIsOpen(open);
+      if (!open) {
+        setResumeFile(null);
+        reset();
+      }
+    }}>
       <DialogTrigger asChild>
-        {trigger || <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-sm transition-all btn-premium w-full">Apply Now</Button>}
+        {trigger || <Button className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium w-full">Apply Now</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Apply for {jobTitle}</DialogTitle>
           <DialogDescription>
-            Submit your application. Your default profile resume will be used.
+            Submit your application with a custom resume for this position.
           </DialogDescription>
         </DialogHeader>
 
@@ -83,18 +106,35 @@ export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalPr
             {errors.cover_note && <p className="text-red-500 text-sm">{errors.cover_note.message}</p>}
           </div>
 
-          <div className="bg-amber-50 border border-amber-100 p-4 rounded-lg flex items-center justify-between">
-            <div className="text-sm">
-              <p className="font-bold text-amber-900">Resume Attached</p>
-              <p className="text-amber-700 font-medium">Using resume from your candidate profile.</p>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="resume-upload">Resume (PDF only) *</Label>
+            <Input
+              id="resume-upload"
+              type="file"
+              accept=".pdf"
+              required
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (file.type !== 'application/pdf') {
+                    toast.error('Only PDF files are allowed');
+                    e.target.value = '';
+                    setResumeFile(null);
+                  } else {
+                    setResumeFile(file);
+                  }
+                }
+              }}
+              className="cursor-pointer"
+            />
+            <p className="text-xs text-slate-400">Each application requires a target PDF resume.</p>
           </div>
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-sm transition-all btn-premium">
+            <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium">
               {isSubmitting ? 'Submitting...' : 'Confirm & Submit Application'}
             </Button>
           </div>
