@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import {
@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from '../../../components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Search, MoreVertical, Shield, UserX, UserCheck } from 'lucide-react';
+import { Plus, Search, MoreVertical, Shield, UserX, UserCheck, CheckCircle2 } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -51,6 +51,7 @@ export const UsersPage = () => {
   const [search, setSearch] = useState('');
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteData, setInviteData] = useState({ name: '', email: '', role: 'Recruiter', password: '' });
+  const [invitedLink, setInvitedLink] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -72,10 +73,10 @@ export const UsersPage = () => {
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/companies/me/users/invite', inviteData);
+      const res = await api.post('/companies/me/users/invite', inviteData);
       toast.success('User invited successfully');
-      setIsInviteOpen(false);
-      fetchUsers();
+      setInvitedLink(res.data.data.inviteLink);
+      setInviteData({ name: '', email: '', role: 'Recruiter', password: '' });
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to invite user');
     }
@@ -101,50 +102,99 @@ export const UsersPage = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in bg-[#f4f5f7] min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in bg-[#fafbfc] min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>User Management</h1>
           <p className="text-slate-500 mt-1 text-[13px]">Manage your team members and their access levels.</p>
         </div>
         
-        <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
+        <Dialog open={isInviteOpen} onOpenChange={(open) => {
+          setIsInviteOpen(open);
+          if (!open) {
+            setInvitedLink(null);
+            fetchUsers();
+          }
+        }}>
           <DialogTrigger asChild>
-            <Button className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-sm btn-premium">
+            <Button className="bg-violet-500 hover:bg-violet-700 text-white font-bold rounded-xl shadow-sm btn-premium">
               <Plus size={16} className="mr-1.5" /> Invite User
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Invite a new team member</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleInvite} className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label>Full Name</Label>
-                <Input required value={inviteData.name} onChange={e => setInviteData({...inviteData, name: e.target.value})} placeholder="John Doe" />
+          <DialogContent className="sm:max-w-md">
+            {invitedLink ? (
+              <div className="space-y-6 py-4 text-center">
+                <div className="mx-auto w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center animate-bounce">
+                  <CheckCircle2 size={24} />
+                </div>
+                <div className="space-y-2">
+                  <DialogTitle className="text-center text-xl font-bold">User Invited Successfully!</DialogTitle>
+                  <p className="text-sm text-slate-500">
+                    An email has been sent. You can also copy and share the invitation link directly:
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border">
+                  <input
+                    readOnly
+                    value={invitedLink}
+                    className="flex-1 bg-transparent text-xs text-slate-600 font-mono focus:outline-none overflow-x-auto"
+                  />
+                  <Button
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                    onClick={() => {
+                      navigator.clipboard.writeText(invitedLink);
+                      toast.success('Link copied to clipboard');
+                    }}
+                  >
+                    Copy
+                  </Button>
+                </div>
+                <Button
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold"
+                  onClick={() => {
+                    setIsInviteOpen(false);
+                    setInvitedLink(null);
+                    fetchUsers();
+                  }}
+                >
+                  Done
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label>Email Address</Label>
-                <Input required type="email" value={inviteData.email} onChange={e => setInviteData({...inviteData, email: e.target.value})} placeholder="john@company.com" />
-              </div>
-              <div className="space-y-2">
-                <Label>Role</Label>
-                <Select value={inviteData.role} onValueChange={v => setInviteData({...inviteData, role: v})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Recruiter">Recruiter</SelectItem>
-                    <SelectItem value="Interviewer">Interviewer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Temporary Password</Label>
-                <Input required type="password" value={inviteData.password} onChange={e => setInviteData({...inviteData, password: e.target.value})} />
-              </div>
-              <Button type="submit" className="w-full">Send Invitation</Button>
-            </form>
+            ) : (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Invite a new team member</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleInvite} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label>Full Name</Label>
+                    <Input required value={inviteData.name} onChange={e => setInviteData({...inviteData, name: e.target.value})} placeholder="John Doe" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email Address</Label>
+                    <Input required type="email" value={inviteData.email} onChange={e => setInviteData({...inviteData, email: e.target.value})} placeholder="john@company.com" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <Select value={inviteData.role} onValueChange={v => setInviteData({...inviteData, role: v})}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Recruiter">Recruiter</SelectItem>
+                        <SelectItem value="Interviewer">Interviewer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Temporary Password</Label>
+                    <Input required type="password" value={inviteData.password} onChange={e => setInviteData({...inviteData, password: e.target.value})} />
+                  </div>
+                  <Button type="submit" className="w-full">Send Invitation</Button>
+                </form>
+              </>
+            )}
           </DialogContent>
         </Dialog>
       </div>
