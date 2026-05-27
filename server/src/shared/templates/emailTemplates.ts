@@ -45,3 +45,15 @@ export const statusUpdate = (candidateName: string, jobTitle: string, newStage: 
   <p>Your application for <strong>${jobTitle}</strong> has been moved to the <strong>${newStage}</strong> stage.</p>
   <p>You can track your application status anytime on your dashboard.</p>
 `);
+
+export const userInviteEmail = (name: string, role: string, companyName: string, inviteLink: string) => baseTemplate(`
+  <h2>You have been invited!</h2>
+  <p>Hi ${name},</p>
+  <p>You have been invited to join <strong>${companyName}</strong> as a <strong>${role}</strong> on Recruiting AI.</p>
+  <p>To sign in to your account, click the button below:</p>
+  <div style="margin-top: 30px; margin-bottom: 30px;">
+    <a href="${inviteLink}" style="background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Accept Invitation & Sign In</a>
+  </div>
+  <p>Or copy and paste this link in your browser:</p>
+  <p style="word-break: break-all; color: #2563eb;">${inviteLink}</p>
+`);
