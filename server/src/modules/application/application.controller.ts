@@ -7,19 +7,32 @@ import {
 } from './application.schema';
 import { sendResponse } from '../../shared/utils/response';
 import { AppError } from '../../shared/errors/AppError';
+import { resumeParserService } from '../candidate/resume-parser.service';
 
 export class ApplicationController {
   async applyToJob(req: Request, res: Response) {
     try {
-      const candidateId = req.user.userId;
-      // In this system, candidateId might be different from userId if we have a candidates table.
-      // Assuming req.user contains the correct IDs.
       const id = req.user.candidateId || req.user.userId;
 
       const parsed = applySchema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
 
-      const application = await applicationService.applyToJob(id, parsed.data);
+      let resumeUrl = parsed.data.resume_url;
+      let resumeText = undefined;
+
+      if (req.file) {
+        resumeUrl = `/uploads/resumes/${req.file.filename}`;
+        const parsedPdf = await resumeParserService.parsePdf(req.file.path).catch(() => null);
+        if (parsedPdf && parsedPdf.resume_text) {
+          resumeText = parsedPdf.resume_text;
+        }
+      }
+
+      const application = await applicationService.applyToJob(id, {
+        ...parsed.data,
+        resume_url: resumeUrl,
+      }, resumeText);
+      
       return sendResponse(res, 201, true, 'Application submitted successfully', application);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
