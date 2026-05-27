@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../../../shared/lib/api';
 import {
   Video, Mic, ExternalLink, Radio,
-  Copy, Check, Loader2, StopCircle, PhoneOff,
-  FileText, RefreshCw, MicOff
+  Copy, Check, Loader2, PhoneOff,
+  FileText, MicOff
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { io, Socket } from 'socket.io-client';
@@ -46,7 +46,7 @@ export const MeetingPanel = ({
   const [meetingJoined, setMeetingJoined] = useState(false);
   const [meetingEnded, setMeetingEnded] = useState(false);
 
-  // Transcription state (Web Speech API — free, no key required)
+  // Transcription state (Web Speech API â€” free, no key required)
   const [transcribing, setTranscribing] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [micError, setMicError] = useState<string | null>(null);
@@ -212,7 +212,7 @@ export const MeetingPanel = ({
     return () => { socket.disconnect(); };
   }, [interviewId]);
 
-  // ── Auto-scroll transcript
+  // â”€â”€ Auto-scroll transcript
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [transcript]);
@@ -223,7 +223,7 @@ export const MeetingPanel = ({
       : `${roomUrl}#config.enableClosePage=false&config.prejoinPageEnabled=false&config.disableDeepLinking=true`
     : null;
 
-  // ── Copy link to clipboard
+  // â”€â”€ Copy link to clipboard
   const handleCopy = async () => {
     if (!roomUrl) return;
     await navigator.clipboard.writeText(roomUrl);
@@ -231,7 +231,7 @@ export const MeetingPanel = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ── Start Web Speech API transcription (auto-triggered on meeting join)
+  // â”€â”€ Start Web Speech API transcription (auto-triggered on meeting join)
   const startTranscription = useCallback(() => {
     if (!SpeechRecognition) {
       setMicError('Your browser does not support speech recognition. Please use Chrome or Edge.');
@@ -287,10 +287,10 @@ export const MeetingPanel = ({
         setTranscribing(false);
         recognitionRef.current = null; // Fix: prevent infinite restart loop
       } else if (event.error === 'no-speech') {
-        // Ignore — just silence, recognition continues
+        // Ignore â€” just silence, recognition continues
       } else if (event.error === 'network') {
         // Web Speech API requires internet for Chrome
-        setMicError('Network error — speech recognition requires an internet connection.');
+        setMicError('Network error â€” speech recognition requires an internet connection.');
         setTranscribing(false);
         recognitionRef.current = null; // Fix: prevent infinite restart loop on network error
       }
@@ -316,7 +316,7 @@ export const MeetingPanel = ({
     }
   }, [participantRole, interviewId, meetingEnded]);
 
-  // ── Stop transcription
+  // â”€â”€ Stop transcription
   const stopTranscription = useCallback(() => {
     if (recognitionRef.current) {
       const ref = recognitionRef.current;
@@ -329,7 +329,7 @@ export const MeetingPanel = ({
   // Cleanup on unmount
   useEffect(() => () => stopTranscription(), [stopTranscription]);
 
-  // ── Auto-start transcription when meeting is joined
+  // â”€â”€ Auto-start transcription when meeting is joined
   useEffect(() => {
     if (meetingJoined && !meetingEnded && speechSupported && !transcribing) {
       startTranscription();
@@ -359,7 +359,7 @@ export const MeetingPanel = ({
     return timer;
   }, [onMeetingWindowClosed, meetingEnded]);
 
-  // ── Open video call in new tab
+  // â”€â”€ Open video call in new tab
   const handleJoin = async () => {
     if (!joinUrl) return;
 
@@ -382,7 +382,7 @@ export const MeetingPanel = ({
     startJitsiPolling(meetingWindow);
   };
 
-  // ── Manual "End Meeting" for interviewers
+  // â”€â”€ Manual "End Meeting" for interviewers
   const handleEndMeeting = () => {
     if (meetingWindowRef.current && !meetingWindowRef.current.closed) {
       try { meetingWindowRef.current.close(); } catch { /* cross-origin */ }
@@ -393,7 +393,7 @@ export const MeetingPanel = ({
     onMeetingWindowClosed?.();
   };
 
-  // ── Save transcript to Notes tab
+  // â”€â”€ Save transcript to Notes tab
   const handleSaveTranscriptToNotes = () => {
     if (transcript.length === 0) return;
     const formatted = transcript
@@ -406,13 +406,13 @@ export const MeetingPanel = ({
 
   const tabs = [
     { key: 'meeting' as const, label: 'Meeting' },
-    { key: 'transcript' as const, label: `Transcript${transcript.length ? ` (${transcript.length})` : ''}` },
+    ...(participantRole === 'candidate' ? [] : [{ key: 'transcript' as const, label: `Transcript${transcript.length ? ` (${transcript.length})` : ''}` }]),
     { key: 'notes' as const, label: 'Notes' },
-  ] as const;
+  ];
 
   return (
     <div className="flex flex-col h-full bg-[#0f111a] text-white border-l border-[#1e2130]">
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <div className="px-4 pt-4 pb-0 shrink-0">
         <div className="flex items-center gap-2 mb-1">
           <div className={`w-2 h-2 rounded-full ${meetingJoined && !meetingEnded ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
@@ -431,23 +431,23 @@ export const MeetingPanel = ({
               onClick={() => setTab(t.key)}
               className={`pb-2 px-3 text-[11px] font-bold transition-colors relative ${
                 tab === t.key
-                  ? 'text-amber-400'
+                  ? 'text-violet-400'
                   : 'text-slate-500 hover:text-slate-300'
               }`}
             >
               {t.label}
               {tab === t.key && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400 rounded-full" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-500 rounded-full" />
               )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── Tab content ── */}
+      {/* â”€â”€ Tab content â”€â”€ */}
       <div className="flex-1 overflow-y-auto min-h-0">
 
-        {/* ── MEETING TAB ── */}
+        {/* â”€â”€ MEETING TAB â”€â”€ */}
         {tab === 'meeting' && (
           <div className="p-4 space-y-4">
             {/* Video Call Card */}
@@ -466,14 +466,14 @@ export const MeetingPanel = ({
                   <>
                     <p className="text-xs font-bold text-slate-400">Video call opens in a separate window</p>
                     <p className="text-[10px] text-slate-600 mt-1">
-                      {meetingJoined ? 'Meeting is active — return to this tab anytime' : 'Click Join to open the video room'}
+                      {meetingJoined ? 'Meeting is active â€” return to this tab anytime' : 'Click Join to open the video room'}
                     </p>
                   </>
                 )}
 
                 {loadingRoom && (
                   <div className="absolute inset-0 bg-[#0d0f1a]/80 flex items-center justify-center">
-                    <Loader2 size={24} className="text-amber-400 animate-spin" />
+                    <Loader2 size={24} className="text-violet-400 animate-spin" />
                   </div>
                 )}
               </div>
@@ -512,7 +512,7 @@ export const MeetingPanel = ({
                     )}
                     {meetingEnded && participantRole === 'interviewer' && (
                       <div className="text-center py-2 text-[11px] text-emerald-400 font-bold">
-                        ✓ Feedback form is open
+                        âœ“ Feedback form is open
                       </div>
                     )}
                   </div>
@@ -535,47 +535,49 @@ export const MeetingPanel = ({
             </div>
 
             {/* Transcription status card */}
-            <div className="bg-[#1a1d2e] rounded-2xl border border-[#2a2d3e] p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-xs font-black text-white">Live Transcription</p>
-                  <p className="text-[10px] text-slate-500">
-                    {speechSupported ? 'Auto-recording · Browser Speech API (Free)' : 'Not supported in this browser'}
-                  </p>
+            {participantRole !== 'candidate' && (
+              <div className="bg-[#1a1d2e] rounded-2xl border border-[#2a2d3e] p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-xs font-black text-white">Live Transcription</p>
+                    <p className="text-[10px] text-slate-500">
+                      {speechSupported ? 'Auto-recording Â· Browser Speech API (Free)' : 'Not supported in this browser'}
+                    </p>
+                  </div>
+                  {transcribing && (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600/20 text-emerald-400 border border-emerald-600/30">
+                      <Radio size={11} className="animate-pulse" /> Recording
+                    </div>
+                  )}
                 </div>
-                {transcribing && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600/20 text-emerald-400 border border-emerald-600/30">
-                    <Radio size={11} className="animate-pulse" /> Recording
+
+                {micError && (
+                  <p className="text-[10px] text-red-400 bg-red-900/20 px-3 py-2 rounded-lg border border-red-900/30">
+                    {micError}
+                  </p>
+                )}
+
+                {!speechSupported && (
+                  <div className="flex items-center gap-2 text-[10px] text-violet-400 bg-amber-900/20 px-3 py-2 rounded-lg border border-amber-900/30">
+                    <MicOff size={12} />
+                    <span>Speech recognition is not supported. Use Chrome or Edge for transcription.</span>
                   </div>
                 )}
+
+                {transcribing && (
+                  <div className="flex items-center gap-2 text-[10px] text-emerald-400 mt-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Listening... speak clearly near your microphone
+                  </div>
+                )}
+
+                {!transcribing && !micError && speechSupported && (
+                  <p className="text-[10px] text-slate-600">
+                    {meetingJoined ? 'Transcription will auto-start momentarily...' : 'Transcription auto-starts when you join the call.'}
+                  </p>
+                )}
               </div>
-
-              {micError && (
-                <p className="text-[10px] text-red-400 bg-red-900/20 px-3 py-2 rounded-lg border border-red-900/30">
-                  {micError}
-                </p>
-              )}
-
-              {!speechSupported && (
-                <div className="flex items-center gap-2 text-[10px] text-amber-400 bg-amber-900/20 px-3 py-2 rounded-lg border border-amber-900/30">
-                  <MicOff size={12} />
-                  <span>Speech recognition is not supported. Use Chrome or Edge for transcription.</span>
-                </div>
-              )}
-
-              {transcribing && (
-                <div className="flex items-center gap-2 text-[10px] text-emerald-400 mt-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Listening... speak clearly near your microphone
-                </div>
-              )}
-
-              {!transcribing && !micError && speechSupported && (
-                <p className="text-[10px] text-slate-600">
-                  {meetingJoined ? 'Transcription will auto-start momentarily...' : 'Transcription auto-starts when you join the call.'}
-                </p>
-              )}
-            </div>
+            )}
 
             {/* Video Recording Status Card */}
             {participantRole === 'interviewer' && (
@@ -592,7 +594,7 @@ export const MeetingPanel = ({
                   When you join, you will be prompted to share the meeting tab. Select the "Share tab audio" option to ensure the candidate's voice is recorded.
                 </p>
                 {videoUploadStatus === 'uploading' && (
-                  <div className="flex items-center gap-2 text-[10px] text-amber-400 mt-2">
+                  <div className="flex items-center gap-2 text-[10px] text-violet-400 mt-2">
                     <Loader2 size={12} className="animate-spin" /> Uploading recording to server...
                   </div>
                 )}
@@ -603,7 +605,7 @@ export const MeetingPanel = ({
                 )}
                 {videoUploadStatus === 'error' && (
                   <div className="flex items-center gap-2 text-[10px] text-red-400 mt-2">
-                    ❌ Failed to upload recording.
+                    âŒ Failed to upload recording.
                   </div>
                 )}
               </div>
@@ -611,7 +613,7 @@ export const MeetingPanel = ({
           </div>
         )}
 
-        {/* ── TRANSCRIPT TAB ── */}
+        {/* â”€â”€ TRANSCRIPT TAB â”€â”€ */}
         {tab === 'transcript' && (
           <div className="flex flex-col h-full">
             {/* Toolbar */}
@@ -620,7 +622,7 @@ export const MeetingPanel = ({
                 <span className="text-[10px] text-slate-500 font-medium">{transcript.length} entries</span>
                 <button
                   onClick={handleSaveTranscriptToNotes}
-                  className="flex items-center gap-1.5 text-[10px] font-bold text-amber-400 hover:text-amber-300 transition-colors border border-amber-600/30 bg-amber-600/10 hover:bg-amber-600/20 px-2.5 py-1 rounded-lg"
+                  className="flex items-center gap-1.5 text-[10px] font-bold text-violet-400 hover:text-violet-300 transition-colors border border-amber-600/30 bg-amber-600/10 hover:bg-violet-700/20 px-2.5 py-1 rounded-lg"
                 >
                   <FileText size={10} />
                   Save to Notes
@@ -634,7 +636,7 @@ export const MeetingPanel = ({
                   <Mic size={28} className="text-slate-700 mb-3" />
                   <p className="text-xs font-bold text-slate-500">No transcript yet</p>
                   <p className="text-[10px] text-slate-600 mt-1">
-                    {meetingJoined ? 'Transcription is active — speak into your microphone' : 'Join the meeting to begin transcription'}
+                    {meetingJoined ? 'Transcription is active â€” speak into your microphone' : 'Join the meeting to begin transcription'}
                   </p>
                 </div>
               ) : (
@@ -670,12 +672,12 @@ export const MeetingPanel = ({
           </div>
         )}
 
-        {/* ── NOTES TAB ── */}
+        {/* â”€â”€ NOTES TAB â”€â”€ */}
         {tab === 'notes' && (
           <div className="p-4 h-full">
             <textarea
               className="w-full h-full min-h-[200px] bg-[#1a1d2e] border border-[#2a2d3e] rounded-2xl p-4 text-sm text-slate-300 font-mono placeholder-slate-700 resize-none outline-none focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 transition-all leading-relaxed"
-              placeholder={`Interviewer notes for ${candidateName}...\n\n• Technical skills:\n• Communication:\n• Problem solving:\n• Overall impression:`}
+              placeholder={`Interviewer notes for ${candidateName}...\n\nâ€¢ Technical skills:\nâ€¢ Communication:\nâ€¢ Problem solving:\nâ€¢ Overall impression:`}
               value={notes}
               onChange={e => setNotes(e.target.value)}
             />
@@ -684,22 +686,24 @@ export const MeetingPanel = ({
 
       </div>
 
-      {/* ── Footer status ── */}
-      <div className="px-4 py-2.5 border-t border-[#1e2130] flex items-center gap-2 shrink-0">
-        {transcribing ? (
-          <>
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-            <span className="text-[10px] text-slate-500 font-medium">Recording transcription</span>
-          </>
-        ) : (
-          <>
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-700" />
-            <span className="text-[10px] text-slate-600 font-medium">
-              {transcript.length > 0 ? `${transcript.length} transcript entries` : 'Transcription off'}
-            </span>
-          </>
-        )}
-      </div>
+      {/* â”€â”€ Footer status â”€â”€ */}
+      {participantRole !== 'candidate' && (
+        <div className="px-4 py-2.5 border-t border-[#1e2130] flex items-center gap-2 shrink-0">
+          {transcribing ? (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+              <span className="text-[10px] text-slate-500 font-medium">Recording transcription</span>
+            </>
+          ) : (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-700" />
+              <span className="text-[10px] text-slate-600 font-medium">
+                {transcript.length > 0 ? `${transcript.length} transcript entries` : 'Transcription off'}
+              </span>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
