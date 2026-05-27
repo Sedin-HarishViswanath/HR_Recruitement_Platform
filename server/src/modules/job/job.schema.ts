@@ -13,6 +13,7 @@ const jobBaseSchema = z.object({
   deadline: z.string().optional(),
   remote: z.boolean().optional(),
   status: z.enum(['draft', 'published']).default('draft'),
+  interview_rounds: z.number().int().min(1).max(10).default(1),
 });
 
 export const createJobSchema = jobBaseSchema.refine(data => !data.salary_min || !data.salary_max || data.salary_max >= data.salary_min, {
