@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+﻿import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import { Clock, CheckCircle2, XCircle, AlertTriangle, ChevronRight, BookOpen } from 'lucide-react';
@@ -39,7 +39,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 const DIFFICULTY_COLOR: Record<string, string> = {
   easy: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-  medium: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  medium: 'text-violet-400 bg-violet-50 border-violet-200',
   hard: 'text-red-400 bg-red-500/10 border-red-500/20',
 };
 
@@ -61,7 +61,7 @@ export const AptitudeTest = ({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const handleSubmitRef = useRef<((autoSubmit?: boolean) => void) | null>(null);
 
-  // ── Fetch questions from Open Trivia DB
+  // â”€â”€ Fetch questions from Open Trivia DB
   const fetchQuestions = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -170,7 +170,7 @@ export const AptitudeTest = ({
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
-  // ── Loading state
+  // â”€â”€ Loading state
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 bg-[#f8fafc]">
@@ -188,18 +188,18 @@ export const AptitudeTest = ({
     );
   }
 
-  // ── Error state
+  // â”€â”€ Error state
   if (error && questions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 bg-[#f8fafc] text-center">
-        <AlertTriangle size={40} className="text-amber-500 mb-4" />
+        <AlertTriangle size={40} className="text-violet-500 mb-4" />
         <p className="font-bold text-slate-900 mb-2">{error}</p>
         <button onClick={fetchQuestions} className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl mt-4">Try Again</button>
       </div>
     );
   }
 
-  // ── Submitted / Result state
+  // â”€â”€ Submitted / Result state
   if (submitted && result) {
     const pct = Math.round((result.score / result.total) * 100);
     const passed = pct >= 60;
@@ -229,7 +229,7 @@ export const AptitudeTest = ({
 
   return (
     <div className="h-full flex flex-col bg-[#f8fafc]">
-      {/* ── Top bar: timer + progress ── */}
+      {/* â”€â”€ Top bar: timer + progress â”€â”€ */}
       <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-slate-200 shrink-0 gap-4">
         {/* Progress */}
         <div className="flex-1">
@@ -256,7 +256,7 @@ export const AptitudeTest = ({
         )}
       </div>
 
-      {/* ── Question + options ── */}
+      {/* â”€â”€ Question + options â”€â”€ */}
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl mx-auto">
           {/* Category + difficulty badge */}
@@ -302,14 +302,14 @@ export const AptitudeTest = ({
         </div>
       </div>
 
-      {/* ── Navigation footer ── */}
+      {/* â”€â”€ Navigation footer â”€â”€ */}
       <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-slate-200 shrink-0">
         <button
           onClick={() => setCurrentQuestion(c => Math.max(0, c - 1))}
           disabled={currentQuestion === 0}
           className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
-          ← Previous
+          â† Previous
         </button>
 
         {/* Question dots */}
@@ -356,7 +356,7 @@ export const AptitudeTest = ({
   );
 };
 
-// ── Offline fallback (used when Open Trivia DB is unavailable) ──
+// â”€â”€ Offline fallback (used when Open Trivia DB is unavailable) â”€â”€
 const OFFLINE_FALLBACK: OTDBQuestion[] = [
   { id: 1, question: "What is the time complexity of binary search?", options: ["O(n)", "O(log n)", "O(n log n)", "O(1)"], correct_answer: "O(log n)", category: "Computer Science", difficulty: "medium", type: "multiple" },
   { id: 2, question: "What does RAM stand for?", options: ["Read Access Memory", "Random Access Memory", "Rapid Application Module", "Readable Assigned Memory"], correct_answer: "Random Access Memory", category: "Computers", difficulty: "easy", type: "multiple" },
@@ -372,7 +372,7 @@ const OFFLINE_FALLBACK: OTDBQuestion[] = [
   { id: 12, question: "What is the next prime after 23?", options: ["25", "27", "29", "31"], correct_answer: "29", category: "Mathematics", difficulty: "medium", type: "multiple" },
   { id: 13, question: "What does HTML stand for?", options: ["Hyper Trainer Marking Language", "Hyper Text Markup Language", "High Text Machine Language", "Hyper Transfer Markup Language"], correct_answer: "Hyper Text Markup Language", category: "Computers", difficulty: "easy", type: "multiple" },
   { id: 14, question: "Which planet is farthest from the Sun?", options: ["Saturn", "Uranus", "Jupiter", "Neptune"], correct_answer: "Neptune", category: "Science", difficulty: "easy", type: "multiple" },
-  { id: 15, question: "What is the area of a circle with radius 7?", options: ["49π", "14π", "21π", "7π"], correct_answer: "49π", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 15, question: "What is the area of a circle with radius 7?", options: ["49Ï€", "14Ï€", "21Ï€", "7Ï€"], correct_answer: "49Ï€", category: "Mathematics", difficulty: "medium", type: "multiple" },
   { id: 16, question: "Which layer of the OSI model handles routing?", options: ["Transport", "Data Link", "Network", "Session"], correct_answer: "Network", category: "Computers", difficulty: "hard", type: "multiple" },
   { id: 17, question: "What is 0.125 as a fraction?", options: ["1/4", "1/8", "1/6", "1/10"], correct_answer: "1/8", category: "Mathematics", difficulty: "medium", type: "multiple" },
   { id: 18, question: "Who invented the World Wide Web?", options: ["Bill Gates", "Vint Cerf", "Tim Berners-Lee", "Steve Jobs"], correct_answer: "Tim Berners-Lee", category: "Computers", difficulty: "easy", type: "multiple" },
