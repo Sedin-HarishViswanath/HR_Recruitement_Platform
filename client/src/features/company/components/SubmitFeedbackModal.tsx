@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import { Star, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
@@ -22,10 +22,10 @@ interface SubmitFeedbackModalProps {
 }
 
 const recommendationOptions = [
-  { value: 'strong_hire', label: 'Strong Hire', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: '🌟' },
-  { value: 'hire', label: 'Hire', color: 'bg-green-50 text-green-700 border-green-200', icon: '👍' },
-  { value: 'no_hire', label: 'No Hire', color: 'bg-orange-50 text-orange-700 border-orange-200', icon: '👎' },
-  { value: 'strong_no_hire', label: 'Strong No Hire', color: 'bg-red-50 text-red-700 border-red-200', icon: '🚫' },
+  { value: 'strong_hire', label: 'Strong Hire', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'ðŸŒŸ' },
+  { value: 'hire', label: 'Hire', color: 'bg-green-50 text-green-700 border-green-200', icon: 'ðŸ‘' },
+  { value: 'no_hire', label: 'No Hire', color: 'bg-orange-50 text-orange-700 border-orange-200', icon: 'ðŸ‘Ž' },
+  { value: 'strong_no_hire', label: 'Strong No Hire', color: 'bg-red-50 text-red-700 border-red-200', icon: 'ðŸš«' },
 ];
 
 export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: SubmitFeedbackModalProps) => {
@@ -116,7 +116,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <MessageSquare size={20} className="text-amber-500" />
+            <MessageSquare size={20} className="text-violet-500" />
             <span>Submit Interview Feedback</span>
           </DialogTitle>
         </DialogHeader>
@@ -128,7 +128,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold text-slate-900 truncate">{interview.candidate_name || 'Candidate'}</p>
-            <p className="text-xs text-slate-500 font-medium">{interview.job_title || 'Position'} · {(interview.round_type || 'Interview').charAt(0).toUpperCase() + (interview.round_type || 'Interview').slice(1)} Round</p>
+            <p className="text-xs text-slate-500 font-medium">{interview.job_title || 'Position'} Â· {(interview.round_type || 'Interview').charAt(0).toUpperCase() + (interview.round_type || 'Interview').slice(1)} Round</p>
           </div>
         </div>
 
@@ -152,7 +152,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
                     size={28}
                     className={`transition-colors duration-150 ${
                       star <= (hoveredStar || rating)
-                        ? 'fill-amber-400 text-amber-400'
+                        ? 'fill-amber-400 text-violet-400'
                         : 'text-slate-200 hover:text-slate-300'
                     }`}
                   />
@@ -160,7 +160,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
               ))}
               {rating > 0 && (
                 <span className="ml-2 text-sm font-bold text-slate-600">
-                  {rating}/5 — {['', 'Poor', 'Below Average', 'Average', 'Good', 'Excellent'][rating]}
+                  {rating}/5 â€” {['', 'Poor', 'Below Average', 'Average', 'Good', 'Excellent'][rating]}
                 </span>
               )}
             </div>
@@ -177,7 +177,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
               onChange={(e) => setStrengths(e.target.value)}
               placeholder="What did the candidate do well? Technical skills, communication, problem-solving..."
               rows={3}
-              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all resize-none placeholder:text-slate-400"
+              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-violet-400 transition-all resize-none placeholder:text-slate-400"
             />
             <p className="text-[10px] text-slate-400 mt-1 font-medium">{strengths.length}/2000 characters (min 10)</p>
           </div>
@@ -193,7 +193,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
               onChange={(e) => setWeaknesses(e.target.value)}
               placeholder="Where could the candidate improve? Knowledge gaps, communication issues..."
               rows={3}
-              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all resize-none placeholder:text-slate-400"
+              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-violet-400 transition-all resize-none placeholder:text-slate-400"
             />
             <p className="text-[10px] text-slate-400 mt-1 font-medium">{weaknesses.length}/2000 characters (min 10)</p>
           </div>
@@ -232,7 +232,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
               onChange={(e) => setAdditionalComments(e.target.value)}
               placeholder="Any additional notes for the hiring team..."
               rows={2}
-              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all resize-none placeholder:text-slate-400"
+              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-violet-400 transition-all resize-none placeholder:text-slate-400"
             />
           </div>
         </div>
@@ -250,7 +250,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
             type="button"
             onClick={handleSubmit}
             disabled={submitting || rating === 0 || !recommendation}
-            className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 rounded-xl shadow-sm shadow-amber-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 rounded-xl shadow-sm shadow-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'Submitting...' : 'Submit Feedback'}
           </button>
