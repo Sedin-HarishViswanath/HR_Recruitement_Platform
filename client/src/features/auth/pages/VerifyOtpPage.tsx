@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../../app/store';
 
 export const VerifyOtpPage = () => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const email = (location.state as any)?.email || '';
@@ -65,11 +66,17 @@ export const VerifyOtpPage = () => {
       await api.post('/auth/verify-otp', { email, otp: code });
       setVerified(true);
       toast.success('Email verified successfully!');
-      const role = (user?.role || '').toLowerCase();
+      const role = (user?.role || '').toLowerCase().trim();
       setTimeout(() => {
-        if (role === 'candidate') navigate('/candidate/onboarding');
-        else if (role === 'super admin') navigate('/superadmin/dashboard');
-        else navigate('/pending-approval');
+        if (role === 'candidate') {
+          navigate('/candidate/onboarding');
+        } else if (role === 'super admin' || role === 'superadmin') {
+          navigate('/superadmin/dashboard');
+        } else if (role === 'admin') {
+          navigate('/company/onboarding');
+        } else {
+          navigate('/company/dashboard');
+        }
       }, 2000);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Invalid verification code');
@@ -116,8 +123,8 @@ export const VerifyOtpPage = () => {
         <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
           {/* Icon */}
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-              <Mail size={28} className="text-amber-400" />
+            <div className="w-16 h-16 rounded-2xl bg-violet-50 border border-violet-200 flex items-center justify-center">
+              <Mail size={28} className="text-violet-400" />
             </div>
           </div>
 
@@ -129,7 +136,7 @@ export const VerifyOtpPage = () => {
             <p className="text-slate-400 text-sm">
               We've sent a 6-digit code to
             </p>
-            <p className="text-amber-400 font-bold text-sm mt-1">{email}</p>
+            <p className="text-violet-400 font-bold text-sm mt-1">{email}</p>
           </div>
 
           {/* OTP Input */}
@@ -145,7 +152,7 @@ export const VerifyOtpPage = () => {
                 onChange={e => handleChange(i, e.target.value)}
                 onKeyDown={e => handleKeyDown(i, e)}
                 className={`w-12 h-14 text-center text-xl font-black rounded-xl border-2 outline-none transition-all bg-white/5 text-white
-                  ${digit ? 'border-amber-400 bg-amber-400/10' : 'border-white/20 focus:border-amber-400/60'}`}
+                  ${digit ? 'border-violet-400 bg-violet-50' : 'border-white/20 focus:border-violet-400'}`}
               />
             ))}
           </div>
@@ -154,7 +161,7 @@ export const VerifyOtpPage = () => {
           <button
             onClick={handleVerify}
             disabled={loading || otp.join('').length !== 6}
-            className="w-full h-12 rounded-2xl bg-amber-500 hover:bg-amber-400 disabled:bg-white/10 disabled:text-white/30 text-slate-900 font-black text-base transition-all active:scale-[0.98] shadow-lg shadow-amber-500/20"
+            className="w-full h-12 rounded-2xl bg-violet-500 hover:bg-violet-500 disabled:bg-white/10 disabled:text-white/30 text-slate-900 font-black text-base transition-all active:scale-[0.98] shadow-lg shadow-violet-500/20"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -167,12 +174,12 @@ export const VerifyOtpPage = () => {
           {/* Resend */}
           <div className="text-center mt-6">
             {countdown > 0 ? (
-              <p className="text-slate-400 text-sm">Resend code in <span className="text-amber-400 font-bold">{countdown}s</span></p>
+              <p className="text-slate-400 text-sm">Resend code in <span className="text-violet-400 font-bold">{countdown}s</span></p>
             ) : (
               <button
                 onClick={handleResend}
                 disabled={resending}
-                className="flex items-center gap-2 text-sm text-amber-400 hover:text-amber-300 font-bold transition-colors mx-auto"
+                className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300 font-bold transition-colors mx-auto"
               >
                 <RefreshCw size={14} className={resending ? 'animate-spin' : ''} />
                 {resending ? 'Sending...' : 'Resend Code'}
