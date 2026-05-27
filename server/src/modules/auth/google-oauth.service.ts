@@ -23,12 +23,19 @@ export class GoogleOAuthService {
       const { email, name } = payload;
       let userRecord;
       let isCandidate = false;
+      let isNewUser = false;
 
       // 1. Check if user exists
       let existingUser = await db('users')
         .leftJoin('memberships', 'users.id', 'memberships.user_id')
         .leftJoin('roles', 'memberships.role_id', 'roles.id')
-        .select('users.*', 'roles.name as role_name', 'companies.status as company_status')
+        .select(
+          'users.*',
+          'roles.name as role_name',
+          'companies.status as company_status',
+          'companies.domain as company_domain',
+          'companies.company_size as company_size'
+        )
         .leftJoin('companies', 'users.company_id', 'companies.id')
         .where('users.email', email)
         .first();
@@ -58,6 +65,7 @@ export class GoogleOAuthService {
 
       // 2. If user doesn't exist, create them
       if (!userRecord) {
+        isNewUser = true;
         if (role === 'candidate') {
           const [candidate] = await db('candidates')
             .insert({
@@ -130,16 +138,23 @@ export class GoogleOAuthService {
         expires_at: expiresAt,
       });
 
+      const companyStatus = userRecord.company_status || (isCandidate ? undefined : 'pending');
+      const onboardingCompleted = isCandidate
+        ? !!userRecord.onboarding_completed
+        : (!!userRecord.company_domain && !!userRecord.company_size);
+
       return {
         accessToken,
         refreshToken,
+        isNewUser,
         user: {
           id: userRecord.id.toString(),
           name: userRecord.name,
           email: userRecord.email,
           role: userRecord.role_name,
           companyId: userRecord.company_id?.toString(),
-          companyStatus: userRecord.company_status || (userRecord.id && !isCandidate ? 'active' : undefined),
+          companyStatus,
+          onboardingCompleted,
         },
       };
     } catch (error) {
