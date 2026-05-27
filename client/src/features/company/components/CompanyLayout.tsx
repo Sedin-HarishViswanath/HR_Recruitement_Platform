@@ -6,7 +6,7 @@ export const CompanyLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#f4f5f7]">
+    <div className="flex min-h-screen bg-[#fafbfc]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
