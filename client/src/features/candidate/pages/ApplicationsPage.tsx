@@ -1,21 +1,15 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
-import { Button } from '../../../components/ui/button';
-import { Badge } from '../../../components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../components/ui/table';
 import { toast } from 'sonner';
 import { unwrapArray } from '../../../shared/lib/response';
+import { 
+  Building2, Calendar, MapPin, Search, Trash2, AlertCircle
+} from 'lucide-react';
 
 export const CandidateApplicationsPage = () => {
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchApplications = async () => {
     try {
@@ -29,7 +23,14 @@ export const CandidateApplicationsPage = () => {
   };
 
   useEffect(() => {
+    const handleSync = () => {
+      fetchApplications();
+    };
+    window.addEventListener('sync-applications', handleSync);
     fetchApplications();
+    return () => {
+      window.removeEventListener('sync-applications', handleSync);
+    };
   }, []);
 
   const handleWithdraw = async (id: string) => {
@@ -43,68 +44,216 @@ export const CandidateApplicationsPage = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'applied': return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none">Applied</Badge>;
-      case 'screening': return <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-none">Screening</Badge>;
-      case 'interview': return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-none">Interview</Badge>;
-      case 'offer': return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none">Offer</Badge>;
-      case 'hired': return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none font-bold">Hired</Badge>;
-      case 'rejected': return <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-none">Rejected</Badge>;
-      case 'withdrawn': return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-none">Withdrawn</Badge>;
-      default: return <Badge variant="outline" className="capitalize">{status}</Badge>;
-    }
+  const getStageIndex = (status: string) => {
+    const s = String(status || '').toLowerCase();
+    if (s === 'applied' || s === 'new') return 0;
+    if (s === 'screening') return 1;
+    if (s === 'interview' || s.startsWith('interview_')) return 2;
+    if (s === 'offer') return 3;
+    if (s === 'hired') return 4;
+    return -1; // rejected/withdrawn
   };
 
+  const getStatusBadgeStyle = (status: string) => {
+    const s = String(status || '').toLowerCase();
+    if (s === 'applied' || s === 'new') return 'bg-blue-50 text-blue-700 border-blue-100';
+    if (s === 'screening') return 'bg-amber-50 text-amber-700 border-amber-100';
+    if (s === 'interview' || s.startsWith('interview_')) return 'bg-violet-50 text-violet-700 border-violet-100';
+    if (s === 'offer') return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+    if (s === 'hired') return 'bg-emerald-600 text-white border-emerald-600';
+    if (s === 'rejected') return 'bg-rose-50 text-rose-700 border-rose-100';
+    return 'bg-slate-100 text-slate-600 border-slate-200';
+  };
+
+  const getStageStyle = (stageIdx: number, currentIdx: number, isWithdrawnOrRejected: boolean) => {
+    if (isWithdrawnOrRejected) {
+      return {
+        dot: 'bg-white border-slate-200 text-slate-350',
+        text: 'text-slate-400',
+        line: 'bg-slate-100'
+      };
+    }
+    if (stageIdx < currentIdx) {
+      return {
+        dot: 'bg-emerald-500 border-emerald-500 text-white',
+        text: 'text-slate-800 font-bold',
+        line: 'bg-emerald-500'
+      };
+    }
+    if (stageIdx === currentIdx) {
+      return {
+        dot: 'bg-violet-600 border-violet-600 ring-4 ring-violet-100 text-white',
+        text: 'text-violet-600 font-black',
+        line: 'bg-slate-100'
+      };
+    }
+    return {
+      dot: 'bg-white border-slate-200 text-slate-300',
+      text: 'text-slate-400 font-semibold',
+      line: 'bg-slate-100'
+    };
+  };
+
+  const filteredApps = applications.filter(app => {
+    const job = String(app.job_title || '').toLowerCase();
+    const company = String(app.company_name || '').toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return job.includes(query) || company.includes(query);
+  });
+
+  const stagesList = ['Applied', 'Screening', 'Interview', 'Offer', 'Hired'];
+
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">My Applications</h1>
-        <p className="text-slate-500 mt-1">Track the status of your job applications.</p>
+    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+      {/* Workspace Header Bar */}
+      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+        <div>
+          <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
+            <span>Candidate</span>
+            <span>&rsaquo;</span>
+            <span className="text-slate-600 font-semibold">Applications</span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+              My Applications
+            </h1>
+            <span className="text-xs text-slate-400 font-medium">{applications.length} submitted applications</span>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-slate-50/50">
-            <TableRow>
-              <TableHead>Job Role</TableHead>
-              <TableHead>Company</TableHead>
-              <TableHead>Date Applied</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-10 text-slate-500">Loading...</TableCell></TableRow>
-            ) : applications.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-10 text-slate-500">You haven't applied to any jobs yet.</TableCell></TableRow>
-            ) : (
-              applications.map((app) => (
-                <TableRow key={app.id}>
-                  <TableCell className="font-semibold text-slate-900">{app.job_title}</TableCell>
-                  <TableCell className="text-slate-600">{app.company_name}</TableCell>
-                  <TableCell className="text-slate-500 text-sm">{new Date(app.applied_at).toLocaleDateString()}</TableCell>
-                  <TableCell>{getStatusBadge(app.status)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex flex-col items-end gap-1">
-                      <Button variant="ghost" size="sm">Details</Button>
-                      {!['hired', 'rejected', 'withdrawn'].includes(app.status) && (
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleWithdraw(app.id)}>
+      <main className="p-5 max-w-[1200px] w-full mx-auto space-y-5 flex-1 flex flex-col">
+        {/* Search Controls toolbar */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-3 flex items-center gap-3 shadow-sm">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
+            <input
+              type="text"
+              placeholder="Search by job title or company..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500 font-medium text-slate-700 placeholder:text-slate-400 transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Applications List */}
+        {loading ? (
+          <div className="py-20 text-center">
+            <div className="w-7 h-7 border-2 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+            <p className="text-xs text-slate-400 font-medium">Loading your applications...</p>
+          </div>
+        ) : filteredApps.length === 0 ? (
+          <div className="py-20 text-center bg-white rounded-xl border border-slate-200/80 shadow-sm max-w-xl mx-auto w-full">
+            <Building2 size={36} className="mx-auto text-slate-250 mb-3" />
+            <h3 className="text-sm font-bold text-slate-800" style={{ fontFamily: 'Sora, sans-serif' }}>No applications found</h3>
+            <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+              {searchQuery ? "We couldn't find any matches for your search query." : "You haven't submitted any applications yet."}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredApps.map((app) => {
+              const currentIdx = getStageIndex(app.status);
+              const isWithdrawnOrRejected = ['withdrawn', 'rejected'].includes(app.status?.toLowerCase());
+              const dateApplied = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+
+              return (
+                <div key={app.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-5 space-y-5 transition-all duration-300 hover:shadow-md hover:border-slate-300">
+                  
+                  {/* Top card block */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      {/* Avatar */}
+                      <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+                        {app.company_name?.charAt(0) || 'C'}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-sm font-black text-slate-900 leading-none group-hover:text-violet-600 transition-colors">
+                            {app.job_title}
+                          </h3>
+                          <span className={`inline-flex items-center text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${getStatusBadgeStyle(app.status)}`}>
+                            {app.status || 'Applied'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[10.5px] text-slate-400 font-semibold mt-1.5 flex-wrap">
+                          <span className="text-slate-500 font-bold">{app.company_name}</span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1"><MapPin size={11} /> {app.location || 'Remote'}</span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1"><Calendar size={11} /> Applied {dateApplied}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions block */}
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      {!isWithdrawnOrRejected && (
+                        <button
+                          onClick={() => handleWithdraw(app.id)}
+                          className="h-8 px-3 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-[10.5px] font-bold transition-all flex items-center gap-1"
+                        >
+                          <Trash2 size={11} />
                           Withdraw
-                        </Button>
-                      )}
-                      {app.status === 'rejected' && app.rejection_reason && (
-                        <p className="text-[10px] text-red-500 font-bold max-w-[150px] italic">"{app.rejection_reason}"</p>
+                        </button>
                       )}
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  </div>
+
+                  {/* Rejection / Special reason alert block */}
+                  {app.status === 'rejected' && app.rejection_reason && (
+                    <div className="bg-rose-50/50 border border-rose-100 rounded-lg p-3 flex gap-2 items-start text-xs text-rose-800 animate-fade-in">
+                      <AlertCircle size={14} className="shrink-0 text-rose-500 mt-0.5" />
+                      <div>
+                        <p className="font-bold">Rejection Feedback:</p>
+                        <p className="italic mt-0.5">"{app.rejection_reason}"</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Horizontal stepper timeline */}
+                  <div className="border-t border-slate-100 pt-5 pb-1">
+                    <div className="flex items-center justify-between relative px-2 sm:px-6">
+                      {/* Timeline bar line */}
+                      <div className="absolute left-6 right-6 top-[7px] h-0.5 bg-slate-100 -z-10" />
+
+                      {stagesList.map((stage, sIdx) => {
+                        const style = getStageStyle(sIdx, currentIdx, isWithdrawnOrRejected);
+                        const isCompleted = sIdx < currentIdx && !isWithdrawnOrRejected;
+                        const isActive = sIdx === currentIdx && !isWithdrawnOrRejected;
+
+                        return (
+                          <div key={stage} className="flex flex-col items-center relative z-10">
+                            {/* Line connecting previous dot (drawn absolute) */}
+                            {sIdx > 0 && (
+                              <div className={`absolute right-1/2 top-[7px] h-0.5 w-[calc(100vw/5)] -z-20 max-w-[200px] ${
+                                sIdx <= currentIdx && !isWithdrawnOrRejected ? 'bg-emerald-500' : 'bg-slate-100'
+                              }`} />
+                            )}
+
+                            {/* Dot indicator */}
+                            <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center border-2 transition-all ${style.dot}`}>
+                              {isCompleted && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+                              {isActive && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                            </div>
+
+                            <span className={`text-[9px] font-black mt-2 tracking-tight uppercase ${style.text}`}>
+                              {stage}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
     </div>
   );
 };
+export default CandidateApplicationsPage;
