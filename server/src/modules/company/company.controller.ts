@@ -84,6 +84,18 @@ export class CompanyController {
     }
   }
 
+  async adminRevokeCompany(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+
+      const company = await companyService.revokeCompany(id as string, reason);
+      return sendResponse(res, 200, true, 'Company access revoked successfully', company);
+    } catch (error: any) {
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
   async getDashboardStats(req: Request, res: Response) {
     try {
       const companyId = req.user.companyId;
