@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { setCredentials } from '../auth.slice';
 import { Button } from '../../../components/ui/button';
@@ -19,8 +19,16 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMode?: () => void }) => {
+  const [searchParams] = useSearchParams();
+  const queryEmail = searchParams.get('email') || '';
+  const queryPassword = searchParams.get('password') || '';
+
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: queryEmail,
+      password: queryPassword,
+    }
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -62,12 +70,25 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
        dispatch(setCredentials({ user: res.data.data.user, accessToken: res.data.data.accessToken }));
        
        const user = res.data.data.user;
-       if (user.role === 'Candidate') {
-         navigate('/candidate/dashboard');
-       } else if (user.role === 'Super Admin') {
-         navigate('/superadmin/dashboard');
+       const isNewUser = res.data.data.isNewUser;
+       const userRole = (user.role || '').toLowerCase().trim();
+       
+       if (isNewUser) {
+         if (userRole === 'candidate') {
+           navigate('/candidate/onboarding');
+         } else {
+           navigate('/company/onboarding');
+         }
        } else {
-         navigate('/company/dashboard');
+         if (userRole === 'candidate') {
+           navigate('/candidate/dashboard');
+         } else if (userRole === 'super admin' || userRole === 'superadmin') {
+           navigate('/superadmin/dashboard');
+         } else if (user.companyStatus?.toLowerCase() === 'pending' || user.companyStatus?.toLowerCase() === 'revoked') {
+           navigate('/pending-approval');
+         } else {
+           navigate('/company/dashboard');
+         }
        }
      } catch (err: any) {
        setError(err.response?.data?.message || 'Google login failed');
