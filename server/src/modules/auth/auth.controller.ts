@@ -109,6 +109,25 @@ export class AuthController {
     }
   }
 
+  async me(req: Request, res: Response) {
+    try {
+      if (!req.user) {
+        return sendResponse(res, 401, false, 'Unauthorized');
+      }
+
+      const { userId, role } = req.user;
+      const user = await authService.getCurrentUser(userId, role);
+      
+      return sendResponse(res, 200, true, 'User profile retrieved successfully', { user });
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        return sendResponse(res, error.statusCode, false, error.message);
+      }
+      console.error('Me Profile Error:', error);
+      return sendResponse(res, 500, false, 'Internal server error during profile retrieval');
+    }
+  }
+
   async logout(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
@@ -148,6 +167,7 @@ export class AuthController {
       return sendResponse(res, 200, true, 'Google login successful', {
         accessToken: result.accessToken,
         user: result.user,
+        isNewUser: result.isNewUser,
       });
     } catch (error: any) {
       if (error instanceof AppError) {
