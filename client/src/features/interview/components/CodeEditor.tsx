@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
@@ -106,7 +106,7 @@ interface ExecutionResult {
 }
 
 // The backend URL for socket.io.
-// In dev: Vite proxies /socket.io → backend:5000, so we connect to current origin.
+// In dev: Vite proxies /socket.io â†’ backend:5000, so we connect to current origin.
 // In prod: the same server serves both frontend and backend (or use VITE_API_URL).
 const BACKEND_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
@@ -195,7 +195,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
       const serverMsg = err?.response?.data?.message;
 
       if (!err?.response) {
-        // Network error — backend not reachable
+        // Network error â€” backend not reachable
         toast.error('Backend server is unreachable. Is the server running?');
         setResult({ output: '// Error: Cannot connect to the backend server.\n// Make sure the server is running on port 5000.', code: 1 });
       } else if (status === 502 || status === 504) {
@@ -214,7 +214,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
   return (
     <div className="flex flex-col h-full bg-[#1e1e1e] text-white select-none">
 
-      {/* ── Toolbar ── */}
+      {/* â”€â”€ Toolbar â”€â”€ */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-[#333] gap-3 shrink-0 bg-[#252526]">
         <div className="flex items-center gap-2">
           {/* Language Selector */}
@@ -233,8 +233,8 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
           </div>
 
           {isReadOnly && (
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+            <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-violet-400 bg-violet-50 px-2 py-1 rounded border border-violet-200 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
               Live View
             </span>
           )}
@@ -275,7 +275,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
         </div>
       </div>
 
-      {/* ── stdin Panel ── */}
+      {/* â”€â”€ stdin Panel â”€â”€ */}
       {showStdin && !isReadOnly && (
         <div className="border-b border-[#333] bg-[#1a1a1a] px-4 py-2.5 shrink-0">
           <p className="text-[10px] text-gray-600 uppercase tracking-widest font-bold mb-1.5">Standard Input (stdin)</p>
@@ -289,7 +289,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
         </div>
       )}
 
-      {/* ── Monaco Editor ── */}
+      {/* â”€â”€ Monaco Editor â”€â”€ */}
       <div className="flex-1 min-h-0">
         <Editor
           height="100%"
@@ -315,7 +315,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
         />
       </div>
 
-      {/* ── Output Panel ── */}
+      {/* â”€â”€ Output Panel â”€â”€ */}
       <div className="border-t border-[#333] bg-[#1a1a1a] shrink-0" style={{ height: '176px' }}>
         {/* Output header */}
         <div className="flex items-center justify-between px-4 py-1.5 border-b border-[#2a2a2a]">
@@ -343,7 +343,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
           'text-gray-600'
         }`}>
           {running
-            ? '⟳  Executing your code...'
+            ? 'âŸ³  Executing your code...'
             : result?.output || '// Press Run to execute your code'}
         </pre>
       </div>
