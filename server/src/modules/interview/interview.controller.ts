@@ -3,7 +3,9 @@ import { interviewService } from './interview.service';
 import { 
   scheduleInterviewSchema, 
   rescheduleInterviewSchema, 
-  feedbackSchema 
+  feedbackSchema,
+  candidateRescheduleRequestSchema,
+  handleRescheduleRequestSchema
 } from './interview.schema';
 import { sendResponse } from '../../shared/utils/response';
 import { AppError } from '../../shared/errors/AppError';
@@ -171,7 +173,7 @@ export class InterviewController {
     try {
       const { candidateId } = req.params;
       const companyId = req.user.companyId;
-      const transcripts = await interviewService.getCandidateTranscripts(candidateId, companyId);
+      const transcripts = await interviewService.getCandidateTranscripts(candidateId as string, companyId as string);
       return sendResponse(res, 200, true, 'Candidate transcripts retrieved', transcripts);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
@@ -193,6 +195,47 @@ export class InterviewController {
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
       return sendResponse(res, 500, false, 'Failed to upload recording');
+    }
+  }
+
+  async requestReschedule(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const candidateId = req.user.candidateId || req.user.userId;
+      const parsed = candidateRescheduleRequestSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
+
+      const request = await interviewService.requestReschedule(id as string, candidateId, parsed.data);
+      return sendResponse(res, 201, true, 'Reschedule request submitted successfully', request);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async listRescheduleRequests(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      const requests = await interviewService.listRescheduleRequests(companyId);
+      return sendResponse(res, 200, true, 'Reschedule requests retrieved', requests);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async handleRescheduleRequest(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const companyId = req.user.companyId;
+      const parsed = handleRescheduleRequestSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
+
+      const result = await interviewService.handleRescheduleRequest(id as string, companyId, parsed.data.action, parsed.data.new_time);
+      return sendResponse(res, 200, true, result.message, result);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
     }
   }
 }
