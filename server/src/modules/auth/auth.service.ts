@@ -111,7 +111,9 @@ export class AuthService {
       .select(
         'users.*',
         'roles.name as role_name',
-        'companies.status as company_status'
+        'companies.status as company_status',
+        'companies.domain as company_domain',
+        'companies.company_size as company_size'
       )
       .where('users.email', email)
       .first();
@@ -204,6 +206,7 @@ export class AuthService {
         role: userRecord.role_name,
         companyId: userRecord.company_id?.toString(),
         companyStatus: userRecord.company_status,
+        onboardingCompleted: isCandidate ? !!userRecord.onboarding_completed : (!!userRecord.company_domain && !!userRecord.company_size),
       },
     };
   }
@@ -229,6 +232,45 @@ export class AuthService {
       failed_login_attempts: 0,
       lock_until: null,
     });
+  }
+
+  async getCurrentUser(userId: string, role: string) {
+    const isCandidate = role.toLowerCase() === 'candidate';
+    let userRecord;
+    if (isCandidate) {
+      userRecord = await db('candidates').where({ id: userId }).first();
+      if (userRecord) {
+        userRecord.role_name = 'Candidate';
+      }
+    } else {
+      userRecord = await db('users')
+        .leftJoin('memberships', 'users.id', 'memberships.user_id')
+        .leftJoin('roles', 'memberships.role_id', 'roles.id')
+        .leftJoin('companies', 'users.company_id', 'companies.id')
+        .select(
+          'users.*',
+          'roles.name as role_name',
+          'companies.status as company_status',
+          'companies.domain as company_domain',
+          'companies.company_size as company_size'
+        )
+        .where('users.id', userId)
+        .first();
+    }
+
+    if (!userRecord) {
+      throw new AppError('User not found', 404);
+    }
+
+    return {
+      id: userRecord.id.toString(),
+      name: userRecord.name,
+      email: userRecord.email,
+      role: userRecord.role_name || role,
+      companyId: userRecord.company_id?.toString(),
+      companyStatus: userRecord.company_status,
+      onboardingCompleted: isCandidate ? !!userRecord.onboarding_completed : (!!userRecord.company_domain && !!userRecord.company_size),
+    };
   }
 
   async refresh(token: string) {
