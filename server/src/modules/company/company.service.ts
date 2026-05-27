@@ -3,6 +3,8 @@ import { CompanyProfileInput } from './company.schema';
 import { AppError } from '../../shared/errors/AppError';
 import bcrypt from 'bcryptjs';
 import { inAppNotificationService } from '../notification/inapp-notification.service';
+import { sendEmail } from '../../shared/utils/email';
+import { userInviteEmail } from '../../shared/templates/emailTemplates';
 
 export class CompanyService {
   async getCompanyProfile(companyId: string) {
@@ -105,6 +107,25 @@ export class CompanyService {
     return company;
   }
 
+  async revokeCompany(companyId: string, reason?: string) {
+    const [company] = await db('companies')
+      .where({ id: companyId })
+      .update({ status: 'revoked', active: false })
+      .returning('*');
+    
+    // Notify the company admin
+    if (company?.admin_user_id) {
+      await inAppNotificationService.create({
+        userId: company.admin_user_id,
+        title: '⚠️ Company Access Revoked',
+        body: reason ? `Your company access has been revoked. Reason: ${reason}` : `Access for your company "${company.name}" has been revoked by the Super Admin.`,
+        type: 'error',
+        link: '/unauthorized',
+      });
+    }
+    return company;
+  }
+
   async getDashboardStats(companyId: string) {
     const [totalJobs, activeJobs, totalApps, totalHires] = await Promise.all([
       db('jobs').where({ company_id: companyId }).count('id as count').first(),
@@ -176,15 +197,18 @@ export class CompanyService {
   async inviteUser(companyId: string, data: any) {
     const { name, email, role, password } = data;
     
-    return await db.transaction(async (trx) => {
+    const { user, inviteLink, companyName } = await db.transaction(async (trx) => {
       const existing = await trx('users').where({ email }).first();
       if (existing) throw new AppError('Email already registered', 400);
+
+      const company = await trx('companies').where({ id: companyId }).first();
+      if (!company) throw new AppError('Company not found', 404);
 
       const roleRecord = await trx('roles').where({ name: role }).first();
       if (!roleRecord) throw new AppError('Invalid role', 400);
 
       const hashedPassword = await bcrypt.hash(password, 12);
-      const [user] = await trx('users')
+      const [insertedUser] = await trx('users')
         .insert({
           name,
           email,
@@ -195,12 +219,26 @@ export class CompanyService {
         .returning('*');
 
       await trx('memberships').insert({
-        user_id: user.id,
+        user_id: insertedUser.id,
         role_id: roleRecord.id,
       });
 
-      return user;
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const inviteLink = `${frontendUrl}/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+
+      return { user: insertedUser, inviteLink, companyName: company.name };
     });
+
+    await sendEmail({
+      to: email,
+      subject: `Invitation to join ${companyName}`,
+      html: userInviteEmail(name, role, companyName, inviteLink),
+      eventType: 'user_invited',
+      entityType: 'company',
+      entityId: companyId
+    });
+
+    return { ...user, inviteLink };
   }
 }
 
