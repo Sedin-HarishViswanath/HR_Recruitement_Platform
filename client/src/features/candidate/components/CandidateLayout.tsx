@@ -6,7 +6,7 @@ export const CandidateLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#f4f5f7]">
+    <div className="flex min-h-screen bg-[#fafbfc]">
       {sidebarOpen && (
         <div
           className="sidebar-mobile-overlay"
