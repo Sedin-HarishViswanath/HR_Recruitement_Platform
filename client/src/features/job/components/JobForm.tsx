@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,6 +29,7 @@ const jobFormSchema = z.object({
   deadline: z.string().optional(),
   remote: z.boolean().default(false),
   status: z.enum(['draft', 'published']).default('draft'),
+  interview_rounds: z.number().int().min(1, 'At least 1 round is required').max(10, 'At most 10 rounds are allowed').default(1),
 });
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
@@ -57,6 +58,7 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
       required_skills: [],
       remote: false,
       status: 'draft',
+      interview_rounds: 1,
     }
   });
 
@@ -152,11 +154,23 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
           </Select>
         </div>
 
+        <div className="space-y-2">
+          <Label>Number of Interview Rounds <span className="text-red-500">*</span></Label>
+          <Input 
+            type="number" 
+            min="1" 
+            max="10" 
+            {...register('interview_rounds', { valueAsNumber: true })} 
+            placeholder="e.g. 3"
+          />
+          {errors.interview_rounds && <p className="text-red-500 text-sm">{(errors.interview_rounds.message as string)}</p>}
+        </div>
+
         <div className="space-y-2 md:col-span-2">
           <Label>Required Skills</Label>
           <div className="flex gap-2 mb-3 flex-wrap">
             {skills.map(skill => (
-              <span key={skill} className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+              <span key={skill} className="bg-violet-100 text-violet-800 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
                 {skill}
                 <button type="button" onClick={() => handleRemoveSkill(skill)} className="hover:text-amber-900">
                   <X size={14} />
@@ -217,7 +231,7 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
         </Button>
         <Button 
           type="submit" 
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-sm transition-all btn-premium"
+          className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium"
           onClick={() => setValue('status', 'published')}
           disabled={isSubmitting}
         >
