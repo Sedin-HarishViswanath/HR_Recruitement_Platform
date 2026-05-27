@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { X, Copy, Check, FileText, Mic, Loader2 } from 'lucide-react';
 
@@ -83,7 +83,7 @@ export const TranscriptViewerModal = ({
               <p className="text-[11px] text-slate-500 font-medium">
                 {(roundType || 'Interview').charAt(0).toUpperCase() + (roundType || '').slice(1)} Round
                 {roundNumber ? ` (Round ${roundNumber})` : ''}
-                {dateStr ? ` · ${dateStr}` : ''}
+                {dateStr ? ` Â· ${dateStr}` : ''}
               </p>
             </div>
           </div>
@@ -137,7 +137,7 @@ export const TranscriptViewerModal = ({
 
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <Loader2 size={24} className="text-amber-400 animate-spin mb-3" />
+              <Loader2 size={24} className="text-violet-400 animate-spin mb-3" />
               <p className="text-sm text-slate-500 font-medium">Loading transcript...</p>
             </div>
           ) : entries.length === 0 ? (
