@@ -11,7 +11,7 @@ import {
 import { atsScreeningService } from './ats-screening.service';
 
 export class ApplicationService {
-  async applyToJob(candidateId: string, data: ApplyInput) {
+  async applyToJob(candidateId: string, data: ApplyInput, resumeText?: string) {
     const { job_id, cover_note, resume_url } = data;
 
     return await db.transaction(async (trx) => {
@@ -30,18 +30,20 @@ export class ApplicationService {
       const finalResumeUrl = resume_url || candidate.resume_url;
       if (!finalResumeUrl) throw new AppError('A resume is required to apply', 400);
 
+      const finalResumeText = resumeText || candidate.resume_text;
+
       // 4. Create application
       const { ai_score, matched_skills } = await atsScreeningService.screenResume(
         candidate.skills || [],
         job,
-        candidate.resume_text || undefined,
+        finalResumeText || undefined,
       );
 
       const [application] = await trx('applications')
         .insert({
           job_id,
           candidate_id: candidateId,
-          status: ai_score >= 40 ? 'screening' : 'applied', // Auto-move to screening if decent score
+          status: 'new',
           resume_url: finalResumeUrl,
           cover_note,
           parsed_skills: candidate.skills || [],
@@ -128,19 +130,30 @@ export class ApplicationService {
     
     // Group by status
     const pipeline: Record<string, any[]> = {
+      new: [],
       applied: [],
       screening: [],
       shortlisted: [],
       interview_1: [],
       interview_2: [],
+      interview_3: [],
+      interview_4: [],
+      interview_5: [],
       offer: [],
       hired: [],
       rejected: []
     };
 
     data.forEach(app => {
-      if (pipeline[app.status]) {
-        pipeline[app.status].push(app);
+      const status = app.status || 'new';
+      if (pipeline[status]) {
+        pipeline[status].push(app);
+      } else {
+        // Fallback for dynamic interview rounds beyond 5
+        if (!pipeline[status]) {
+          pipeline[status] = [];
+        }
+        pipeline[status].push(app);
       }
     });
 
