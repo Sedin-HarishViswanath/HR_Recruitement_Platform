@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { Users, Briefcase, MoreVertical, Activity } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -25,7 +25,7 @@ export const AdminDashboard = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f4f5f7]">
+    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
       <DashboardHeader title="Admin Dashboard" subtitle="Platform-wide overview" />
       <main className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in">
         {loading ? (
@@ -45,7 +45,7 @@ export const AdminDashboard = () => {
                     </div>
                   </div>
                   <h4 className="text-3xl font-extrabold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora' }}>{data.kpis?.[s.key] || 0}</h4>
-                  <p className="text-[10px] font-semibold mt-1.5 text-amber-600">System-wide</p>
+                  <p className="text-[10px] font-semibold mt-1.5 text-violet-600">System-wide</p>
                 </div>
               ))}
             </div>
@@ -55,7 +55,7 @@ export const AdminDashboard = () => {
               <div className="lg:col-span-2 card-premium p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><Activity size={14} /></div>
+                    <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center"><Activity size={14} /></div>
                     <h3 className="font-bold text-slate-900 tracking-tight text-[14px]" style={{ fontFamily: 'Sora' }}>Companies by Status</h3>
                   </div>
                   <button className="text-slate-400 hover:text-slate-600 transition-colors"><MoreVertical size={16} /></button>
@@ -81,7 +81,7 @@ export const AdminDashboard = () => {
                     <div key={i} className="flex items-center justify-between text-[13px] font-medium border-b border-slate-100 pb-2.5 last:border-0 group hover:bg-slate-50 -mx-2 px-2 rounded-lg transition-colors cursor-pointer">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-[10px] font-bold group-hover:scale-105 transition-transform">{i + 1}</div>
-                        <span className="text-slate-700 group-hover:text-amber-600 transition-colors">{company.name}</span>
+                        <span className="text-slate-700 group-hover:text-violet-600 transition-colors">{company.name}</span>
                       </div>
                       <span className="text-slate-900 font-semibold">{company.jobs_count} jobs</span>
                     </div>
