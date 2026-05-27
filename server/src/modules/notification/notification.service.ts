@@ -1,15 +1,16 @@
 import { sendEmail } from '../../shared/utils/email';
 import * as templates from '../../shared/templates/emailTemplates';
-import { notifyUser } from '../../socket';
+import { inAppNotificationService } from './inapp-notification.service';
 
 export class NotificationService {
   async notifyWelcome(userId: string, name: string, email: string) {
-    // Socket notification
-    notifyUser(userId, 'notification', {
+    // Persistent In-App Notification
+    await inAppNotificationService.create({
+      userId,
       title: 'Welcome!',
-      message: `Hi ${name}, welcome to RecruitAI!`,
+      body: `Hi ${name}, welcome to RecruitAI!`,
       type: 'info'
-    });
+    }).catch(err => console.error('Failed to save welcome notification:', err));
 
     return sendEmail({
       to: email,
@@ -20,12 +21,14 @@ export class NotificationService {
   }
 
   async notifyApplicationSubmitted(candidate: any, job: any, company: any) {
-    // Socket notification for candidate
-    notifyUser(candidate.id, 'notification', {
+    // Persistent In-App Notification for candidate
+    await inAppNotificationService.create({
+      candidateId: candidate.id,
       title: 'Application Received',
-      message: `Your application for ${job.title} at ${company.name} was received.`,
-      type: 'success'
-    });
+      body: `Your application for ${job.title} at ${company.name} was received.`,
+      type: 'success',
+      link: '/candidate/applications'
+    }).catch(err => console.error('Failed to save application submission notification:', err));
 
     return sendEmail({
       to: candidate.email,
@@ -40,20 +43,24 @@ export class NotificationService {
   async notifyInterviewScheduled(candidate: any, job: any, interview: any) {
     const dateStr = new Date(interview.scheduled_at).toLocaleString();
     
-    // Socket notification for candidate
-    notifyUser(candidate.id, 'notification', {
+    // Persistent In-App Notification for candidate
+    await inAppNotificationService.create({
+      candidateId: candidate.id,
       title: 'Interview Scheduled',
-      message: `Your interview for ${job.title} is scheduled for ${dateStr}.`,
-      type: 'calendar'
-    });
+      body: `Your interview for ${job.title} is scheduled for ${dateStr}.`,
+      type: 'info',
+      link: '/candidate/interviews'
+    }).catch(err => console.error('Failed to save candidate interview notification:', err));
 
-    // Socket notification for interviewer if different from user
+    // Persistent In-App Notification for interviewer if different from user
     if (interview.interviewer_id) {
-       notifyUser(interview.interviewer_id, 'notification', {
-         title: 'New Interview Assigned',
-         message: `You have been assigned an interview for ${job.title} with ${candidate.name}.`,
-         type: 'calendar'
-       });
+      await inAppNotificationService.create({
+        userId: interview.interviewer_id,
+        title: 'New Interview Assigned',
+        body: `You have been assigned an interview for ${job.title} with ${candidate.name}.`,
+        type: 'info',
+        link: '/company/interviews'
+      }).catch(err => console.error('Failed to save interviewer interview notification:', err));
     }
 
     return sendEmail({
@@ -67,12 +74,14 @@ export class NotificationService {
   }
 
   async notifyStatusUpdate(candidate: any, job: any, newStage: string) {
-    // Socket notification
-    notifyUser(candidate.id, 'notification', {
+    // Persistent In-App Notification
+    await inAppNotificationService.create({
+      candidateId: candidate.id,
       title: 'Application Update',
-      message: `Your application for ${job.title} has been moved to: ${newStage}.`,
-      type: 'info'
-    });
+      body: `Your application for ${job.title} has been moved to: ${newStage}.`,
+      type: 'info',
+      link: '/candidate/applications'
+    }).catch(err => console.error('Failed to save status update notification:', err));
 
     return sendEmail({
       to: candidate.email,
