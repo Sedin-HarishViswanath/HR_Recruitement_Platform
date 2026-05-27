@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
@@ -91,12 +91,12 @@ export const CompanyJobsPage = () => {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search jobs"
-              className="h-10 w-full sm:w-56 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none transition-colors focus:border-amber-400"
+              className="h-10 w-full sm:w-56 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none transition-colors focus:border-violet-400"
             />
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
-              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 outline-none transition-colors focus:border-amber-400"
+              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 outline-none transition-colors focus:border-violet-400"
             >
               <option value="all">All statuses</option>
               <option value="draft">Draft</option>
@@ -104,7 +104,7 @@ export const CompanyJobsPage = () => {
               <option value="closed">Closed</option>
             </select>
             <Button 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl h-10 px-6 shadow-sm shadow-amber-500/20 active:scale-95 transition-all btn-premium"
+              className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl h-10 px-6 shadow-sm shadow-violet-500/20 active:scale-95 transition-all btn-premium"
               onClick={() => setShowForm(true)}
             >
               <Plus className="mr-2" size={18} /> Create Job
@@ -142,7 +142,7 @@ export const CompanyJobsPage = () => {
             <p className="text-slate-500 max-w-sm mx-auto mt-2 font-medium">
               You haven't created any job postings yet matching your criteria.
             </p>
-            <Button className="mt-8 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl h-12 px-8 shadow-sm shadow-amber-500/20 transition-all active:scale-95 btn-premium" onClick={() => setShowForm(true)}>
+            <Button className="mt-8 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl h-12 px-8 shadow-sm shadow-violet-500/20 transition-all active:scale-95 btn-premium" onClick={() => setShowForm(true)}>
               Post First Job
             </Button>
           </div>
