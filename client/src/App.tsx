@@ -1,4 +1,6 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from './app/store';
 import { Providers } from './app/providers';
 import { AuthPage } from './features/auth/pages/AuthPage';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
@@ -31,7 +33,25 @@ import { CompanyAnalyticsPage } from './features/analytics/CompanyAnalyticsPage'
 import { InterviewWorkspace } from './features/interview/pages/InterviewWorkspace';
 import { PublicCareersPage } from './features/company/pages/PublicCareersPage';
 import { VerifyOtpPage } from './features/auth/pages/VerifyOtpPage';
+import SettingsPage from './features/company/pages/SettingsPage';
 
+
+const PublicJobBoardWrapper = () => {
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const isCandidate = user?.role?.toLowerCase() === 'candidate';
+  
+  if (isAuthenticated && isCandidate) {
+    return <CandidateLayout />;
+  }
+  
+  return (
+    <div className="flex min-h-screen bg-[#fafbfc]">
+      <main className="flex-1 min-h-screen transition-all duration-300">
+        <Outlet />
+      </main>
+    </div>
+  );
+};
 
 const router = createBrowserRouter([
   {
@@ -75,6 +95,14 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
+        path: 'onboarding',
+        element: (
+          <RoleGuard allowedRoles={['Admin']}>
+            <OnboardingWizard />
+          </RoleGuard>
+        ),
+      },
+      {
         element: (
           <RoleGuard allowedRoles={['Admin', 'Recruiter', 'Interviewer']}>
             <CompanyLayout />
@@ -86,12 +114,12 @@ const router = createBrowserRouter([
             element: <CompanyDashboard />,
           },
           {
-            path: 'onboarding',
-            element: <OnboardingWizard />,
-          },
-          {
             path: 'users',
             element: <UsersPage />,
+          },
+          {
+            path: 'settings',
+            element: <SettingsPage />,
           },
           {
             path: 'jobs',
@@ -153,6 +181,16 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: '/candidate/jobs',
+    element: <PublicJobBoardWrapper />,
+    children: [
+      {
+        index: true,
+        element: <CandidateJobBoard />,
+      },
+    ],
+  },
+  {
     path: '/candidate',
     element: <ProtectedRoute />,
     children: [
@@ -174,10 +212,6 @@ const router = createBrowserRouter([
           {
             path: 'dashboard',
             element: <RealCandidateDashboard />,
-          },
-          {
-            path: 'jobs',
-            element: <CandidateJobBoard />,
           },
           {
             path: 'profile',
