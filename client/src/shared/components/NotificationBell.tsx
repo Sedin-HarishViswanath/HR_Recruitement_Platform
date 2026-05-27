@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Bell, CheckCheck, X } from 'lucide-react';
 import { api } from '../lib/api';
 import { useSelector } from 'react-redux';
@@ -126,7 +126,7 @@ export const NotificationBell = () => {
       >
         <Bell size={18} />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-4 h-4 bg-amber-500 text-white text-[9px] font-black rounded-full border-2 border-white flex items-center justify-center">
+          <span className="absolute top-1 right-1 w-4 h-4 bg-violet-600 text-white text-[9px] font-black rounded-full border-2 border-white flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -145,7 +145,7 @@ export const NotificationBell = () => {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-600 font-bold px-2 py-1 rounded-lg hover:bg-amber-50 transition-colors"
+                  className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-violet-600 font-bold px-2 py-1 rounded-lg hover:bg-violet-50 transition-colors"
                 >
                   <CheckCheck size={12} />
                   Mark all read
@@ -172,7 +172,7 @@ export const NotificationBell = () => {
               notifications.map(n => (
                 <div
                   key={n.id}
-                  className={`px-4 py-3 flex gap-3 cursor-pointer transition-colors ${n.read_at ? 'bg-white hover:bg-slate-50/60' : 'bg-amber-50/40 hover:bg-amber-50/70'}`}
+                  className={`px-4 py-3 flex gap-3 cursor-pointer transition-colors ${n.read_at ? 'bg-white hover:bg-slate-50/60' : 'bg-violet-50/40 hover:bg-violet-50/70'}`}
                   onClick={() => {
                     if (!n.read_at) markOneRead(n.id);
                     if (n.link) window.location.href = n.link;
