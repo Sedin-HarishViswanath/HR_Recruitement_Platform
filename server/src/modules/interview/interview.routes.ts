@@ -20,6 +20,11 @@ router.post('/:id/feedback', authenticate, authorize('Interviewer', 'Recruiter',
 router.get('/:id/meeting-room', authenticate, interviewController.getMeetingRoom.bind(interviewController));
 router.post('/:id/aptitude-result', authenticate, authorize('Candidate'), interviewController.submitAptitudeResult.bind(interviewController));
 
+// Reschedule routes
+router.get('/reschedule-requests', authenticate, authorize('Admin', 'Recruiter'), interviewController.listRescheduleRequests.bind(interviewController));
+router.patch('/reschedule-requests/:id', authenticate, authorize('Admin', 'Recruiter'), interviewController.handleRescheduleRequest.bind(interviewController));
+router.post('/:id/reschedule-request', authenticate, authorize('Candidate'), interviewController.requestReschedule.bind(interviewController));
+
 // Transcript routes
 
 // Ensure recordings directory exists
