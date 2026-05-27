@@ -25,8 +25,8 @@ export default (app: Application) => {
   app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
   const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 3000, // Increased to prevent 429 errors during testing
   });
 
   app.use('/api', limiter);
