@@ -22,88 +22,124 @@ export const PendingApproval = () => {
     navigate('/');
   };
 
+  const isRevoked = user?.companyStatus?.toLowerCase() === 'revoked';
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 flex flex-col">
-      {/* Header */}
-      <nav className="w-full bg-[#0a0e17] px-8 py-4 flex items-center justify-between shadow-lg sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
-            <Building2 size={24} />
+    <div className="min-h-screen bg-[#fafbfc] font-sans text-slate-900 flex flex-col">
+      {/* Header bar matching Image 4 */}
+      <nav className="w-full bg-[#0b0f19] px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md">
+            <Building2 size={18} />
           </div>
           <div>
-            <h1 className="text-white text-lg font-bold tracking-tight leading-none">Recruiting AI</h1>
-            <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-bold">Company Portal</p>
+            <h1 className="text-white text-sm font-bold tracking-tight leading-none">Recruiting AI</h1>
+            <p className="text-[9px] text-slate-500 mt-1 uppercase tracking-widest font-black">Company Portal</p>
           </div>
         </div>
         <button 
           onClick={handleSignOut}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-sm transition-all border border-white/10"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white font-bold text-xs transition-all border border-white/10"
         >
-          <LogOut size={18} /> Sign Out
+          <LogOut size={13} /> Sign Out
         </button>
       </nav>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left - Status Card */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-[32px] border border-slate-200 p-10 shadow-2xl shadow-slate-200/40 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full -mr-32 -mt-32 transition-transform duration-700 group-hover:scale-110" />
+      {/* Main Container */}
+      <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Panel: Status Card & Journey Progress */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Status Info Card */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm relative overflow-hidden group">
+              {/* Decorative radial overlay */}
+              <div className={`absolute top-0 right-0 w-48 h-48 rounded-full -mr-24 -mt-24 transition-all duration-700 opacity-20 ${isRevoked ? 'bg-rose-400' : 'bg-blue-400'}`} />
               
-              <div className="relative z-10">
-                <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-blue-600 mb-8 shadow-inner animate-pulse">
-                  <Clock size={40} />
-                </div>
-                
-                <h2 className="text-4xl font-black text-slate-900 tracking-tighter leading-none mb-4">
-                  Account Pending <br />
-                  <span className="text-blue-600">Verification</span>
-                </h2>
-                
-                <p className="text-lg text-slate-500 font-medium leading-relaxed mb-8 max-w-lg">
-                  Thanks for joining Recruiting AI! Our Super Admin is currently reviewing your company details. You'll have full access as soon as your account is approved.
-                </p>
+              <div className="relative z-10 space-y-6">
+                {isRevoked ? (
+                  <>
+                    <div className="w-14 h-14 bg-rose-50 rounded-2xl border border-rose-100 flex items-center justify-center text-rose-600 shadow-inner">
+                      <AlertCircle size={28} />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
+                        Account Access <span className="text-rose-600">Revoked</span>
+                      </h2>
+                      <p className="text-xs text-slate-500 font-semibold leading-relaxed max-w-md">
+                        Your company's access to recruiting tools has been suspended or revoked by the system administrator. Please reach out to support if you think this is in error.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-14 h-14 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-center text-blue-600 shadow-inner animate-pulse">
+                      <Clock size={28} />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
+                        Account Pending <span className="text-blue-600">Verification</span>
+                      </h2>
+                      <p className="text-xs text-slate-500 font-semibold leading-relaxed max-w-md">
+                        Thanks for joining Recruiting AI! Our Super Admin is currently reviewing your company details. You'll have full access as soon as your account is approved.
+                      </p>
+                    </div>
+                  </>
+                )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-colors hover:bg-blue-50/50">
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm">
-                      <ShieldCheck size={20} />
+                {/* Sub status details box */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                  <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100/50 transition-colors">
+                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center ${isRevoked ? 'text-rose-600' : 'text-blue-600'} shadow-sm`}>
+                      <ShieldCheck size={16} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Verification</p>
-                      <p className="text-sm font-bold text-slate-900">In Progress</p>
+                      <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Status</p>
+                      <p className="text-xs font-bold text-slate-800">{isRevoked ? 'Revoked' : 'In Progress'}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-colors hover:bg-blue-50/50">
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm">
-                      <Clock size={20} />
+
+                  <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100/50 transition-colors">
+                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center ${isRevoked ? 'text-rose-600' : 'text-blue-600'} shadow-sm`}>
+                      <Clock size={16} />
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Wait Time</p>
-                      <p className="text-sm font-bold text-slate-900">~24 Hours</p>
+                      <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Action Required</p>
+                      <p className="text-xs font-bold text-slate-800">{isRevoked ? 'Contact Support' : 'Wait for Email'}</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Steps Timeline */}
-            <div className="bg-white rounded-[32px] border border-slate-200 p-10 shadow-sm">
-              <h3 className="text-xl font-black text-slate-900 tracking-tight mb-8">Verification Journey</h3>
-              <div className="space-y-8">
+            {/* Steps Journey Timeline */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+              <h3 className="text-[14px] font-black text-slate-900 tracking-tight mb-6" style={{ fontFamily: 'Sora' }}>Verification Journey</h3>
+              <div className="space-y-6">
                 {[
                   { step: '1', title: 'Registration', desc: 'Your company and admin details were submitted.', completed: true },
-                  { step: '2', title: 'Super Admin Review', desc: 'We are verifying your company domain and information.', current: true },
-                  { step: '3', title: 'Platform Access', desc: 'Unlock job management, AI shortlisting, and more.', pending: true },
+                  { step: '2', title: 'Super Admin Review', desc: 'We are verifying your company domain and information.', current: !isRevoked, completed: isRevoked },
+                  { step: '3', title: isRevoked ? 'Access Revoked' : 'Platform Access', desc: isRevoked ? 'Your access has been terminated.' : 'Unlock job management, AI shortlisting, and more.', pending: !isRevoked, error: isRevoked },
                 ].map((s, i) => (
-                  <div key={i} className="flex gap-6 relative">
-                    {i !== 2 && <div className="absolute left-5 top-10 w-0.5 h-12 bg-slate-100" />}
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm transition-all ${s.completed ? 'bg-blue-600 text-white' : s.current ? 'bg-blue-100 text-blue-600 ring-4 ring-blue-50' : 'bg-slate-100 text-slate-400'}`}>
-                      {s.completed ? <CheckCircle2 size={20} /> : <span className="font-black text-sm">{s.step}</span>}
+                  <div key={i} className="flex gap-4 relative">
+                    {i !== 2 && <div className="absolute left-4 top-8 w-0.5 h-10 bg-slate-100" />}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm transition-all border ${
+                      s.error 
+                        ? 'bg-rose-50 border-rose-200 text-rose-600' 
+                        : s.completed 
+                          ? 'bg-blue-50 border-blue-200 text-blue-600' 
+                          : s.current 
+                            ? 'bg-blue-100 border-blue-300 text-blue-600 ring-2 ring-blue-50' 
+                            : 'bg-slate-50 border-slate-200 text-slate-400'
+                    }`}>
+                      {s.completed ? <CheckCircle2 size={15} /> : s.error ? <AlertCircle size={15} /> : <span className="font-bold text-xs">{s.step}</span>}
                     </div>
-                    <div className="pt-1">
-                      <h4 className={`font-black text-base ${s.pending ? 'text-slate-400' : 'text-slate-900'}`}>{s.title}</h4>
-                      <p className="text-sm text-slate-500 font-medium mt-1">{s.desc}</p>
+                    <div className="pt-0.5">
+                      <h4 className={`font-bold text-xs ${s.pending ? 'text-slate-400' : 'text-slate-900'}`}>{s.title}</h4>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">{s.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -111,62 +147,67 @@ export const PendingApproval = () => {
             </div>
           </div>
 
-          {/* Right - Info Sidebar */}
-          <div className="space-y-8">
-            {/* Company Summary */}
-            <div className="bg-white rounded-[32px] border border-slate-200 p-8 shadow-sm">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 border-l-4 border-blue-600 pl-4">Company Details</h3>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
-                    <Building2 size={20} />
+          {/* Right Panel: Info Sidebar */}
+          <div className="space-y-6">
+            {/* Company details panel */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-l-2 border-blue-600 pl-3">Company Details</h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
+                    <Building2 size={16} />
                   </div>
-                  <div>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Name</p>
-                    <p className="text-sm font-bold text-slate-900">{user?.name}'s Company</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 shrink-0">
-                    <ShieldCheck size={20} />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Admin</p>
-                    <p className="text-sm font-bold text-slate-900">{user?.name}</p>
-                    <p className="text-xs text-slate-500 font-medium">{user?.email}</p>
+                  <div className="min-w-0">
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Name</p>
+                    <p className="text-xs font-bold text-slate-800 truncate">
+                      {user?.name ? `${user.name}'s Company` : 'Harish Viswanath\'s Company'}
+                    </p>
                   </div>
                 </div>
-                <div className="pt-4 border-t border-slate-50">
-                   <div className="flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase tracking-wider">
-                      <AlertCircle size={14} /> Need to update details?
-                   </div>
-                   <p className="text-[11px] text-slate-400 mt-1 font-medium italic">Contact support@recruiting.ai</p>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
+                    <ShieldCheck size={16} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Admin</p>
+                    <p className="text-xs font-bold text-slate-800 truncate">{user?.name || 'Harish Viswanath'}</p>
+                    <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">{user?.email || 'harishviswanath017@gmail.com'}</p>
+                  </div>
+                </div>
+
+                <div className="pt-3.5 border-t border-slate-50">
+                  <div className="flex items-center gap-1.5 text-blue-600 font-black text-[9px] uppercase tracking-wider">
+                    <AlertCircle size={12} /> Need to update details?
+                  </div>
+                  <p className="text-[10.5px] text-slate-400 mt-1 font-medium italic">Contact support@recruiting.ai</p>
                 </div>
               </div>
             </div>
 
-            {/* Help Card */}
-            <div className="bg-[#0a0e17] rounded-[32px] p-8 text-white shadow-xl relative overflow-hidden group">
-               <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mb-16" />
-               <h4 className="font-black text-lg mb-4 relative z-10">Have Questions?</h4>
-               <p className="text-sm text-slate-400 font-medium mb-6 relative z-10 leading-relaxed">
-                 Our team is here to help you get started with the platform features.
-               </p>
-               <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl relative z-10">
-                 Read Documentation
-               </Button>
+            {/* Have Questions Documentation Card */}
+            <div className="bg-[#0b0f19] rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-600/10 rounded-full -mr-12 -mb-12" />
+              <h4 className="font-bold text-[14px] mb-2 relative z-10" style={{ fontFamily: 'Sora' }}>Have Questions?</h4>
+              <p className="text-[11.5px] text-slate-400 font-medium mb-5 relative z-10 leading-relaxed">
+                Our team is here to help you get started with the platform features.
+              </p>
+              <Button className="w-full h-8 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg relative z-10 transition-colors">
+                Read Documentation
+              </Button>
             </div>
           </div>
+
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-slate-200 bg-white py-8">
-        <div className="max-w-5xl mx-auto px-8 flex justify-between items-center">
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">© 2026 Recruiting AI. All rights reserved.</p>
-          <div className="flex gap-6">
-            <a href="#" className="text-xs text-slate-400 hover:text-blue-600 font-bold transition-colors uppercase tracking-widest">Privacy</a>
-            <a href="#" className="text-xs text-slate-400 hover:text-blue-600 font-bold transition-colors uppercase tracking-widest">Terms</a>
+      {/* Footer bar */}
+      <footer className="w-full border-t border-slate-150 bg-white py-6 mt-auto">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2026 Recruiting AI. All rights reserved.</p>
+          <div className="flex gap-4">
+            <a href="#" className="text-[10px] text-slate-400 hover:text-blue-600 font-bold transition-colors uppercase tracking-widest">Privacy</a>
+            <a href="#" className="text-[10px] text-slate-400 hover:text-blue-600 font-bold transition-colors uppercase tracking-widest">Terms</a>
           </div>
         </div>
       </footer>
