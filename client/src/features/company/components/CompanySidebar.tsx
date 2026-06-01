@@ -10,21 +10,12 @@ import {
   LogOut,
   BarChart3,
   X,
+  Users,
 } from 'lucide-react';
 import { cn } from '../../../shared/lib/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../../app/store';
 import { logout } from '../../auth/auth.slice';
-
-const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/company/dashboard' },
-  { icon: FileText, label: 'Applications', path: '/company/applications' },
-  { icon: Briefcase, label: 'Jobs', path: '/company/jobs' },
-  { icon: Calendar, label: 'Interviews', path: '/company/interviews' },
-  { icon: MessageSquare, label: 'Feedback', path: '/company/feedback' },
-  { icon: UserSearch, label: 'Candidates', path: '/company/candidates' },
-  { icon: BarChart3, label: 'Analytics', path: '/company/analytics' },
-];
 
 interface CompanySidebarProps {
   isOpen: boolean;
@@ -35,6 +26,18 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const isAdmin = user?.role === 'Admin';
+  const menuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/company/dashboard' },
+    { icon: FileText, label: 'Applications', path: '/company/applications' },
+    { icon: Briefcase, label: 'Jobs', path: '/company/jobs' },
+    { icon: Calendar, label: 'Interviews', path: '/company/interviews' },
+    { icon: MessageSquare, label: 'Feedback', path: '/company/feedback' },
+    { icon: UserSearch, label: 'Candidates', path: '/company/candidates' },
+    ...(isAdmin ? [{ icon: Users, label: 'Team', path: '/company/users' }] : []),
+    { icon: BarChart3, label: 'Analytics', path: '/company/analytics' },
+  ];
 
   return (
     <div

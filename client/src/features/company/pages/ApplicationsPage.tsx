@@ -13,6 +13,7 @@ const getInterviewRound = (app: any) => {
   return Number(app.latest_interview_round || fromStatus || 0);
 };
 
+
 const getStageLabel = (app: any) => {
   const status = String(app.status || '').toLowerCase();
   if (status.startsWith('interview_') || status === 'interview') {

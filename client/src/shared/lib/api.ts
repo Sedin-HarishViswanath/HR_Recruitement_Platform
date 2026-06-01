@@ -43,8 +43,9 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If 401 and not already retrying (and not the refresh endpoint itself)
-    if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/refresh') {
+    // If 401 and not already retrying (and not auth endpoints like login/refresh)
+    const ignoredPaths = ['/auth/refresh', '/auth/login', '/auth/signup', '/auth/google'];
+    if (error.response?.status === 401 && !originalRequest._retry && !ignoredPaths.includes(originalRequest.url)) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });

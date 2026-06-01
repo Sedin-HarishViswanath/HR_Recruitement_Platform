@@ -24,6 +24,11 @@ export class OtpService {
       expires_at: expiresAt,
     });
 
+    // Log OTP to console in development so devs can bypass email
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n🔑 [DEV] OTP for ${email}: ${otp}\n`);
+    }
+
     // Send OTP email
     const html = `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; border-radius: 16px; background: #f8fafc; border: 1px solid #e2e8f0;">

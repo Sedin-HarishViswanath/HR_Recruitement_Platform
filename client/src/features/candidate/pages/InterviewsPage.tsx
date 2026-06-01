@@ -255,7 +255,7 @@ export const CandidateInterviewsPage = () => {
                   </div>
 
                   <button 
-                    onClick={() => toast.success("Loading personalized practice console...")}
+                    onClick={() => navigate('/candidate/practice')}
                     className="w-full bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm mt-2"
                   >
                     Launch Practice Room &rarr;

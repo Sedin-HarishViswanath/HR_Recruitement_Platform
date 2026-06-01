@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
-import { Users, Briefcase, Calendar, TrendingUp, ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-react';
+import { Users, Briefcase, Calendar, TrendingUp, ChevronRight } from 'lucide-react';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { unwrapArray } from '../../../shared/lib/response';
 

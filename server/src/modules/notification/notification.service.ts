@@ -3,10 +3,11 @@ import * as templates from '../../shared/templates/emailTemplates';
 import { inAppNotificationService } from './inapp-notification.service';
 
 export class NotificationService {
-  async notifyWelcome(userId: string, name: string, email: string) {
+  async notifyWelcome(id: string, name: string, email: string, isCandidate = false) {
     // Persistent In-App Notification
     await inAppNotificationService.create({
-      userId,
+      userId: isCandidate ? null : id,
+      candidateId: isCandidate ? id : null,
       title: 'Welcome!',
       body: `Hi ${name}, welcome to RecruitAI!`,
       type: 'info'
@@ -42,7 +43,7 @@ export class NotificationService {
 
   async notifyInterviewScheduled(candidate: any, job: any, interview: any) {
     const dateStr = new Date(interview.scheduled_at).toLocaleString();
-    
+
     // Persistent In-App Notification for candidate
     await inAppNotificationService.create({
       candidateId: candidate.id,

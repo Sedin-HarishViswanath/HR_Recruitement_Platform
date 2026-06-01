@@ -34,6 +34,7 @@ import { InterviewWorkspace } from './features/interview/pages/InterviewWorkspac
 import { PublicCareersPage } from './features/company/pages/PublicCareersPage';
 import { VerifyOtpPage } from './features/auth/pages/VerifyOtpPage';
 import SettingsPage from './features/company/pages/SettingsPage';
+import { PracticeRoom } from './features/candidate/pages/PracticeRoom';
 
 
 const PublicJobBoardWrapper = () => {
@@ -199,6 +200,14 @@ const router = createBrowserRouter([
         element: (
           <RoleGuard allowedRoles={['Candidate']}>
             <CandidateOnboardingWizard />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'practice',
+        element: (
+          <RoleGuard allowedRoles={['Candidate']}>
+            <PracticeRoom />
           </RoleGuard>
         ),
       },

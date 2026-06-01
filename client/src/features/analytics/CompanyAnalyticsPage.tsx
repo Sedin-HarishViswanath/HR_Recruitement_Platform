@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BarChart3, Users, Briefcase, Calendar, Award, Activity } from 'lucide-react';
+import { Users, Briefcase, Award, Activity } from 'lucide-react';
 import { api } from '../../shared/lib/api';
 import { toast } from 'sonner';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

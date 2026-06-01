@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { Link } from 'react-router-dom';
 import {
-  Video, Sparkles, Upload, Search
+  Video, Sparkles, Search
 } from 'lucide-react';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { unwrapArray } from '../../../shared/lib/response';
@@ -74,22 +74,16 @@ export const CandidateDashboard = () => {
           </h1>
         </div>
 
-        {/* Search & Update Resume controls */}
+        {/* Search controls */}
         <div className="flex items-center gap-3">
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
             <input
               type="text"
               placeholder="Search candidates, jobs..."
-              className="pl-9 pr-10 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-none w-[200px] font-medium text-slate-700 placeholder:text-slate-400"
+              className="pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-none w-[200px] font-medium text-slate-700 placeholder:text-slate-400"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 bg-white border border-slate-100 px-1 py-0.5 rounded shadow-sm">&#8984;K</span>
           </div>
-
-          <button className="text-[12px] font-bold text-white bg-violet-600 hover:bg-violet-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm shadow-violet-500/10 hover:scale-[1.01]">
-            <Upload size={13} />
-            Update resume
-          </button>
         </div>
       </div>
 

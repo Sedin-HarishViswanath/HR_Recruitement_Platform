@@ -43,7 +43,7 @@ export class AuthService {
           .returning(['id', 'name', 'email']);
 
         const result = { user: candidate, role: 'Candidate' };
-        void notificationService.notifyWelcome(candidate.id, candidate.name, candidate.email);
+        void notificationService.notifyWelcome(candidate.id, candidate.name, candidate.email, true);
         return result;
       } else {
         // Company role
@@ -94,7 +94,7 @@ export class AuthService {
           },
           role: 'Admin'
         };
-        void notificationService.notifyWelcome(user.id, user.name, user.email);
+        void notificationService.notifyWelcome(user.id, user.name, user.email, false);
         return result;
       }
     });

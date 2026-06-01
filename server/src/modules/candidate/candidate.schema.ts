@@ -4,7 +4,7 @@ export const wizardStep1Schema = z.object({
   name: z.string().min(1, 'Name is required'),
   phone: z.string().min(10, 'Phone must be at least 10 characters'),
   location: z.string().optional(),
-  date_of_birth: z.string().optional(),
+  date_of_birth: z.string().transform(val => val === '' ? null : val).optional().nullable(),
   about_me: z.string().max(300, 'About me must be less than 300 characters').optional(),
   avatar: z.string().optional(),
 });
@@ -36,7 +36,7 @@ export const updateProfileSchema = z.object({
   name: z.string().nullish(),
   phone: z.string().nullish(),
   location: z.string().nullish(),
-  date_of_birth: z.string().nullish(),
+  date_of_birth: z.string().transform(val => val === '' ? null : val).nullish(),
   about_me: z.string().max(300).nullish(),
   avatar: z.string().nullish(),
   summary: z.string().max(1000).nullish(),

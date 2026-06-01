@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import {
@@ -52,6 +52,7 @@ export const UsersPage = () => {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteData, setInviteData] = useState({ name: '', email: '', role: 'Recruiter', password: '' });
   const [invitedLink, setInvitedLink] = useState<string | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -72,6 +73,8 @@ export const UsersPage = () => {
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isInviting) return;
+    setIsInviting(true);
     try {
       const res = await api.post('/companies/me/users/invite', inviteData);
       toast.success('User invited successfully');
@@ -79,6 +82,8 @@ export const UsersPage = () => {
       setInviteData({ name: '', email: '', role: 'Recruiter', password: '' });
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to invite user');
+    } finally {
+      setIsInviting(false);
     }
   };
 
@@ -191,7 +196,9 @@ export const UsersPage = () => {
                     <Label>Temporary Password</Label>
                     <Input required type="password" value={inviteData.password} onChange={e => setInviteData({...inviteData, password: e.target.value})} />
                   </div>
-                  <Button type="submit" className="w-full">Send Invitation</Button>
+                  <Button type="submit" disabled={isInviting} className="w-full">
+                    {isInviting ? 'Sending Invitation...' : 'Send Invitation'}
+                  </Button>
                 </form>
               </>
             )}

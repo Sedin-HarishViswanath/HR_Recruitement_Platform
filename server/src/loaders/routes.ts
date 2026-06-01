@@ -9,6 +9,7 @@ import applicationRoutes from '../modules/application/application.routes';
 import candidateRoutes from '../modules/candidate/candidate.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
 import notificationRoutes from '../modules/notification/notification.routes';
+import practiceRoutes from '../modules/practice/practice.routes';
 
 export default (app: Application) => {
   app.get('/api/health', (req: Request, res: Response) => {
@@ -27,6 +28,7 @@ export default (app: Application) => {
   app.use('/api/candidate', candidateRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/notifications', notificationRoutes);
+  app.use('/api/practice', practiceRoutes);
 
   // Future modules will be registered here
 };

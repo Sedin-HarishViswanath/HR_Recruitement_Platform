@@ -191,7 +191,7 @@ export const AuthPage = () => {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-400 rounded-full blur-[300px] opacity-[0.06]" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-400 rounded-full blur-[200px] opacity-[0.04]" />
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-16 sm:py-28 text-center relative z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 pt-6 pb-16 sm:pt-10 sm:pb-28 text-center relative z-10">
           <div className={`space-y-6 max-w-3xl mx-auto transition-all duration-1000 ${hero.vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 text-[11px] font-medium border border-violet-200">
               <Sparkles size={11} className="animate-float" /> New · AI-powered shortlisting v2 →

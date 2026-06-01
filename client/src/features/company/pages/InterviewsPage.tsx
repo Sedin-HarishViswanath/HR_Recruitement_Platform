@@ -4,7 +4,7 @@ import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import {
   Calendar, Clock, Video, Plus,
-  Brain, AlertCircle, CalendarDays, CheckSquare, MessageSquare,
+  Brain, AlertCircle, CheckSquare, MessageSquare,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { ScheduleInterviewModal } from '../components/ScheduleInterviewModal';
@@ -121,63 +121,47 @@ export const CompanyInterviewsPage = () => {
     return days;
   };
 
-  // Mock interviews list matching Image 2 schedule
-  const mockInterviews = [
-    {
-      id: 'mock-int-1',
-      candidate_name: 'Maria Santos',
-      job_title: 'Senior Designer',
-      scheduled_at: '2026-05-21T09:00:00.000Z',
-      duration: 30,
-      round_type: 'Phone screen',
-      status: 'scheduled',
-      isLive: true,
-      ai_score: 96,
-      location: 'Berlin',
-      ai_notes: 'Candidate showed strong systems thinking. Asked thoughtful questions about design ops. Considers herself a "T-shape" — deep in product, broad in research.'
-    },
-    {
-      id: 'mock-int-2',
-      candidate_name: 'James Kim',
-      job_title: 'Backend Engineer',
-      scheduled_at: '2026-05-21T10:30:00.000Z',
-      duration: 45,
-      round_type: 'Technical',
-      status: 'scheduled',
-      isLive: false,
-      ai_score: 89,
-      location: 'NYC',
-      ai_notes: 'Demonstrates deep database optimization skills. Solid experience with Kafka streams. Strong architectural understanding.'
-    },
-    {
-      id: 'mock-int-3',
-      candidate_name: 'Priya Raghavan',
-      job_title: 'Product Manager',
-      scheduled_at: '2026-05-21T13:00:00.000Z',
-      duration: 60,
-      round_type: 'Final',
-      status: 'scheduled',
-      isLive: false,
-      ai_score: 92,
-      location: 'London',
-      ai_notes: 'Strong customer discovery insights. Clear metrics-focused prioritization framework. Excellent communication skills.'
-    },
-    {
-      id: 'mock-int-4',
-      candidate_name: 'David Chen',
-      job_title: 'iOS Engineer',
-      scheduled_at: '2026-05-21T15:00:00.000Z',
-      duration: 30,
-      round_type: 'Phone screen',
-      status: 'scheduled',
-      isLive: false,
-      ai_score: 84,
-      location: 'SF',
-      ai_notes: 'Solid Swift concepts. Understands memory management. Needs minor training on SwiftUI architectural design patterns.'
-    }
-  ];
+  const now = new Date();
+  const todayStr = now.toDateString();
+  
+  // Start of week (Sunday)
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  
+  // End of week (Saturday 11:59:59 PM)
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 7);
 
-  const displayInterviews = interviews.length > 0 ? interviews : mockInterviews;
+  const processedInterviews = interviews.map((item) => {
+    const schedTime = new Date(item.scheduled_at).getTime();
+    const durationMs = (Number(item.duration) || 60) * 60000;
+    const nowMs = Date.now();
+    const isLive = item.status === 'scheduled' && nowMs >= schedTime && nowMs <= schedTime + durationMs;
+    const isNoShow = item.status === 'scheduled' && nowMs > schedTime + durationMs;
+    return { ...item, isLive, isNoShow };
+  });
+
+  const todayInterviews = processedInterviews.filter(
+    item => new Date(item.scheduled_at).toDateString() === todayStr && item.status !== 'cancelled'
+  );
+
+  const weekInterviews = processedInterviews.filter(
+    item => {
+      const d = new Date(item.scheduled_at);
+      return d >= startOfWeek && d < endOfWeek && item.status !== 'cancelled';
+    }
+  );
+
+  const noShowInterviews = processedInterviews.filter(item => item.isNoShow);
+
+  const totalDuration = processedInterviews.reduce((acc, item) => acc + (Number(item.duration) || 0), 0);
+  const avgDuration = processedInterviews.length > 0 ? Math.round(totalDuration / processedInterviews.length) : 0;
+
+  const todayScheduledCount = todayInterviews.filter(item => item.status === 'scheduled').length;
+  const todayInProgressCount = todayInterviews.filter(item => item.isLive).length;
+
+  const displayInterviews = processedInterviews;
 
   const getActiveInterview = () => {
     return selectedActiveInterview || displayInterviews[0];
@@ -203,16 +187,11 @@ export const CompanyInterviewsPage = () => {
             <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
               Interviews
             </h1>
-            <span className="text-xs text-slate-400 font-medium">42 this week · 4 today</span>
+            <span className="text-xs text-slate-400 font-medium">{weekInterviews.length} this week · {todayInterviews.length} today</span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="text-[12px] font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:bg-slate-50 transition-colors shadow-sm whitespace-nowrap">
-            <CalendarDays size={13} className="text-slate-400" />
-            Sync calendar
-          </button>
-          
           <button
             onClick={() => setIsModalOpen(true)}
             className="text-[12px] font-bold text-white bg-violet-600 hover:bg-violet-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm shadow-violet-500/10 hover:scale-[1.01]"
@@ -228,10 +207,10 @@ export const CompanyInterviewsPage = () => {
         {/* Top metrics bar matching Image 2 */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Today', value: '4', icon: Calendar, color: 'text-violet-600 bg-violet-50' },
-            { label: 'This Week', value: '42', icon: Clock, color: 'text-sky-600 bg-sky-50' },
-            { label: 'Avg Duration', value: '47m', icon: Brain, color: 'text-emerald-600 bg-emerald-50' },
-            { label: 'No-Shows', value: '2', icon: AlertCircle, color: 'text-rose-600 bg-rose-50' },
+            { label: 'Today', value: String(todayInterviews.length), icon: Calendar, color: 'text-violet-600 bg-violet-50' },
+            { label: 'This Week', value: String(weekInterviews.length), icon: Clock, color: 'text-sky-600 bg-sky-50' },
+            { label: 'Avg Duration', value: `${avgDuration}m`, icon: Brain, color: 'text-emerald-600 bg-emerald-50' },
+            { label: 'No-Shows', value: String(noShowInterviews.length), icon: AlertCircle, color: 'text-rose-600 bg-rose-50' },
           ].map((metric, i) => (
             <div key={i} className="bg-white border border-slate-200/80 rounded-xl p-4 flex items-center justify-between shadow-sm">
               <div>
@@ -255,9 +234,9 @@ export const CompanyInterviewsPage = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
               <div>
                 <h3 className="font-bold text-slate-900 text-sm" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  Today &middot; Wed, May 21
+                  Today &middot; {now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                 </h3>
-                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">4 scheduled &middot; 1 in progress</p>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{todayScheduledCount} scheduled &middot; {todayInProgressCount} in progress</p>
               </div>
 
               {/* Day, Week, Month tabs */}
@@ -279,8 +258,13 @@ export const CompanyInterviewsPage = () => {
 
             {/* List of interviews */}
             <div className="divide-y divide-slate-100">
+              {displayInterviews.length === 0 && (
+                <div className="py-8 text-center text-sm text-slate-400">
+                  No interviews available
+                </div>
+              )}
               {displayInterviews.map((item, idx) => {
-                const isActive = activeInt.id === item.id;
+                const isActive = activeInt?.id === item.id;
                 const time = new Date(item.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const initials = getInitials(item.candidate_name);
                 const avatarBg = avatarColors[idx % avatarColors.length];
@@ -353,6 +337,7 @@ export const CompanyInterviewsPage = () => {
           <div className="space-y-6">
             
             {/* Live Now Assistant Panel */}
+            {activeInt ? (
             <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
@@ -382,7 +367,7 @@ export const CompanyInterviewsPage = () => {
                     {activeInt.candidate_name}
                   </span>
                   <span className="bg-violet-600 text-white text-[9px] font-bold px-2 py-0.5 rounded flex items-center gap-1 shadow-sm">
-                    AI score {activeInt.ai_score}
+                    AI score {activeInt.ai_score || 'N/A'}
                   </span>
                 </div>
 
@@ -418,10 +403,15 @@ export const CompanyInterviewsPage = () => {
                   Live AI notes
                 </div>
                 <p className="text-[11.5px] text-slate-600 leading-relaxed font-semibold">
-                  {activeInt.ai_notes}
+                  {activeInt.ai_notes || 'No live notes available yet for this interview.'}
                 </p>
               </div>
             </div>
+            ) : (
+              <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm flex items-center justify-center text-slate-400 h-64 text-sm font-medium">
+                No interviews scheduled
+              </div>
+            )}
 
             {/* Calendar widget matching Image 2 */}
             <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-3">

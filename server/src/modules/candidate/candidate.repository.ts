@@ -52,7 +52,7 @@ export class CandidateRepository {
 
   async getRecommendedJobs(skills: string[], limit = 4) {
     if (!skills || skills.length === 0) return [];
-    
+
     // Using Postgres array overlap operator '&&'
     return knex('jobs')
       .select(
@@ -72,12 +72,12 @@ export class CandidateRepository {
     const [totalApps] = await knex('applications')
       .where({ candidate_id: candidateId })
       .count('* as count');
-      
+
     const [activeApps] = await knex('applications')
       .where({ candidate_id: candidateId })
       .whereNotIn('status', ['rejected', 'withdrawn'])
       .count('* as count');
-      
+
     const [scheduledInterviews] = await knex('interviews')
       .join('applications', 'interviews.application_id', 'applications.id')
       .where('applications.candidate_id', candidateId)
@@ -106,11 +106,11 @@ export class CandidateRepository {
     if (query.status) {
       q = q.where('applications.status', query.status);
     }
-    
+
     if (query.search) {
       q = q.whereILike('jobs.title', `%${query.search}%`);
     }
-    
+
     return q;
   }
 
@@ -178,7 +178,8 @@ export class CandidateRepository {
         'candidates.portfolio_url',
         'candidates.profile_completion',
         'candidates.skills',
-        'candidates.ai_match_score'
+        'candidates.ai_match_score',
+        knex.raw("string_agg(distinct jobs.department, ',') as departments")
       )
       .count('applications.id as applied_jobs_count')
       .max('applications.status as overall_status')

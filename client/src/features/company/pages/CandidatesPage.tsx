@@ -3,7 +3,7 @@ import { api } from '../../../shared/lib/api';
 import {
   Search, MapPin, X, Mail, Phone,
   BriefcaseBusiness, FileText, Loader2, Calendar,
-  Star, Bookmark, MessageSquare, SlidersHorizontal, Upload
+  Star, Bookmark, MessageSquare
 } from 'lucide-react';
 import { unwrapArray } from '../../../shared/lib/response';
 import { TranscriptViewerModal } from '../components/TranscriptViewerModal';
@@ -47,9 +47,9 @@ export const CompanyCandidatesPage = () => {
   
   // Sidebar active selections
   const [activeSavedSearch, setActiveSavedSearch] = useState('Top performers');
-  const [selectedDepts, setSelectedDepts] = useState<string[]>(['Engineering', 'Design']);
+  const [selectedDepts, setSelectedDepts] = useState<string[]>([]);
   const [aiScoreRange, setAiScoreRange] = useState<number>(80);
-  const [selectedLocations, setSelectedLocations] = useState<string[]>(['Remote', 'NYC']);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 
   // Transcript state
   const [candidateInterviews, setCandidateInterviews] = useState<any[]>([]);
@@ -107,20 +107,57 @@ export const CompanyCandidatesPage = () => {
     fetchCandidates(search);
   };
 
-  const filteredCandidates = dbCandidates.map(c => ({
-    ...c,
-    skills: Array.isArray(c.skills) ? c.skills : (c.skills ? String(c.skills).split(',') : []),
-    ai_score: c.ai_match_score || 0,
-    matching_jobs_count: c.applied_jobs_count || 0,
-    source: c.source || 'Direct',
-    star: c.ai_match_score >= 90
-  })).filter((c) => {
+  const filteredCandidates = dbCandidates.map(c => {
+    const skillsArray = Array.isArray(c.skills) ? c.skills : (c.skills ? String(c.skills).split(',').map(s => s.trim()) : []);
+    const aiScore = Number(c.ai_match_score) || 0;
+    return {
+      ...c,
+      skills: skillsArray,
+      ai_score: aiScore,
+      matching_jobs_count: c.applied_jobs_count || 0,
+      source: c.source || 'Direct',
+      star: aiScore >= 90
+    };
+  }).filter((c) => {
+    // Search query filter
     const nameMatch = !search || 
       c.name?.toLowerCase().includes(search.toLowerCase()) || 
       c.email?.toLowerCase().includes(search.toLowerCase()) ||
       c.skills?.some((s: string) => s.toLowerCase().includes(search.toLowerCase()));
     
-    return nameMatch;
+    if (!nameMatch) return false;
+
+    // Saved search filter
+    if (activeSavedSearch === 'Top performers' && c.ai_score < 85) return false;
+    if (activeSavedSearch === 'Diverse pipeline' && c.skills.length < 3) return false;
+    if (activeSavedSearch === 'Recently active' && c.matching_jobs_count === 0) return false;
+    if (activeSavedSearch === 'New this week') {
+      if (!c.first_applied_date) return false;
+      const diff = new Date().getTime() - new Date(c.first_applied_date).getTime();
+      if (diff >= 30 * 24 * 60 * 60 * 1000) return false;
+    }
+
+    // Department filter
+    if (selectedDepts.length > 0) {
+      const candidateDepts = c.departments 
+        ? c.departments.split(',').map((d: string) => d.trim()) 
+        : [];
+      const hasMatchingDept = candidateDepts.some((d: string) => selectedDepts.includes(d));
+      if (!hasMatchingDept) return false;
+    }
+
+    // AI score filter
+    if (c.ai_score < aiScoreRange) return false;
+
+    // Location filter
+    if (selectedLocations.length > 0) {
+      const hasMatchingLoc = selectedLocations.some((loc: string) => 
+        c.location?.toLowerCase().includes(loc.toLowerCase())
+      );
+      if (!hasMatchingLoc) return false;
+    }
+
+    return true;
   });
 
   const toggleDept = (dept: string) => {
@@ -149,7 +186,7 @@ export const CompanyCandidatesPage = () => {
             <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
               Candidates
             </h1>
-            <span className="text-xs text-slate-400 font-medium">1,247 in your talent pool</span>
+            <span className="text-xs text-slate-400 font-medium">{dbCandidates.length} in your talent pool</span>
           </div>
         </div>
 
@@ -163,23 +200,10 @@ export const CompanyCandidatesPage = () => {
                 placeholder="Search candidates, jobs..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-14 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500 font-medium text-slate-700 placeholder:text-slate-400 transition-all"
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500 font-medium text-slate-700 placeholder:text-slate-400 transition-all"
               />
             </form>
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 bg-white border border-slate-100 px-1.5 py-0.5 rounded shadow-sm select-none">
-              &#8984;K
-            </span>
           </div>
-
-          <button className="text-[12px] font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:bg-slate-50 transition-colors shadow-sm whitespace-nowrap">
-            <Upload size={13} className="text-slate-400" />
-            Import
-          </button>
-          
-          <button className="text-[12px] font-bold text-white bg-violet-600 hover:bg-violet-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm shadow-violet-500/10 hover:scale-[1.01]">
-            <SlidersHorizontal size={13} />
-            AI sourcing
-          </button>
         </div>
       </div>
 
@@ -193,10 +217,17 @@ export const CompanyCandidatesPage = () => {
             <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Saved Searches</h3>
             <div className="space-y-0.5">
               {[
-                { name: 'Top performers', count: 24 },
-                { name: 'Diverse pipeline', count: 86 },
-                { name: 'Recently active', count: 142 },
-                { name: 'New this week', count: 38 },
+                { name: 'Top performers', count: dbCandidates.filter(c => (c.ai_match_score || 0) >= 85).length },
+                { name: 'Diverse pipeline', count: dbCandidates.filter(c => {
+                    const skills = Array.isArray(c.skills) ? c.skills : (c.skills ? String(c.skills).split(',') : []);
+                    return skills.length >= 3;
+                  }).length },
+                { name: 'Recently active', count: dbCandidates.filter(c => (c.applied_jobs_count || 0) > 0).length },
+                { name: 'New this week', count: dbCandidates.filter(c => {
+                    if (!c.first_applied_date) return false;
+                    const diff = new Date().getTime() - new Date(c.first_applied_date).getTime();
+                    return diff < 30 * 24 * 60 * 60 * 1000;
+                  }).length },
               ].map((item) => (
                 <button
                   key={item.name}
@@ -227,11 +258,11 @@ export const CompanyCandidatesPage = () => {
               <label className="text-[11px] font-bold text-slate-500">Department</label>
               <div className="space-y-2">
                 {[
-                  { name: 'Engineering', count: 412 },
-                  { name: 'Design', count: 218 },
-                  { name: 'Product', count: 184 },
-                  { name: 'Data', count: 96 },
-                  { name: 'Sales', count: 142 },
+                  { name: 'Engineering', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Engineering')).length },
+                  { name: 'Design', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Design')).length },
+                  { name: 'Product', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Product')).length },
+                  { name: 'Data', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Data')).length },
+                  { name: 'Sales', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Sales')).length },
                 ].map((dept) => (
                   <label key={dept.name} className="flex items-center justify-between text-xs text-slate-600 hover:text-slate-950 font-semibold cursor-pointer">
                     <div className="flex items-center gap-2">

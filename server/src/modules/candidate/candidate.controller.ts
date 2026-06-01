@@ -44,7 +44,8 @@ export class CandidateController {
 
       const updated = await candidateService.updateProfileStep(candidateId as string, step, validatedData);
       res.json({ success: true, data: updated });
-    } catch (err) {
+    } catch (err: any) {
+      console.error('[WizardStep] Error:', err?.message || err, err?.detail || '');
       next(err);
     }
   };
