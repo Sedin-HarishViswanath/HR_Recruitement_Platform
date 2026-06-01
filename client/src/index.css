@@ -93,7 +93,7 @@
     cursor: not-allowed;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', 'Sora', sans-serif;
+    font-family: 'Sora', 'Plus Jakarta Sans', 'Inter', sans-serif;
   }
 }
 
@@ -192,6 +192,19 @@
 /*         COMPONENT LIBRARY          */
 /* ═══════════════════════════════════ */
 @layer components {
+
+  /* ── Concentric Double-Bezel Card ── */
+  .outer-bezel {
+    @apply bg-slate-50/70 p-1.5 rounded-[24px] border border-slate-200/50 shadow-sm transition-all duration-300;
+  }
+  .inner-core {
+    @apply bg-white p-5 rounded-[calc(24px-6px)] border border-slate-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)] h-full;
+  }
+
+  /* ── Tactile / Spring Transition ── */
+  .transition-spring {
+    transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  }
 
   /* ── Glass ── */
   .glass {

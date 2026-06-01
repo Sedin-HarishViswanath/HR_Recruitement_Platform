@@ -1,3 +1,4 @@
+// Reading this as: candidate interviews overview list, with a soft structuralism design system, leaning toward clean typography, responsive flex-wrap detail layouts + custom modals.
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
@@ -142,31 +143,33 @@ export const CandidateInterviewsPage = () => {
                         </div>
                       </div>
 
-                      {/* Middle: Details grid */}
-                      <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-semibold text-slate-650 w-full md:w-auto">
-                        <div className="space-y-0.5">
+                      {/* Middle: Details Row */}
+                      <div className="flex-1 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-slate-650 w-full md:w-auto md:px-4">
+                        <div className="space-y-0.5 min-w-[100px]">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
                             <Calendar size={11} className="text-slate-400" /> Date
                           </p>
                           <p className="text-slate-800 font-bold">{date}</p>
                         </div>
-                        <div className="space-y-0.5">
+                        <div className="space-y-0.5 min-w-[70px]">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
                             <Clock size={11} className="text-slate-400" /> Time
                           </p>
                           <p className="text-slate-800 font-bold">{time}</p>
                         </div>
-                        <div className="space-y-0.5">
+                        <div className="space-y-0.5 min-w-[90px]">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
                             <Video size={11} className="text-slate-400" /> Format
                           </p>
                           <p className="text-slate-800 font-bold capitalize">{interview.round_type || 'Interview'}</p>
                         </div>
-                        <div className="space-y-0.5">
+                        <div className="space-y-0.5 min-w-[120px]">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
                             <User size={11} className="text-slate-400" /> Host
                           </p>
-                          <p className="text-slate-800 font-bold">{interview.interviewer_name || 'Hiring Manager'}</p>
+                          <p className="text-slate-800 font-bold truncate max-w-[130px]" title={interview.interviewer_name}>
+                            {interview.interviewer_name || 'Hiring Manager'}
+                          </p>
                         </div>
                       </div>
 
@@ -254,12 +257,14 @@ export const CandidateInterviewsPage = () => {
                     </div>
                   </div>
 
+                  {/* Hide for now as not implemented correctly yet
                   <button 
                     onClick={() => navigate('/candidate/practice')}
                     className="w-full bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm mt-2"
                   >
                     Launch Practice Room &rarr;
                   </button>
+                  */}
                 </div>
               ) : (
                 <div className="text-center py-6 text-slate-400 text-xs">
