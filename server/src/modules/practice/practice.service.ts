@@ -163,17 +163,8 @@ export class PracticeService {
         }
 
         if (status === 429) {
-          logger.warn('Gemini rate limit exhausted. Falling back to mock coach response.', { module: 'Practice' });
-          
-          const replies = MOCK_COACH_RESPONSES[request.mode] || MOCK_COACH_RESPONSES.technical;
-          const index = Math.min(Math.floor((request.history?.length || 0) / 2), replies.length - 1);
-          const replyText = replies[index] + 
-            "\n\n*(Note: This is a simulated response because the system's shared Gemini API key is currently rate-limited or exhausted. To use unrestricted AI coaching, please set your own GEMINI_API_KEY in the root `.env` file and restart Docker).*";
-
-          return {
-            reply: replyText,
-            role: 'model' as const,
-          };
+          logger.warn('Gemini rate limit exhausted. Attempting Groq fallback...', { module: 'Practice' });
+          return this.groqFallback(request, systemPrompt);
         }
         if (status === 400) {
           throw new Error('Request was invalid. Please try rephrasing your message.');
@@ -182,6 +173,85 @@ export class PracticeService {
         throw new Error('Failed to get AI response. Please try again.');
       }
     }
+  }
+
+  /**
+   * Groq fallback — called when Gemini is rate-limited (429).
+   * Uses OpenAI-compatible chat completions API.
+   */
+  private async groqFallback(request: PracticeChatRequest, systemPrompt: string) {
+    if (!env.GROQ_API_KEY) {
+      logger.warn('GROQ_API_KEY not set. Returning mock coach response.', { module: 'Practice' });
+      return this.mockFallback(request);
+    }
+
+    try {
+      // Convert Gemini-style history to OpenAI messages format
+      const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+        { role: 'system', content: systemPrompt },
+      ];
+
+      if (request.history && request.history.length > 0) {
+        for (const msg of request.history) {
+          messages.push({
+            role: msg.role === 'model' ? 'assistant' : 'user',
+            content: msg.parts.map(p => p.text).join('\n'),
+          });
+        }
+      }
+
+      // Add current user message with optional code context
+      let userMessage = request.message;
+      if (request.code && request.code.trim()) {
+        userMessage += `\n\nHere is my current code (${request.language || 'unknown language'}):\n\`\`\`${request.language || ''}\n${request.code}\n\`\`\``;
+      }
+      messages.push({ role: 'user', content: userMessage });
+
+      const response = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model: env.GROQ_MODEL,
+          messages,
+          temperature: 0.7,
+          max_tokens: 1024,
+          top_p: 0.9,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${env.GROQ_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 30000,
+        }
+      );
+
+      const text = response.data?.choices?.[0]?.message?.content;
+      if (!text) {
+        throw new Error('Empty response from Groq');
+      }
+
+      logger.info('Groq fallback succeeded', { module: 'Practice' });
+      return {
+        reply: text,
+        role: 'model' as const,
+      };
+    } catch (error: any) {
+      logger.error('Groq fallback failed', { module: 'Practice', message: error?.message });
+      return this.mockFallback(request);
+    }
+  }
+
+  /** Last-resort mock responses when both Gemini and Groq are unavailable. */
+  private mockFallback(request: PracticeChatRequest) {
+    const replies = MOCK_COACH_RESPONSES[request.mode] || MOCK_COACH_RESPONSES.technical;
+    const index = Math.min(Math.floor((request.history?.length || 0) / 2), replies.length - 1);
+    const replyText = replies[index] +
+      "\n\n*(Note: This is a simulated response because both Gemini and Groq AI providers are unavailable. To enable AI coaching, set your own GEMINI_API_KEY or GROQ_API_KEY in the root `.env` file and restart Docker).*";
+
+    return {
+      reply: replyText,
+      role: 'model' as const,
+    };
   }
 }
 

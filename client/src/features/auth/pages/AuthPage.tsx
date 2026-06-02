@@ -296,7 +296,21 @@ export const AuthPage = () => {
               { name: 'Vercel', slug: 'vercel' },
               { name: 'Figma', slug: 'figma' },
               { name: 'Ramp', slug: 'ramp' }
-            ].map((logo, i) => (
+            ].map((logo, i) => logo.slug === 'ramp' ? (
+              <svg
+                key={i}
+                viewBox="0 0 500 500"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 sm:h-5.5 opacity-60 hover:opacity-100 transition-opacity duration-200 cursor-default text-[#64748b] dark:text-slate-400"
+              >
+                <mask id="ramp-mask">
+                  <rect width="500" height="500" fill="white" />
+                  <path d="M382 357.969V359.099L218.605 359.147V357.969C242.176 344.678 258.435 331.162 273.075 317.016H340.164L382 357.969ZM341.523 145.533L300.108 105H298.895C298.895 105 299.591 180.576 230.059 249.304C162.015 316.58 82 316.725 82 316.725V317.904L124.192 359.164C124.192 359.164 203.042 359.939 272.703 291.743C342.106 223.757 341.523 145.533 341.523 145.533Z" fill="black" />
+                </mask>
+                <circle cx="250" cy="250" r="250" fill="currentColor" mask="url(#ramp-mask)" />
+              </svg>
+            ) : (
               <img
                 key={i}
                 src={`https://cdn.simpleicons.org/${logo.slug}/64748b`}

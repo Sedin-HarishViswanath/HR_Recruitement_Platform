@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { candidateService } from './candidate.service';
-import { 
-  wizardStep1Schema, 
-  wizardStep2Schema, 
-  wizardStep3Schema, 
+import {
+  wizardStep1Schema,
+  wizardStep2Schema,
+  wizardStep3Schema,
   wizardStep4Schema,
-  updateProfileSchema 
+  updateProfileSchema
 } from './candidate.schema';
 
 export class CandidateController {
@@ -67,7 +67,7 @@ export class CandidateController {
       if (!(req as any).file) {
         return res.status(400).json({ success: false, message: 'No resume file uploaded' });
       }
-      
+
       const resumeUrl = `/uploads/resumes/${(req as any).file.filename}`;
       const updated = await candidateService.uploadResume(
         candidateId as string,
@@ -141,10 +141,10 @@ export class CandidateController {
   };
 
   getCompanyCandidates = async (req: Request, res: Response, next: NextFunction) => {
-    try {
+    try { 
       const companyId = req.user?.companyId;
       if (!companyId) return res.status(403).json({ success: false, message: 'Forbidden' });
-      
+
       const candidates = await candidateService.getCompanyCandidates(companyId as string, req.query);
       res.json({ success: true, data: candidates });
     } catch (err) {
