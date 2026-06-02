@@ -1,12 +1,13 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from '../../../shared/hooks/usePageTitle';
 import Editor from '@monaco-editor/react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Send, Bot, User, Sparkles, Code2, MessageSquare,
-  Cpu, BrainCircuit, ChevronDown, Loader2, Play, RotateCcw,
-  Lightbulb, Terminal, Clock, CheckCircle2, AlertCircle
+  BrainCircuit, ChevronDown, Loader2, Play, RotateCcw,
+  Terminal, Clock, CheckCircle2, AlertCircle, Zap, Trophy
 } from 'lucide-react';
 
 type InterviewMode = 'behavioral' | 'technical' | 'system_design';
@@ -18,99 +19,180 @@ interface ChatMessage {
 }
 
 const LANGUAGES = [
-  { label: 'JavaScript', monaco: 'javascript', starter: '// Write your solution here\nconsole.log("Hello, World!");' },
-  { label: 'Python 3', monaco: 'python', starter: '# Write your solution here\nprint("Hello, World!")' },
-  { label: 'Java', monaco: 'java', starter: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}' },
-  { label: 'C++', monaco: 'cpp', starter: '#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello, World!" << endl;\n    return 0;\n}' },
-  { label: 'TypeScript', monaco: 'typescript', starter: '// Write your solution here\nconst greet = (name: string): string => `Hello, ${name}!`;\nconsole.log(greet("World"));' },
-  { label: 'Go', monaco: 'go', starter: 'package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello, World!")\n}' },
-  { label: 'Rust', monaco: 'rust', starter: 'fn main() {\n    println!("Hello, World!");\n}' },
+  { label: 'JavaScript', monaco: 'javascript', starter: '// Write your solution here\nfunction solution() {\n  \n}\n' },
+  { label: 'Python 3', monaco: 'python', starter: '# Write your solution here\ndef solution():\n    pass\n' },
+  { label: 'Java', monaco: 'java', starter: 'public class Solution {\n    public static void main(String[] args) {\n        \n    }\n}' },
+  { label: 'C++', monaco: 'cpp', starter: '#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    \n    return 0;\n}' },
+  { label: 'TypeScript', monaco: 'typescript', starter: '// Write your solution here\nfunction solution(): void {\n  \n}\n' },
+  { label: 'Go', monaco: 'go', starter: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello")\n}' },
+  { label: 'Rust', monaco: 'rust', starter: 'fn main() {\n    \n}' },
 ];
 
-const MODE_CONFIG: Record<InterviewMode, { label: string; icon: typeof MessageSquare; description: string; color: string; bg: string; border: string }> = {
+const MODE_CONFIG = {
   behavioral: {
     label: 'Behavioral',
     icon: MessageSquare,
-    description: 'STAR method practice — leadership, conflict, teamwork',
-    color: 'text-amber-600',
+    description: 'STAR method — leadership, conflict, teamwork',
+    accent: 'amber',
     bg: 'bg-amber-50',
     border: 'border-amber-200',
+    text: 'text-amber-600',
+    btnBg: 'bg-amber-500 hover:bg-amber-600',
+    ring: 'ring-amber-200',
   },
   technical: {
     label: 'Technical',
     icon: Code2,
-    description: 'Algorithm & data structure problems with code review',
-    color: 'text-emerald-600',
+    description: 'Algorithms & data structures with live code review',
+    accent: 'emerald',
     bg: 'bg-emerald-50',
     border: 'border-emerald-200',
+    text: 'text-emerald-600',
+    btnBg: 'bg-emerald-500 hover:bg-emerald-600',
+    ring: 'ring-emerald-200',
   },
   system_design: {
     label: 'System Design',
     icon: BrainCircuit,
-    description: 'Architect scalable systems — databases, APIs, caching',
-    color: 'text-blue-600',
+    description: 'Architect scalable systems end-to-end',
+    accent: 'blue',
     bg: 'bg-blue-50',
     border: 'border-blue-200',
+    text: 'text-blue-600',
+    btnBg: 'bg-blue-500 hover:bg-blue-600',
+    ring: 'ring-blue-200',
   },
-};
+} as const;
 
-// Simple markdown renderer for chat messages
-const renderMarkdown = (text: string) => {
-  // Process code blocks first
-  const parts = text.split(/(```[\s\S]*?```)/g);
-  
-  return parts.map((part, i) => {
-    if (part.startsWith('```')) {
-      const match = part.match(/```(\w*)\n?([\s\S]*?)```/);
-      if (match) {
-        return (
-          <pre key={i} className="bg-slate-900 text-emerald-300 rounded-lg p-3 my-2 text-[11px] font-mono overflow-x-auto border border-slate-700">
-            <code>{match[2].trim()}</code>
-          </pre>
-        );
+// ── Safe markdown renderer (pure React elements, zero dangerouslySetInnerHTML) ──
+const renderSafeMarkdown = (text: string): React.ReactNode => {
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let i = 0;
+  let key = 0;
+
+  const nextKey = () => `md-${key++}`;
+
+  // Inline: bold + inline code only (safe, no HTML injection)
+  const renderInline = (line: string): React.ReactNode[] => {
+    const parts: React.ReactNode[] = [];
+    let rest = line;
+    let k = 0;
+
+    while (rest.length > 0) {
+      // Bold **text**
+      const boldMatch = rest.match(/^(.*?)\*\*(.+?)\*\*/);
+      if (boldMatch) {
+        if (boldMatch[1]) parts.push(<Fragment key={k++}>{boldMatch[1]}</Fragment>);
+        parts.push(<strong key={k++} className="font-bold text-slate-900">{boldMatch[2]}</strong>);
+        rest = rest.slice(boldMatch[0].length);
+        continue;
       }
+      // Inline code `code`
+      const codeMatch = rest.match(/^(.*?)`([^`]+)`/);
+      if (codeMatch) {
+        if (codeMatch[1]) parts.push(<Fragment key={k++}>{codeMatch[1]}</Fragment>);
+        parts.push(
+          <code key={k++} className="bg-slate-100 text-violet-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-slate-200">
+            {codeMatch[2]}
+          </code>
+        );
+        rest = rest.slice(codeMatch[0].length);
+        continue;
+      }
+      parts.push(<Fragment key={k++}>{rest}</Fragment>);
+      break;
     }
-    
-    // Process inline formatting
-    const lines = part.split('\n');
-    return (
-      <span key={i}>
-        {lines.map((line, j) => {
-          // Bold
-          let processed: React.ReactNode = line.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-          // Inline code
-          processed = (processed as string).replace(/`(.*?)`/g, '<code class="bg-slate-100 text-violet-700 px-1 py-0.5 rounded text-[10px] font-mono">$1</code>');
-          // Bullet points
-          if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
-            const content = line.trim().replace(/^[-•]\s/, '');
-            return (
-              <span key={j} className="block pl-3 relative before:content-['•'] before:absolute before:left-0 before:text-violet-400 before:font-bold">
-                <span dangerouslySetInnerHTML={{ __html: content.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/`(.*?)`/g, '<code class="bg-slate-100 text-violet-700 px-1 py-0.5 rounded text-[10px] font-mono">$1</code>') }} />
-              </span>
-            );
-          }
-          // Numbered lists
-          const numMatch = line.trim().match(/^(\d+)\.\s(.*)/);
-          if (numMatch) {
-            return (
-              <span key={j} className="block pl-5 relative">
-                <span className="absolute left-0 text-violet-500 font-bold text-[10px]">{numMatch[1]}.</span>
-                <span dangerouslySetInnerHTML={{ __html: numMatch[2].replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/`(.*?)`/g, '<code class="bg-slate-100 text-violet-700 px-1 py-0.5 rounded text-[10px] font-mono">$1</code>') }} />
-              </span>
-            );
-          }
-          return (
-            <span key={j}>
-              <span dangerouslySetInnerHTML={{ __html: (processed as string) }} />
-              {j < lines.length - 1 && <br />}
-            </span>
-          );
-        })}
-      </span>
+    return parts;
+  };
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Fenced code block
+    if (line.trim().startsWith('```')) {
+      const lang = line.trim().slice(3).trim() || '';
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      elements.push(
+        <div key={nextKey()} className="my-2 rounded-xl overflow-hidden border border-slate-700 text-[11px]">
+          {lang && (
+            <div className="bg-[#1a1d2e] px-3 py-1.5 text-[9px] text-slate-500 font-mono font-bold uppercase tracking-wider border-b border-slate-700">
+              {lang}
+            </div>
+          )}
+          <pre className="bg-[#0f111a] text-emerald-300 px-4 py-3 font-mono overflow-x-auto whitespace-pre leading-relaxed">
+            <code>{codeLines.join('\n')}</code>
+          </pre>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Heading ## or ###
+    if (/^#{1,3}\s/.test(line.trim())) {
+      const level = line.match(/^(#{1,3})\s/)?.[1]?.length || 1;
+      const content = line.replace(/^#{1,3}\s/, '').trim();
+      elements.push(
+        <p key={nextKey()} className={`font-bold text-slate-900 mt-3 mb-1 ${level === 1 ? 'text-sm' : level === 2 ? 'text-xs' : 'text-[11px]'}`}>
+          {renderInline(content)}
+        </p>
+      );
+      i++;
+      continue;
+    }
+
+    // Numbered list
+    const numMatch = line.trim().match(/^(\d+)\.\s+(.*)/);
+    if (numMatch) {
+      elements.push(
+        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed">
+          <span className="text-violet-500 font-bold shrink-0 min-w-[16px]">{numMatch[1]}.</span>
+          <span>{renderInline(numMatch[2])}</span>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Bullet list
+    if (/^[-•*]\s/.test(line.trim())) {
+      const content = line.trim().replace(/^[-•*]\s/, '');
+      elements.push(
+        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed">
+          <span className="text-violet-400 font-bold shrink-0 mt-0.5">•</span>
+          <span>{renderInline(content)}</span>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Blank line
+    if (line.trim() === '') {
+      elements.push(<div key={nextKey()} className="h-1.5" />);
+      i++;
+      continue;
+    }
+
+    // Regular paragraph
+    elements.push(
+      <p key={nextKey()} className="text-[12px] text-slate-700 font-medium leading-relaxed">
+        {renderInline(line)}
+      </p>
     );
-  });
+    i++;
+  }
+
+  return <>{elements}</>;
 };
 
+// ── Component ─────────────────────────────────────────────────────────────────
 export const PracticeRoom = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState<InterviewMode>('technical');
@@ -126,29 +208,27 @@ export const PracticeRoom = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  usePageTitle('AI Practice Room');
   const currentLang = LANGUAGES[langIndex];
+  const cfg = MODE_CONFIG[mode];
+  const ModeIcon = cfg.icon;
 
   const scrollToBottom = useCallback(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, loading, scrollToBottom]);
+  useEffect(() => { scrollToBottom(); }, [messages, loading, scrollToBottom]);
 
-  const buildHistory = (): { role: 'user' | 'model'; parts: { text: string }[] }[] => {
-    return messages.map(m => ({
-      role: m.role,
-      parts: [{ text: m.text }],
-    }));
-  };
+  const buildHistory = () => messages.map(m => ({
+    role: m.role,
+    parts: [{ text: m.text }],
+  }));
 
   const sendMessage = async (text?: string) => {
     const msg = (text || input).trim();
     if (!msg || loading) return;
 
-    const userMessage: ChatMessage = { role: 'user', text: msg, timestamp: new Date() };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, { role: 'user', text: msg, timestamp: new Date() }]);
     setInput('');
     setLoading(true);
     setSessionStarted(true);
@@ -159,29 +239,27 @@ export const PracticeRoom = () => {
         history: buildHistory(),
         mode,
         language: currentLang.label,
-        code: showEditor ? code : undefined,
+        code: showEditor && mode === 'technical' ? code : undefined,
       });
 
       const reply = data.data?.reply || data.data?.text || 'No response received.';
-      const aiMessage: ChatMessage = { role: 'model', text: reply, timestamp: new Date() };
-      setMessages(prev => [...prev, aiMessage]);
+      setMessages(prev => [...prev, { role: 'model', text: reply, timestamp: new Date() }]);
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || 'Failed to get AI response. Please try again.';
       toast.error(errorMsg);
     } finally {
       setLoading(false);
-      inputRef.current?.focus();
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
 
   const startSession = () => {
     setMessages([]);
     setSessionStarted(false);
-    const greeting = mode === 'behavioral'
-      ? "Hi! I'd like to practice behavioral interview questions."
-      : mode === 'system_design'
-      ? "Hi! I'd like to practice system design interview questions."
-      : "Hi! I'd like to practice technical coding interview questions.";
+    const greeting =
+      mode === 'behavioral' ? "Hi! I'd like to practice behavioral interview questions using the STAR method." :
+      mode === 'system_design' ? "Hi! I'd like to practice system design interviews." :
+      "Hi! I'd like to practice technical coding interview questions.";
     sendMessage(greeting);
   };
 
@@ -197,27 +275,25 @@ export const PracticeRoom = () => {
     setRunning(true);
     setExecutionResult(null);
     try {
-      // Use a mock interview id to execute code via the existing endpoint
       const res = await api.post('/interviews/practice-exec/execute', {
         script: code,
-        language: currentLang.monaco === 'python' ? 'python' : currentLang.monaco,
-        stdin: undefined,
+        language: currentLang.monaco,
+        stdin: '',
       });
       setExecutionResult(res.data.data);
     } catch {
-      toast.error('Code execution is only available during live interviews. Use the AI to review your code instead.');
-      setExecutionResult({ output: '// Tip: Share your code with the AI by clicking "Share Code with AI" button.', code: 1 });
+      setExecutionResult({
+        output: '// Code execution unavailable in practice mode.\n// Share your code with the AI for review instead.',
+        code: 1,
+      });
     } finally {
       setRunning(false);
     }
   };
 
   const shareCodeWithAI = () => {
-    if (!code.trim()) {
-      toast.error('Write some code first!');
-      return;
-    }
-    const msg = `Can you review my code and give me feedback?\n\n\`\`\`${currentLang.monaco}\n${code}\n\`\`\``;
+    if (!code.trim()) { toast.error('Write some code first!'); return; }
+    const msg = `Please review my ${currentLang.label} solution:\n\n\`\`\`${currentLang.monaco}\n${code}\n\`\`\``;
     sendMessage(msg);
   };
 
@@ -228,64 +304,61 @@ export const PracticeRoom = () => {
     }
   };
 
-  const modeConfig = MODE_CONFIG[mode];
-  const ModeIcon = modeConfig.icon;
+  const isTechnical = mode === 'technical';
+  const showCodePanel = isTechnical && showEditor;
 
   return (
-    <div className="flex flex-col h-screen bg-[#fafbfc]" style={{ fontFamily: "'Inter', sans-serif" }}>
-      
-      {/* ── Top Bar ── */}
-      <div className="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between shrink-0 z-50">
+    <div className="flex flex-col h-screen bg-[#f8f9fb]" style={{ fontFamily: "'Inter', sans-serif" }}>
+
+      {/* ── Top bar ── */}
+      <div className="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between shrink-0 z-20 shadow-sm/5">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/candidate/interviews')}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-all"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-all cursor-pointer"
           >
             <ArrowLeft size={16} />
           </button>
           <div className="w-px h-5 bg-slate-200" />
           <div className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-lg ${modeConfig.bg} ${modeConfig.border} border flex items-center justify-center`}>
-              <ModeIcon size={13} className={modeConfig.color} />
+            <div className={`w-7 h-7 rounded-lg ${cfg.bg} ${cfg.border} border flex items-center justify-center`}>
+              <ModeIcon size={13} className={cfg.text} />
             </div>
             <div>
               <h1 className="text-[13px] font-bold text-slate-900 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 AI Practice Room
               </h1>
-              <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">{modeConfig.label} Mode</p>
+              <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">{cfg.label} Mode</p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Mode Selector */}
+          {/* Mode selector — only when session not started */}
           {!sessionStarted && (
-            <div className="flex bg-slate-100 border border-slate-200/60 p-0.5 rounded-lg">
-              {(Object.entries(MODE_CONFIG) as [InterviewMode, typeof modeConfig][]).map(([key, cfg]) => {
-                const Icon = cfg.icon;
+            <div className="flex bg-slate-100 border border-slate-200/60 p-0.5 rounded-lg gap-0.5">
+              {(Object.entries(MODE_CONFIG) as [InterviewMode, typeof cfg][]).map(([key, c]) => {
+                const Icon = c.icon;
                 return (
                   <button
                     key={key}
                     onClick={() => setMode(key)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-bold transition-all ${
-                      mode === key
-                        ? 'bg-white text-slate-800 shadow-sm'
-                        : 'text-slate-400 hover:text-slate-600'
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                      mode === key ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
                     <Icon size={11} />
-                    {cfg.label}
+                    {c.label}
                   </button>
                 );
               })}
             </div>
           )}
 
-          {/* Toggle Editor (only in technical mode) */}
-          {mode === 'technical' && (
+          {isTechnical && (
             <button
               onClick={() => setShowEditor(e => !e)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${
                 showEditor
                   ? 'bg-slate-800 text-white border-slate-700'
                   : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
@@ -299,7 +372,7 @@ export const PracticeRoom = () => {
           {sessionStarted && (
             <button
               onClick={resetSession}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 transition-all cursor-pointer"
             >
               <RotateCcw size={11} />
               New Session
@@ -308,71 +381,89 @@ export const PracticeRoom = () => {
         </div>
       </div>
 
-      {/* ── Main Content ── */}
+      {/* ── Main ── */}
       <div className="flex-1 flex min-h-0">
-        
-        {/* ── Chat Panel ── */}
-        <div className={`flex flex-col ${mode === 'technical' && showEditor ? 'w-1/2' : 'w-full max-w-4xl mx-auto'} border-r border-slate-200/60`}>
-          
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+
+        {/* ── Chat panel ── */}
+        <div className={`flex flex-col ${showCodePanel ? 'w-[45%]' : 'w-full max-w-3xl mx-auto'} bg-white border-r border-slate-200/60`}>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 scroll-smooth">
+
+            {/* Welcome screen */}
             {!sessionStarted && messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in-up">
-                <div className={`w-16 h-16 rounded-2xl ${modeConfig.bg} ${modeConfig.border} border-2 flex items-center justify-center mb-5 shadow-sm`}>
-                  <Sparkles size={28} className={modeConfig.color} />
+              <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                <div className={`w-16 h-16 rounded-2xl ${cfg.bg} ${cfg.border} border-2 flex items-center justify-center mb-5 shadow-sm`}>
+                  <Sparkles size={28} className={cfg.text} />
                 </div>
                 <h2 className="text-lg font-bold text-slate-900 mb-1.5" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  AI Mock Interview
+                  {cfg.label} Practice
                 </h2>
-                <p className="text-xs text-slate-400 font-medium mb-1 max-w-sm">
-                  Practice with an AI interviewer that gives real-time feedback on your answers and code.
-                </p>
-                <p className="text-[10px] text-slate-350 font-medium mb-6 max-w-xs">
-                  {modeConfig.description}
+                <p className="text-[12px] text-slate-500 font-medium mb-1 max-w-sm leading-relaxed">
+                  {cfg.description}
                 </p>
 
                 <button
                   onClick={startSession}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all shadow-lg hover:shadow-xl active:scale-[0.98] ${
-                    mode === 'behavioral' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-200/50' :
-                    mode === 'system_design' ? 'bg-blue-500 hover:bg-blue-600 shadow-blue-200/50' :
-                    'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200/50'
-                  }`}
+                  className={`mt-6 flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold text-white transition-all shadow-lg hover:shadow-xl active:scale-[0.97] cursor-pointer ${cfg.btnBg}`}
                 >
-                  <Sparkles size={13} />
+                  <Trophy size={14} />
                   Start Practice Session
                 </button>
 
-                <div className="mt-8 flex gap-3 text-[10px] text-slate-350 font-medium">
-                  <div className="flex items-center gap-1"><Lightbulb size={10} className="text-amber-400" /> AI-powered feedback</div>
-                  <div className="flex items-center gap-1"><Cpu size={10} className="text-violet-400" /> Gemini AI</div>
-                  <div className="flex items-center gap-1"><Code2 size={10} className="text-emerald-400" /> Code review</div>
+                {/* Mode cards */}
+                {!sessionStarted && (
+                  <div className="mt-8 grid grid-cols-3 gap-3 w-full max-w-sm">
+                    {(Object.entries(MODE_CONFIG) as [InterviewMode, typeof cfg][]).map(([key, c]) => {
+                      const Icon = c.icon;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => { setMode(key); }}
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all cursor-pointer text-center ${
+                            mode === key
+                              ? `${c.bg} ${c.border} ${c.text}`
+                              : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:text-slate-600'
+                          }`}
+                        >
+                          <Icon size={16} />
+                          <span className="text-[9.5px] font-bold">{c.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="mt-6 flex gap-4 text-[10px] text-slate-400 font-medium">
+                  <span className="flex items-center gap-1"><Zap size={10} className="text-violet-400" /> Powered by Gemini</span>
+                  <span className="flex items-center gap-1"><Code2 size={10} className="text-emerald-400" /> Live code review</span>
                 </div>
               </div>
             )}
 
+            {/* Messages */}
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex gap-3 animate-fade-in-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                style={{ animationDelay: `${Math.min(idx * 50, 200)}ms` }}
+                className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'model' && (
-                  <div className={`w-7 h-7 rounded-lg ${modeConfig.bg} ${modeConfig.border} border flex items-center justify-center shrink-0 mt-0.5`}>
-                    <Bot size={13} className={modeConfig.color} />
+                  <div className={`w-7 h-7 rounded-lg ${cfg.bg} ${cfg.border} border flex items-center justify-center shrink-0 mt-0.5`}>
+                    <Bot size={13} className={cfg.text} />
                   </div>
                 )}
-                <div
-                  className={`max-w-[85%] rounded-xl px-4 py-3 text-[12px] leading-relaxed font-medium ${
-                    msg.role === 'user'
-                      ? 'bg-slate-800 text-white rounded-br-sm'
-                      : 'bg-white border border-slate-200/80 text-slate-700 rounded-bl-sm shadow-sm'
-                  }`}
-                >
-                  {msg.role === 'model' ? renderMarkdown(msg.text) : msg.text}
-                  <div className={`text-[9px] mt-1.5 ${msg.role === 'user' ? 'text-slate-400' : 'text-slate-300'}`}>
+                <div className={`max-w-[86%] rounded-2xl px-4 py-3 ${
+                  msg.role === 'user'
+                    ? 'bg-slate-800 text-white rounded-br-sm'
+                    : 'bg-white border border-slate-200/80 text-slate-700 rounded-bl-sm shadow-sm'
+                }`}>
+                  {msg.role === 'model'
+                    ? renderSafeMarkdown(msg.text)
+                    : <p className="text-[12px] font-medium leading-relaxed">{msg.text}</p>
+                  }
+                  <p className={`text-[9px] mt-2 ${msg.role === 'user' ? 'text-slate-500' : 'text-slate-400'}`}>
                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
+                  </p>
                 </div>
                 {msg.role === 'user' && (
                   <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
@@ -382,15 +473,17 @@ export const PracticeRoom = () => {
               </div>
             ))}
 
+            {/* Typing indicator */}
             {loading && (
-              <div className="flex gap-3 items-start animate-fade-in">
-                <div className={`w-7 h-7 rounded-lg ${modeConfig.bg} ${modeConfig.border} border flex items-center justify-center shrink-0`}>
-                  <Bot size={13} className={modeConfig.color} />
+              <div className="flex gap-2.5 items-start">
+                <div className={`w-7 h-7 rounded-lg ${cfg.bg} ${cfg.border} border flex items-center justify-center shrink-0`}>
+                  <Bot size={13} className={cfg.text} />
                 </div>
-                <div className="bg-white border border-slate-200/80 rounded-xl rounded-bl-sm px-4 py-3 shadow-sm">
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium">
-                    <Loader2 size={12} className="animate-spin" />
-                    Thinking...
+                <div className="bg-white border border-slate-200/80 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -399,17 +492,16 @@ export const PracticeRoom = () => {
             <div ref={chatEndRef} />
           </div>
 
-          {/* Input Bar */}
+          {/* ── Input bar ── */}
           {sessionStarted && (
             <div className="border-t border-slate-200/80 bg-white p-3 shrink-0">
               <div className="flex items-end gap-2">
-                {mode === 'technical' && showEditor && (
+                {showCodePanel && (
                   <button
                     onClick={shareCodeWithAI}
-                    className="flex items-center gap-1 px-3 py-2 rounded-lg text-[10px] font-bold text-violet-600 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all shrink-0"
-                    title="Send your current code to the AI for review"
+                    className="flex items-center gap-1 px-3 py-2 rounded-lg text-[10px] font-bold text-violet-600 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all shrink-0 cursor-pointer"
                   >
-                    <Code2 size={11} />
+                    <Sparkles size={11} />
                     Share Code
                   </button>
                 )}
@@ -420,14 +512,14 @@ export const PracticeRoom = () => {
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder={
-                      mode === 'behavioral' ? 'Type your answer...' :
-                      mode === 'system_design' ? 'Describe your design approach...' :
-                      'Ask a question or describe your approach...'
+                      mode === 'behavioral' ? 'Share your answer...' :
+                      mode === 'system_design' ? 'Describe your approach...' :
+                      'Ask a question or describe your logic...'
                     }
-                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[12px] text-slate-700 font-medium placeholder:text-slate-350 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 transition-all"
+                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[12px] text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 transition-all"
                     rows={1}
                     style={{ minHeight: '40px', maxHeight: '120px' }}
-                    onInput={(e) => {
+                    onInput={e => {
                       const t = e.currentTarget;
                       t.style.height = 'auto';
                       t.style.height = Math.min(t.scrollHeight, 120) + 'px';
@@ -437,27 +529,32 @@ export const PracticeRoom = () => {
                 <button
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || loading}
-                  className="p-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shrink-0"
+                  className={`p-2.5 rounded-xl text-white transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shrink-0 active:scale-95 ${
+                    mode === 'behavioral' ? 'bg-amber-500 hover:bg-amber-600' :
+                    mode === 'system_design' ? 'bg-blue-500 hover:bg-blue-600' :
+                    'bg-violet-600 hover:bg-violet-700'
+                  }`}
                 >
-                  <Send size={14} />
+                  {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 </button>
               </div>
-              <p className="text-[9px] text-slate-300 mt-1.5 px-1">
-                Press Enter to send • Shift+Enter for new line
+              <p className="text-[9px] text-slate-400 mt-1.5 px-1">
+                Enter to send · Shift+Enter for new line
               </p>
             </div>
           )}
         </div>
 
-        {/* ── Code Editor Panel (Technical Mode Only) ── */}
-        {mode === 'technical' && showEditor && (
-          <div className="w-1/2 flex flex-col bg-[#1e1e1e] text-white">
-            {/* Editor Toolbar */}
-            <div className="flex items-center justify-between px-3 py-2 border-b border-[#333] bg-[#252526] shrink-0">
-              <div className="flex items-center gap-2">
+        {/* ── Code editor panel ── */}
+        {showCodePanel && (
+          <div className="flex-1 flex flex-col bg-[#0f111a] text-white min-w-0">
+
+            {/* Editor toolbar */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#252840] bg-[#1a1d2e] shrink-0">
+              <div className="flex items-center gap-3">
                 <div className="relative">
                   <select
-                    className="bg-[#3c3c3c] border border-[#555] rounded-md text-xs px-3 py-1.5 pr-7 focus:outline-none focus:ring-1 focus:ring-amber-500 appearance-none font-bold text-gray-200 cursor-pointer"
+                    className="bg-[#252840] border border-[#3a3d5c] rounded-lg text-[11px] px-3 py-1.5 pr-7 focus:outline-none focus:ring-1 focus:ring-violet-500 appearance-none font-bold text-slate-300 cursor-pointer"
                     value={langIndex}
                     onChange={(e) => {
                       const idx = Number(e.target.value);
@@ -470,16 +567,15 @@ export const PracticeRoom = () => {
                       <option key={l.monaco} value={i}>{l.label}</option>
                     ))}
                   </select>
-                  <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                  <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
                 </div>
-                <span className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Practice Sandbox</span>
+                <span className="text-[9px] text-slate-600 font-bold uppercase tracking-wider">Practice Sandbox</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={shareCodeWithAI}
-                  className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md font-bold transition-colors bg-violet-600/20 text-violet-300 border border-violet-500/30 hover:bg-violet-600/30"
-                  title="Send code to AI for review"
+                  className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg font-bold transition-colors bg-violet-600/15 text-violet-400 border border-violet-500/20 hover:bg-violet-600/25 cursor-pointer"
                 >
                   <Sparkles size={11} />
                   AI Review
@@ -487,9 +583,9 @@ export const PracticeRoom = () => {
                 <button
                   onClick={handleRunCode}
                   disabled={running}
-                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white px-4 py-1.5 rounded-md text-xs font-black transition-all shadow-lg shadow-emerald-900/40"
+                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all shadow-sm shadow-emerald-900/40 cursor-pointer"
                 >
-                  <Play size={11} fill="white" />
+                  {running ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} fill="white" />}
                   {running ? 'Running...' : 'Run'}
                 </button>
               </div>
@@ -509,45 +605,47 @@ export const PracticeRoom = () => {
                   wordWrap: 'on',
                   scrollBeyondLastLine: false,
                   lineNumbers: 'on',
-                  renderLineHighlight: 'line',
+                  renderLineHighlight: 'gutter',
                   fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
                   fontLigatures: true,
-                  padding: { top: 12 },
+                  padding: { top: 16, bottom: 8 },
                   smoothScrolling: true,
                   cursorBlinking: 'phase',
                   cursorSmoothCaretAnimation: 'on',
+                  lineDecorationsWidth: 8,
+                  bracketPairColorization: { enabled: true },
                 }}
               />
             </div>
 
-            {/* Output Panel */}
-            <div className="border-t border-[#333] bg-[#1a1a1a] shrink-0" style={{ height: '140px' }}>
-              <div className="flex items-center justify-between px-4 py-1.5 border-b border-[#2a2a2a]">
+            {/* Output panel */}
+            <div className="h-[140px] border-t border-[#252840] bg-[#0d0f1a] shrink-0 flex flex-col">
+              <div className="flex items-center justify-between px-4 py-1.5 border-b border-[#1e2035] shrink-0">
                 <div className="flex items-center gap-2">
-                  <Terminal size={11} className="text-gray-600" />
-                  <span className="text-[10px] text-gray-600 uppercase tracking-widest font-bold">Output</span>
+                  <Terminal size={11} className="text-slate-600" />
+                  <span className="text-[9px] text-slate-600 uppercase tracking-widest font-bold">Output</span>
                   {executionResult && (
                     executionResult.code === 0
-                      ? <CheckCircle2 size={12} className="text-emerald-400" />
-                      : <AlertCircle size={12} className="text-red-400" />
+                      ? <CheckCircle2 size={11} className="text-emerald-500" />
+                      : <AlertCircle size={11} className="text-red-400" />
                   )}
                 </div>
                 {running && (
-                  <div className="flex items-center gap-1 text-[10px] text-gray-600">
+                  <div className="flex items-center gap-1 text-[9px] text-slate-600">
                     <Clock size={10} className="animate-spin" />
-                    <span>Executing...</span>
+                    Executing...
                   </div>
                 )}
               </div>
-              <pre className={`h-[100px] overflow-auto px-4 py-3 text-xs font-mono whitespace-pre-wrap leading-relaxed ${
-                running ? 'text-gray-600 animate-pulse' :
+              <pre className={`flex-1 overflow-auto px-4 py-3 text-[11px] font-mono whitespace-pre-wrap leading-relaxed ${
+                running ? 'text-slate-600 animate-pulse' :
                 executionResult?.code === 0 ? 'text-emerald-300' :
-                executionResult?.code !== null ? 'text-red-400' :
-                'text-gray-600'
+                executionResult ? 'text-red-400' :
+                'text-slate-600'
               }`}>
                 {running
-                  ? '⟳  Executing your code...'
-                  : executionResult?.output || '// Press Run to execute your code, or ask the AI to review it'}
+                  ? '⟳  Executing...'
+                  : executionResult?.output || '// Press Run ▶  to execute, or use AI Review for code feedback'}
               </pre>
             </div>
           </div>

@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
 import { db } from '../../config/db';
+import { logger } from '../../shared/utils/logger';
 import { notificationService } from '../notification/notification.service';
 import { SignupInput, LoginInput } from './auth.schema';
 import { AppError } from '../../shared/errors/AppError';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt';
 import crypto from 'crypto';
-import knex from 'knex';
 
 const SALT_ROUNDS = 12;
 const MAX_LOGIN_ATTEMPTS = 5;
@@ -153,7 +153,7 @@ export class AuthService {
 
     // Auto-assign Admin role if missing for company users
     if (!isCandidate && !userRecord.role_name && userRecord.company_id) {
-      console.log(`AuthService: Auto-assigning Admin role to user ${userRecord.id}`);
+      logger.info(`Auto-assigning Admin role to user ${userRecord.id}`, { module: 'Auth' });
       const adminRole = await db('roles').where({ name: 'Admin' }).first();
       if (adminRole) {
         await db('memberships').insert({
@@ -274,9 +274,9 @@ export class AuthService {
   }
 
   async refresh(token: string) {
-    // 1. Verify token signature and expiry
-    const decoded = verifyRefreshToken(token);
-    
+    // 1. Verify token signature and expiry (throws if invalid/expired)
+    verifyRefreshToken(token);
+
     // 2. Hash token to check in DB
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     

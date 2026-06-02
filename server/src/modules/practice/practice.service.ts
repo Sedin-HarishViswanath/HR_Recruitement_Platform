@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { env } from '../../config/env';
+import { logger } from '../../shared/utils/logger';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -156,13 +157,13 @@ export class PracticeService {
         const status = error?.response?.status;
         if (status === 429 && attempt < maxRetries) {
           const delay = Math.pow(2, attempt) * 1000;
-          console.warn(`[PracticeService] Gemini rate limit hit (429). Attempt ${attempt}/${maxRetries}. Retrying in ${delay}ms...`);
+          logger.warn(`Gemini rate limit hit (429). Attempt ${attempt}/${maxRetries}. Retrying in ${delay}ms`, { module: 'Practice' });
           await sleep(delay);
           continue;
         }
 
         if (status === 429) {
-          console.warn('[PracticeService] Gemini rate limit exhausted/key exhausted. Falling back to mock coach response.');
+          logger.warn('Gemini rate limit exhausted. Falling back to mock coach response.', { module: 'Practice' });
           
           const replies = MOCK_COACH_RESPONSES[request.mode] || MOCK_COACH_RESPONSES.technical;
           const index = Math.min(Math.floor((request.history?.length || 0) / 2), replies.length - 1);
@@ -177,7 +178,7 @@ export class PracticeService {
         if (status === 400) {
           throw new Error('Request was invalid. Please try rephrasing your message.');
         }
-        console.error('[PracticeService] Gemini error:', status || error?.message);
+        logger.error('Gemini error', { module: 'Practice', status, message: error?.message });
         throw new Error('Failed to get AI response. Please try again.');
       }
     }

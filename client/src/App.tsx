@@ -35,6 +35,7 @@ import { PublicCareersPage } from './features/company/pages/PublicCareersPage';
 import { VerifyOtpPage } from './features/auth/pages/VerifyOtpPage';
 import SettingsPage from './features/company/pages/SettingsPage';
 import { PracticeRoom } from './features/candidate/pages/PracticeRoom';
+import { CandidateOffersPage } from './features/candidate/pages/OffersPage';
 
 
 const PublicJobBoardWrapper = () => {
@@ -233,6 +234,10 @@ const router = createBrowserRouter([
           {
             path: 'interviews',
             element: <CandidateInterviewsPage />,
+          },
+          {
+            path: 'offers',
+            element: <CandidateOffersPage />,
           },
         ],
       },

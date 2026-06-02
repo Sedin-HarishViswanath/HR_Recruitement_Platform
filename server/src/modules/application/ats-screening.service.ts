@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { env } from '../../config/env';
+import { logger } from '../../shared/utils/logger';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -39,7 +40,7 @@ export class AtsScreeningService {
           };
         }
       } catch (err) {
-        console.warn('[ATS] Gemini scoring failed, falling back to keyword match:', err);
+        logger.warn('Gemini scoring failed, falling back to keyword match', { module: 'ATS', err });
       }
     }
 
@@ -109,19 +110,19 @@ Score rubric:
         const score = Number(parsed.score);
 
         if (!isNaN(score) && score >= 0 && score <= 100) {
-          console.log(`[ATS] Gemini score: ${score} — ${parsed.reason || ''}`);
+          logger.debug(`Gemini score: ${score} — ${parsed.reason || ''}`, { module: 'ATS' });
           return score;
         }
 
         return null;
       } catch (err: any) {
         if (err?.response?.status === 429 && attempt <= maxRetries) {
-          console.warn(`[ATS] Gemini rate limit — retrying in ${attempt * 2}s...`);
+          logger.warn(`Gemini rate limit — retrying in ${attempt * 2}s`, { module: 'ATS' });
           await sleep(attempt * 2000);
           continue;
         }
         // Non-retryable or max retries exhausted
-        console.warn('[ATS] Gemini scoring error:', err?.response?.status || err?.message);
+        logger.warn('Gemini scoring error', { module: 'ATS', status: err?.response?.status, message: err?.message });
         return null;
       }
     }

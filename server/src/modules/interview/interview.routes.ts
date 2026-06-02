@@ -50,6 +50,7 @@ router.get('/:id/transcript', authenticate, authorize('Admin', 'Recruiter'), int
 router.post('/:id/recording', authenticate, authorize('Interviewer', 'Recruiter', 'Admin'), upload.single('recording'), interviewController.uploadRecording.bind(interviewController));
 
 router.get('/:id', authenticate, interviewController.getById.bind(interviewController));
+router.post('/:id/debrief', authenticate, authorize('Admin', 'Recruiter', 'Interviewer'), interviewController.generateDebrief.bind(interviewController));
 
 // Workspace routes (Common)
 

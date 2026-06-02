@@ -15,6 +15,7 @@ router.get('/public/:id', extractUserIfPresent, jobController.getPublicJobDetail
 router.use(authenticate);
 router.use(authorize('Admin', 'Recruiter'));
 
+router.post('/generate-description', jobController.generateDescription.bind(jobController));
 router.post('/', jobController.createJob.bind(jobController));
 router.get('/', jobController.getCompanyJobs.bind(jobController));
 router.get('/:id', jobController.getJobDetail.bind(jobController));

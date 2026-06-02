@@ -4,6 +4,7 @@ import { notificationService } from '../notification/notification.service';
 import { interviewRepository } from './interview.repository';
 import { AppError } from '../../shared/errors/AppError';
 import { executeWithPiston } from './code-execution.service';
+import { getIO } from '../../socket';
 
 import { 
   ScheduleInterviewInput, 
@@ -197,15 +198,27 @@ export class InterviewService {
     const interview = await db('interviews').where({ id }).first();
     if (!interview) throw new AppError('Interview not found', 404);
     if (interview.round_type !== 'aptitude') throw new AppError('This is not an aptitude round', 400);
-    
+
     const [updated] = await db('interviews')
       .where({ id })
       .update({
         status: 'completed',
         aptitude_score: result.score,
-        updated_at: db.fn.now()
+        updated_at: db.fn.now(),
       })
       .returning('*');
+
+    // Broadcast real-time score to everyone in the interview room (interviewers)
+    try {
+      const io = getIO();
+      io.to(`interview_${id}`).emit('aptitude-score-updated', {
+        score: result.score,
+        total: result.total ?? 20,
+        interviewId: id,
+      });
+    } catch {
+      // Socket may not be initialized in test environments — non-fatal
+    }
 
     return updated;
   }
@@ -275,21 +288,24 @@ export class InterviewService {
       .where('jobs.company_id', companyId)
       .orderBy('interviews.scheduled_at', 'asc');
 
-    // For each interview, check if transcript entries exist
-    const results = await Promise.all(
-      interviews.map(async (iv: any) => {
-        const [countRow] = await db('interview_transcripts')
-          .where({ interview_id: iv.id })
-          .count('id as count');
-        return {
-          ...iv,
-          has_transcript: Number(countRow?.count || 0) > 0,
-          transcript_count: Number(countRow?.count || 0),
-        };
-      })
-    );
+    if (interviews.length === 0) return [];
 
-    return results;
+    // Single GROUP BY query instead of N individual COUNT queries
+    const interviewIds = interviews.map((iv: any) => iv.id);
+    const counts = await db('interview_transcripts')
+      .whereIn('interview_id', interviewIds)
+      .groupBy('interview_id')
+      .select('interview_id', db.raw('COUNT(id)::int as transcript_count'));
+
+    const countMap: Record<string, number> = {};
+    for (const row of counts) {
+      countMap[row.interview_id] = Number(row.transcript_count);
+    }
+
+    return interviews.map((iv: any) => {
+      const tc = countMap[iv.id] || 0;
+      return { ...iv, has_transcript: tc > 0, transcript_count: tc };
+    });
   }
 
   async requestReschedule(interviewId: string, candidateId: string, data: { reason: string, preferred_date: string }) {

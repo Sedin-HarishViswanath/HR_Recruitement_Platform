@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { interviewService } from './interview.service';
+import { aiDebriefService } from './ai-debrief.service';
 import { 
   scheduleInterviewSchema, 
   rescheduleInterviewSchema, 
@@ -236,6 +237,17 @@ export class InterviewController {
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
       return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async generateDebrief(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const debrief = await aiDebriefService.generateDebrief(id as string);
+      return sendResponse(res, 200, true, 'AI debrief generated', debrief);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to generate AI debrief');
     }
   }
 }

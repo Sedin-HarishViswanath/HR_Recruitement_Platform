@@ -6,31 +6,32 @@ import type { RootState } from '../../app/store';
 
 export const useSocket = () => {
   const socketRef = useRef<Socket | null>(null);
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated, accessToken } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
+    if (!isAuthenticated || !user || !accessToken) return;
 
-    // Connect to same host as the page, Vite proxy will handle /socket.io
-    const socket = io();
+    // Pass JWT in handshake so the server can verify identity without trusting client userId
+    const socket = io({
+      auth: { token: accessToken },
+    });
     socketRef.current = socket;
-
-    // Authenticate the socket with user ID
-    socket.emit('authenticate', user.id);
 
     // Listen for generic notifications
     socket.on('notification', (data: { title: string; message: string; type: string }) => {
-      // Show as a toast for immediate feedback
-      toast(data.title, {
-        description: data.message,
-        duration: 5000,
-      });
+      toast(data.title, { description: data.message, duration: 5000 });
+    });
+
+    socket.on('connect_error', (err) => {
+      // Silent — auth failure on token expiry is expected; provider handles refresh
+      console.warn('[Socket] Connection error:', err.message);
     });
 
     return () => {
       socket.disconnect();
+      socketRef.current = null;
     };
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, accessToken]);
 
   return socketRef.current;
 };

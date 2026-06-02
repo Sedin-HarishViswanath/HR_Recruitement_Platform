@@ -1,4 +1,4 @@
-import { Application, Request, Response } from 'express';
+import { Application, Response } from 'express';
 import { sendResponse } from '../shared/utils/response';
 import interviewRoutes from '../modules/interview/interview.routes';
 import authRoutes from '../modules/auth/auth.routes';
@@ -10,9 +10,10 @@ import candidateRoutes from '../modules/candidate/candidate.routes';
 import analyticsRoutes from '../modules/analytics/analytics.routes';
 import notificationRoutes from '../modules/notification/notification.routes';
 import practiceRoutes from '../modules/practice/practice.routes';
+import offerRoutes from '../modules/offer/offer.routes';
 
 export default (app: Application) => {
-  app.get('/api/health', (req: Request, res: Response) => {
+  app.get('/api/health', (_req, res: Response) => {
     sendResponse(res, 200, true, 'API is running', {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
@@ -29,6 +30,5 @@ export default (app: Application) => {
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/practice', practiceRoutes);
-
-  // Future modules will be registered here
+  app.use('/api/offers', offerRoutes);
 };
