@@ -204,24 +204,25 @@ export const CompanyInterviewsPage = () => {
 
       <main className="p-5 max-w-[1600px] w-full mx-auto space-y-6 flex-1 flex flex-col">
         
-        {/* Top metrics bar matching Image 2 */}
+        {/* Top metrics bar */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Today', value: String(todayInterviews.length), icon: Calendar, color: 'text-violet-600 bg-violet-50' },
-            { label: 'This Week', value: String(weekInterviews.length), icon: Clock, color: 'text-sky-600 bg-sky-50' },
-            { label: 'Avg Duration', value: `${avgDuration}m`, icon: Brain, color: 'text-emerald-600 bg-emerald-50' },
-            { label: 'No-Shows', value: String(noShowInterviews.length), icon: AlertCircle, color: 'text-rose-600 bg-rose-50' },
+            { label: 'Today', value: String(todayInterviews.length), icon: Calendar, color: 'text-violet-600 bg-violet-50 border-violet-100' },
+            { label: 'This Week', value: String(weekInterviews.length), icon: Clock, color: 'text-sky-600 bg-sky-50 border-sky-100' },
+            { label: 'Avg Duration', value: `${avgDuration}m`, icon: Brain, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
+            { label: 'No-Shows', value: String(noShowInterviews.length), icon: AlertCircle, color: 'text-rose-600 bg-rose-50 border-rose-100' },
           ].map((metric, i) => (
-            <div key={i} className="bg-white border border-slate-200/80 rounded-xl p-4 flex items-center justify-between shadow-sm">
-              <div>
-                <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider mb-0.5">{metric.label}</p>
-                <p className="text-2xl font-black text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  {metric.value}
-                </p>
+            <div key={i} className="metric-card p-4 group">
+              <div className="metric-card-accent" />
+              <div className="flex items-start justify-between mb-3">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${metric.color}`}>
+                  <metric.icon size={15} />
+                </div>
+                <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.12em] pt-0.5">{metric.label}</p>
               </div>
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${metric.color}`}>
-                <metric.icon size={16} />
-              </div>
+              <p className="text-[28px] font-extrabold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>
+                {metric.value}
+              </p>
             </div>
           ))}
         </div>
@@ -230,7 +231,7 @@ export const CompanyInterviewsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
           
           {/* Left panel: Daily Timeline */}
-          <div className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-4 shadow-sm">
+          <div className="surface-raised p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
               <div>
                 <h3 className="font-bold text-slate-900 text-sm" style={{ fontFamily: 'Sora, sans-serif' }}>
@@ -338,7 +339,7 @@ export const CompanyInterviewsPage = () => {
             
             {/* Live Now Assistant Panel */}
             {activeInt ? (
-            <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-4">
+            <div className="surface-raised p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
@@ -408,13 +409,13 @@ export const CompanyInterviewsPage = () => {
               </div>
             </div>
             ) : (
-              <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm flex items-center justify-center text-slate-400 h-64 text-sm font-medium">
+              <div className="surface-raised p-5 flex items-center justify-center text-slate-400 h-64 text-sm font-medium">
                 No interviews scheduled
               </div>
             )}
 
-            {/* Calendar widget matching Image 2 */}
-            <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-3">
+            {/* Calendar widget */}
+            <div className="surface-raised p-5 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <h4 className="font-bold text-slate-900 text-xs" style={{ fontFamily: 'Sora, sans-serif' }}>
                   May 2026

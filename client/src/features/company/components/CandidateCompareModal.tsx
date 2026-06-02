@@ -1,5 +1,5 @@
 import { Dialog, DialogContent } from '../../../components/ui/dialog';
-import { Star, Sparkles, CheckCircle2, XCircle, Award, Users, X } from 'lucide-react';
+import { Sparkles, CheckCircle2, Users, X } from 'lucide-react';
 
 const REC_LABEL: Record<string, string> = {
   strong_hire: 'Strong Hire', hire: 'Hire',
@@ -22,21 +22,6 @@ const AVATAR_GRADIENTS = [
 const getInitials = (name: string) => {
   const p = (name || '').trim().split(' ');
   return ((p[0]?.[0] || '') + (p[1]?.[0] || '')).toUpperCase() || 'U';
-};
-
-const ScoreBar = ({ score, label }: { score: number; label: string }) => {
-  const color = score >= 75 ? 'bg-emerald-500' : score >= 50 ? 'bg-violet-500' : 'bg-amber-500';
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-[10px] text-slate-500 font-semibold">
-        <span>{label}</span>
-        <span className="font-bold text-slate-700">{score}%</span>
-      </div>
-      <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full transition-all duration-700 ${color}`} style={{ width: `${score}%` }} />
-      </div>
-    </div>
-  );
 };
 
 interface CandidateCompareModalProps {

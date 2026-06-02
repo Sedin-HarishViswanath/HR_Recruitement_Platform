@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { usePageTitle } from '../../../shared/hooks/usePageTitle';
 import { api } from '../../../shared/lib/api';
 import {
-  Star, ThumbsUp, ThumbsDown, CheckCircle2, XCircle,
-  Calendar, User, Briefcase, Brain, ChevronDown
+  Star, CheckCircle2, XCircle,
+  Calendar, User, Briefcase, Brain
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { unwrapArray } from '../../../shared/lib/response';

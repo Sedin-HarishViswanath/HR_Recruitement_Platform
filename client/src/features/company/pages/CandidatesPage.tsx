@@ -209,12 +209,12 @@ export const CompanyCandidatesPage = () => {
 
       <div className="flex-1 flex flex-col md:grid md:grid-cols-[240px_1fr] max-w-[1600px] w-full mx-auto">
         
-        {/* Left Filters Sidebar matching Image 1 */}
-        <aside className="border-r border-slate-100 bg-white p-5 space-y-6 md:sticky md:top-[73px] md:h-[calc(100vh-73px)] overflow-y-auto hidden md:block">
-          
+        {/* Left Filters Sidebar */}
+        <aside className="border-r border-slate-100/80 bg-white p-5 space-y-6 md:sticky md:top-[73px] md:h-[calc(100vh-73px)] overflow-y-auto hidden md:block">
+
           {/* Saved Searches */}
           <div className="space-y-2">
-            <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Saved Searches</h3>
+            <h3 className="section-eyebrow">Saved Searches</h3>
             <div className="space-y-0.5">
               {[
                 { name: 'Top performers', count: dbCandidates.filter(c => (c.ai_match_score || 0) >= 85).length },
@@ -253,7 +253,7 @@ export const CompanyCandidatesPage = () => {
 
           {/* Department Filters */}
           <div className="space-y-3">
-            <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Filters</h3>
+            <h3 className="section-eyebrow">Filters</h3>
             <div className="space-y-2">
               <label className="text-[11px] font-bold text-slate-500">Department</label>
               <div className="space-y-2">

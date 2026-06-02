@@ -10,7 +10,6 @@ import {
   Zap, Users, Trophy
 } from 'lucide-react';
 import { unwrapArray } from '../../../shared/lib/response';
-import { useNavigate as useNav } from 'react-router-dom';
 
 // ── Skeleton helpers ────────────────────────────────────────────────────────
 const Skeleton = ({ className = '' }: { className?: string }) => (
@@ -147,10 +146,10 @@ export const CandidateDashboard = () => {
     <div className="flex flex-col min-h-screen bg-[#f8f9fb]">
 
       {/* ── Top header ── */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40" style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.04)' }}>
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
-            Candidate &rsaquo; <span className="text-slate-600">Dashboard</span>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.12em] mb-0.5">
+            Candidate · Dashboard
           </p>
           <h1 className="text-[22px] font-extrabold text-slate-900 tracking-tight leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
             Hi, {firstName} 👋
@@ -163,7 +162,8 @@ export const CandidateDashboard = () => {
             type="text"
             placeholder="Search jobs, companies..."
             onFocus={() => navigate('/candidate/jobs')}
-            className="pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 w-[220px] font-medium text-slate-700 placeholder:text-slate-400 transition-all cursor-pointer"
+            className="pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50/80 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-400 w-[230px] font-medium text-slate-700 placeholder:text-slate-400 transition-all cursor-pointer"
+            style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}
             readOnly
           />
         </div>
@@ -210,16 +210,17 @@ export const CandidateDashboard = () => {
             : STAT_CARDS.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <div key={card.label} className="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 group">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{card.label}</p>
-                      <p className="text-2xl font-extrabold text-slate-900 mt-0.5 leading-none" style={{ fontFamily: 'Sora' }}>
-                        {card.value}
-                      </p>
+                  <div key={card.label} className="metric-card p-4 group">
+                    <div className="metric-card-accent" />
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${card.bg} border ${card.border} transition-transform group-hover:scale-105 duration-200`}>
+                        <Icon size={15} className={card.color} />
+                      </div>
+                      <p className="text-[9.5px] font-black text-slate-400 uppercase tracking-[0.12em] pt-0.5 text-right leading-tight max-w-[80px]">{card.label}</p>
                     </div>
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${card.bg} border ${card.border} transition-transform group-hover:scale-110 duration-200`}>
-                      <Icon size={16} className={card.color} />
-                    </div>
+                    <p className="text-[28px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
+                      {card.value}
+                    </p>
                   </div>
                 );
               })}

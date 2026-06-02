@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent } from '../../../components/ui/dialog';
 import {
   Sparkles, Star, TrendingUp, MessageSquare, Code2, Users,
-  CheckCircle2, AlertTriangle, ArrowRight, Loader2, RotateCcw, Brain
+  CheckCircle2, AlertTriangle, ArrowRight, RotateCcw, Brain
 } from 'lucide-react';
 
 interface AIDebrief {

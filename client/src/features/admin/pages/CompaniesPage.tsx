@@ -104,10 +104,10 @@ export const CompaniesPage = () => {
             <CheckCircle2 size={12} /> Active
           </div>
         );
-      case 'pending': 
+      case 'pending':
         return (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100 text-[11px] font-black uppercase tracking-wider">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" /> Pending
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100 text-[11px] font-black uppercase tracking-wider">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Pending
           </div>
         );
       case 'rejected': 
@@ -136,33 +136,36 @@ export const CompaniesPage = () => {
       <main className="p-8 space-y-8 animate-in fade-in duration-500">
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-           <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-inner">
-                 <Building2 size={28} />
+           <div className="metric-card p-6 flex items-center gap-5 group cursor-default">
+              <div className="metric-card-accent" />
+              <div className="w-12 h-12 rounded-xl bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                 <Building2 size={22} />
               </div>
               <div>
-                 <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Total Companies</p>
-                 <h4 className="text-2xl font-black text-slate-900 leading-none mt-1">{companies.length}</h4>
+                 <p className="section-eyebrow mb-1">Total Companies</p>
+                 <h4 className="text-[28px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>{companies.length}</h4>
               </div>
            </div>
-           <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center shadow-inner">
-                 <Clock size={28} />
+           <div className="metric-card p-6 flex items-center gap-5 group cursor-default">
+              <div className="metric-card-accent" />
+              <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                 <Clock size={22} />
               </div>
               <div>
-                 <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Pending Review</p>
-                 <h4 className="text-2xl font-black text-slate-900 leading-none mt-1">
+                 <p className="section-eyebrow mb-1">Pending Review</p>
+                 <h4 className="text-[28px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
                    {companies.filter(c => c.status === 'pending').length}
                  </h4>
               </div>
            </div>
-           <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center shadow-inner">
-                 <CheckCircle2 size={28} />
+           <div className="metric-card p-6 flex items-center gap-5 group cursor-default">
+              <div className="metric-card-accent" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                 <CheckCircle2 size={22} />
               </div>
               <div>
-                 <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Active Tenants</p>
-                 <h4 className="text-2xl font-black text-slate-900 leading-none mt-1">
+                 <p className="section-eyebrow mb-1">Active Tenants</p>
+                 <h4 className="text-[28px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
                    {companies.filter(c => c.status === 'active').length}
                  </h4>
               </div>

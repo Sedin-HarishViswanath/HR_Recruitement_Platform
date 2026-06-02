@@ -1,11 +1,11 @@
-import { 
-  MapPin, 
+import {
+  MapPin,
   Users,
   BriefcaseBusiness,
   MoreHorizontal,
   Edit,
   Eye,
-  Trash2
+  Trash2,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -36,31 +36,38 @@ interface JobCardProps {
 
 export const JobCard = ({ job, onEdit, onView, onDelete, onChangeStatus }: JobCardProps) => {
   const isClosed = job.status === 'closed';
+  const isDraft = job.status === 'draft';
 
   return (
-    <div className="bg-white rounded-xl border border-slate-100 p-5 flex flex-col shadow-sm hover:shadow-md transition-all group">
+    <div className="metric-card p-5 flex flex-col group cursor-default">
       {/* Top Row: Icon + Status */}
       <div className="flex items-start justify-between mb-4">
-        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-          isClosed ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-blue-500'
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-colors group-hover:scale-105 ${
+          isClosed
+            ? 'bg-slate-50 text-slate-400 border-slate-100'
+            : isDraft
+            ? 'bg-amber-50 text-amber-500 border-amber-100'
+            : 'bg-violet-50 text-violet-600 border-violet-100'
         }`}>
-          <BriefcaseBusiness size={18} />
+          <BriefcaseBusiness size={17} />
         </div>
         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
           isClosed
             ? 'bg-slate-50 text-slate-500 border-slate-200'
-            : 'bg-green-50 text-green-600 border-green-200'
+            : isDraft
+            ? 'bg-amber-50 text-amber-600 border-amber-200'
+            : 'bg-emerald-50 text-emerald-600 border-emerald-200'
         }`}>
-          {isClosed ? 'Closed' : 'Open'}
+          {isClosed ? 'Closed' : isDraft ? 'Draft' : 'Open'}
         </span>
       </div>
 
       {/* Title + Department */}
       <div className="mb-4">
-        <h3 className="text-[14px] font-bold text-slate-900 leading-tight group-hover:text-blue-700 transition-colors">
+        <h3 className="text-[14px] font-bold text-slate-900 leading-tight group-hover:text-violet-700 transition-colors">
           {job.title}
         </h3>
-        <p className="text-[11px] text-blue-600 font-medium mt-0.5">{job.department}</p>
+        <p className="text-[11px] text-violet-600 font-semibold mt-0.5">{job.department}</p>
       </div>
 
       {/* Meta Info */}
@@ -76,37 +83,37 @@ export const JobCard = ({ job, onEdit, onView, onDelete, onChangeStatus }: JobCa
       </div>
 
       {/* Actions */}
-      <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-50">
+      <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
         <button
           onClick={() => onView(job.id)}
-          className="text-[12px] font-semibold text-slate-700 border border-slate-200 rounded-lg px-3 py-1.5 hover:border-blue-300 hover:text-blue-600 transition-colors"
+          className="text-[11.5px] font-semibold text-slate-700 border border-slate-200 rounded-lg px-3 py-1.5 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 transition-all cursor-pointer"
         >
           View Pipeline
         </button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100">
+            <button className="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer">
               <MoreHorizontal size={16} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44 rounded-xl p-1.5 border-slate-200 shadow-lg">
-            <DropdownMenuItem onClick={() => onView(job.id)} className="rounded-lg text-[12px] font-semibold">
+            <DropdownMenuItem onClick={() => onView(job.id)} className="rounded-lg text-[12px] font-semibold cursor-pointer">
               <Eye className="mr-2" size={14} /> View Details
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onEdit(job.id)} className="rounded-lg text-[12px] font-semibold">
+            <DropdownMenuItem onClick={() => onEdit(job.id)} className="rounded-lg text-[12px] font-semibold cursor-pointer">
               <Edit className="mr-2" size={14} /> Edit Job
             </DropdownMenuItem>
             <div className="h-px bg-slate-100 my-1" />
             <DropdownMenuItem
               onClick={() => onChangeStatus(job.id, isClosed ? 'published' : 'closed')}
-              className="rounded-lg text-[12px] font-semibold"
+              className="rounded-lg text-[12px] font-semibold cursor-pointer"
             >
               {isClosed ? 'Reopen Job' : 'Close Job'}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onDelete(job.id)}
-              className="rounded-lg text-[12px] font-semibold text-red-600 focus:text-red-600"
+              className="rounded-lg text-[12px] font-semibold text-red-600 focus:text-red-600 cursor-pointer"
             >
               <Trash2 className="mr-2" size={14} /> Delete Job
             </DropdownMenuItem>

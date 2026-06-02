@@ -59,12 +59,20 @@ export const CandidateJobBoard = () => {
       <div className="max-w-5xl mx-auto space-y-6">
         
         {/* Header Section */}
-        <div className="text-center space-y-2 py-4">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900" style={{ fontFamily: 'Sora' }}>
-            Find your next great opportunity
+        <div className="text-center space-y-3 py-8 relative">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10">
+            <div className="w-64 h-64 bg-violet-400 rounded-full blur-[120px] opacity-[0.06]" />
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 text-violet-700 text-[10px] font-bold border border-violet-200/60 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+            {loading ? 'Loading jobs...' : `${jobs.length}+ open positions`}
+          </div>
+          <h1 className="text-[32px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight" style={{ fontFamily: 'Sora' }}>
+            Find your next<br />
+            <span className="bg-gradient-to-r from-violet-600 via-purple-500 to-violet-500 bg-clip-text text-transparent">great opportunity</span>
           </h1>
-          <p className="text-sm text-slate-500 max-w-xl mx-auto font-medium">
-            Browse hundreds of job openings from top companies on our platform.
+          <p className="text-[14px] text-slate-500 max-w-md mx-auto font-normal leading-relaxed">
+            Browse open positions from top companies on our platform.
           </p>
         </div>
 

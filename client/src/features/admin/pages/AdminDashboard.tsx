@@ -37,22 +37,23 @@ export const AdminDashboard = () => {
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-stagger">
               {statMeta.map((s, i) => (
-                <div key={i} className="stat-card p-5 group cursor-pointer" style={{ '--stat-gradient': `linear-gradient(90deg, var(--tw-gradient-stops))` } as any}>
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.12em]">{s.label}</p>
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center text-white shadow-sm group-hover:scale-110 group-hover:shadow-md transition-all duration-300`}>
+                <div key={i} className="metric-card p-5 group cursor-default">
+                  <div className="metric-card-accent" />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-all duration-200`}>
                       <s.icon size={17} />
                     </div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.12em] pt-0.5 text-right max-w-[100px] leading-tight">{s.label}</p>
                   </div>
-                  <h4 className="text-3xl font-extrabold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora' }}>{data.kpis?.[s.key] || 0}</h4>
-                  <p className="text-[10px] font-semibold mt-1.5 text-violet-600">System-wide</p>
+                  <h4 className="text-[32px] font-extrabold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>{data.kpis?.[s.key] || 0}</h4>
+                  <p className="text-[10px] font-bold mt-2 text-violet-600 uppercase tracking-wider">System-wide</p>
                 </div>
               ))}
             </div>
 
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-              <div className="lg:col-span-2 card-premium p-5 sm:p-6">
+              <div className="lg:col-span-2 surface-raised p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center"><Activity size={14} /></div>
@@ -74,8 +75,8 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="card-premium p-5 sm:p-6">
-                <h3 className="font-bold text-slate-900 tracking-tight mb-5 text-[14px]" style={{ fontFamily: 'Sora' }}>Top Companies</h3>
+              <div className="surface-raised p-5 sm:p-6">
+                <h3 className="font-bold text-slate-900 tracking-tight mb-5 text-[15px]" style={{ fontFamily: 'Sora' }}>Top Companies</h3>
                 <div className="space-y-3 list-slide-in">
                   {(data.topCompanies || []).map((company: any, i: number) => (
                     <div key={i} className="flex items-center justify-between text-[13px] font-medium border-b border-slate-100 pb-2.5 last:border-0 group hover:bg-slate-50 -mx-2 px-2 rounded-lg transition-colors cursor-pointer">

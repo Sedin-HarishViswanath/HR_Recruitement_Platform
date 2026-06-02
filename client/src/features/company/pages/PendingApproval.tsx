@@ -29,7 +29,7 @@ export const PendingApproval = () => {
       {/* Header bar matching Image 4 */}
       <nav className="w-full bg-[#0b0f19] px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-white shadow-md">
             <Building2 size={18} />
           </div>
           <div>
@@ -75,13 +75,13 @@ export const PendingApproval = () => {
                   </>
                 ) : (
                   <>
-                    <div className="w-14 h-14 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-center text-blue-600 shadow-inner animate-pulse">
+                    <div className="w-14 h-14 bg-violet-50 rounded-2xl border border-violet-100 flex items-center justify-center text-violet-600 shadow-inner animate-pulse">
                       <Clock size={28} />
                     </div>
                     
                     <div className="space-y-2">
                       <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
-                        Account Pending <span className="text-blue-600">Verification</span>
+                        Account Pending <span className="text-violet-600">Verification</span>
                       </h2>
                       <p className="text-xs text-slate-500 font-semibold leading-relaxed max-w-md">
                         Thanks for joining Recruiting AI! Our Super Admin is currently reviewing your company details. You'll have full access as soon as your account is approved.
@@ -93,7 +93,7 @@ export const PendingApproval = () => {
                 {/* Sub status details box */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
                   <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100/50 transition-colors">
-                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center ${isRevoked ? 'text-rose-600' : 'text-blue-600'} shadow-sm`}>
+                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center ${isRevoked ? 'text-rose-600' : 'text-violet-600'} shadow-sm`}>
                       <ShieldCheck size={16} />
                     </div>
                     <div>
@@ -103,7 +103,7 @@ export const PendingApproval = () => {
                   </div>
 
                   <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100/50 transition-colors">
-                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center ${isRevoked ? 'text-rose-600' : 'text-blue-600'} shadow-sm`}>
+                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center ${isRevoked ? 'text-rose-600' : 'text-violet-600'} shadow-sm`}>
                       <Clock size={16} />
                     </div>
                     <div>
@@ -130,9 +130,9 @@ export const PendingApproval = () => {
                       s.error 
                         ? 'bg-rose-50 border-rose-200 text-rose-600' 
                         : s.completed 
-                          ? 'bg-blue-50 border-blue-200 text-blue-600' 
+                          ? 'bg-violet-50 border-violet-200 text-violet-600' 
                           : s.current 
-                            ? 'bg-blue-100 border-blue-300 text-blue-600 ring-2 ring-blue-50' 
+                            ? 'bg-violet-100 border-violet-300 text-violet-600 ring-2 ring-violet-50' 
                             : 'bg-slate-50 border-slate-200 text-slate-400'
                     }`}>
                       {s.completed ? <CheckCircle2 size={15} /> : s.error ? <AlertCircle size={15} /> : <span className="font-bold text-xs">{s.step}</span>}
@@ -151,7 +151,7 @@ export const PendingApproval = () => {
           <div className="space-y-6">
             {/* Company details panel */}
             <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-l-2 border-blue-600 pl-3">Company Details</h3>
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-l-2 border-violet-600 pl-3">Company Details</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
@@ -177,7 +177,7 @@ export const PendingApproval = () => {
                 </div>
 
                 <div className="pt-3.5 border-t border-slate-50">
-                  <div className="flex items-center gap-1.5 text-blue-600 font-black text-[9px] uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-violet-600 font-black text-[9px] uppercase tracking-wider">
                     <AlertCircle size={12} /> Need to update details?
                   </div>
                   <p className="text-[10.5px] text-slate-400 mt-1 font-medium italic">Contact support@recruiting.ai</p>
@@ -187,12 +187,12 @@ export const PendingApproval = () => {
 
             {/* Have Questions Documentation Card */}
             <div className="bg-[#0b0f19] rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
-              <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-600/10 rounded-full -mr-12 -mb-12" />
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-violet-600/10 rounded-full -mr-12 -mb-12" />
               <h4 className="font-bold text-[14px] mb-2 relative z-10" style={{ fontFamily: 'Sora' }}>Have Questions?</h4>
               <p className="text-[11.5px] text-slate-400 font-medium mb-5 relative z-10 leading-relaxed">
                 Our team is here to help you get started with the platform features.
               </p>
-              <Button className="w-full h-8 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg relative z-10 transition-colors">
+              <Button className="w-full h-8 bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs rounded-lg relative z-10 transition-colors">
                 Read Documentation
               </Button>
             </div>
@@ -206,8 +206,8 @@ export const PendingApproval = () => {
         <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2026 Recruiting AI. All rights reserved.</p>
           <div className="flex gap-4">
-            <a href="#" className="text-[10px] text-slate-400 hover:text-blue-600 font-bold transition-colors uppercase tracking-widest">Privacy</a>
-            <a href="#" className="text-[10px] text-slate-400 hover:text-blue-600 font-bold transition-colors uppercase tracking-widest">Terms</a>
+            <a href="#" className="text-[10px] text-slate-400 hover:text-violet-600 font-bold transition-colors uppercase tracking-widest">Privacy</a>
+            <a href="#" className="text-[10px] text-slate-400 hover:text-violet-600 font-bold transition-colors uppercase tracking-widest">Terms</a>
           </div>
         </div>
       </footer>
