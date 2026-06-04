@@ -102,7 +102,7 @@ export const CandidateProfile = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-[#fafbfc] items-center justify-center">
+      <div className="flex flex-col min-h-screen items-center justify-center">
         <div className="w-8 h-8 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" />
         <p className="text-xs text-slate-400 font-semibold mt-2">Loading profile...</p>
       </div>
@@ -123,9 +123,9 @@ export const CandidateProfile = () => {
   const initials = (profile.name || '').trim().split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
       {/* Workspace Header Bar */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Candidate</span>
@@ -171,7 +171,7 @@ export const CandidateProfile = () => {
       <main className="p-5 max-w-[1200px] w-full mx-auto space-y-6 flex-1 flex flex-col">
         
         {/* Profile Card with Cover Banner */}
-        <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="surface-raised !rounded-xl overflow-hidden">
           {/* Cover gradient */}
           <div className="h-32 bg-gradient-to-r from-violet-600 via-indigo-600 to-indigo-700 relative" />
 
@@ -221,12 +221,12 @@ export const CandidateProfile = () => {
             
             {/* Contact Details Card */}
             <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-              <h3 className="text-xs font-black uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
+              <h3 className="text-xs font-semibold uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
                 <User size={13} className="text-slate-400" /> Contact Info
               </h3>
               <div className="space-y-3.5">
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">Full Name</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">Full Name</Label>
                   {editMode ? (
                     <Input 
                       value={formData.name || ''} 
@@ -239,7 +239,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">Email address</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">Email address</Label>
                   <p className="text-xs font-bold text-slate-500 flex items-center gap-1.5">
                     <Mail size={12} className="text-slate-400" />
                     {profile.email}
@@ -247,7 +247,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">Phone Number</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">Phone Number</Label>
                   {editMode ? (
                     <Input 
                       value={formData.phone || ''} 
@@ -263,7 +263,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">Location</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">Location</Label>
                   {editMode ? (
                     <Input 
                       value={formData.location || ''} 
@@ -282,13 +282,13 @@ export const CandidateProfile = () => {
 
             {/* Links Editor Card */}
             <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-              <h3 className="text-xs font-black uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
+              <h3 className="text-xs font-semibold uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
                 <Globe size={13} className="text-slate-400" /> Professional Links
               </h3>
               
               <div className="space-y-3.5">
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">LinkedIn URL</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">LinkedIn URL</Label>
                   {editMode ? (
                     <Input 
                       value={formData.linkedin_url || ''} 
@@ -308,7 +308,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">GitHub URL</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">GitHub URL</Label>
                   {editMode ? (
                     <Input 
                       value={formData.github_url || ''} 
@@ -328,7 +328,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">Portfolio Website</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">Portfolio Website</Label>
                   {editMode ? (
                     <Input 
                       value={formData.portfolio_url || ''} 
@@ -356,7 +356,7 @@ export const CandidateProfile = () => {
             
             {/* About Me Card */}
             <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-3">
-              <h3 className="text-xs font-black uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
+              <h3 className="text-xs font-semibold uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
                 <Sparkles size={13} className="text-violet-500 animate-float" /> About Me Summary
               </h3>
               
@@ -379,7 +379,7 @@ export const CandidateProfile = () => {
 
             {/* Top Skills Card */}
             <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-              <h3 className="text-xs font-black uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
+              <h3 className="text-xs font-semibold uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
                 <Code size={13} className="text-slate-400" /> Core Skills
               </h3>
               
@@ -438,13 +438,13 @@ export const CandidateProfile = () => {
 
             {/* Job Preferences Card */}
             <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-              <h3 className="text-xs font-black uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
+              <h3 className="text-xs font-semibold uppercase text-slate-450 tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
                 <Briefcase size={13} className="text-slate-400" /> Career Preferences
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">Target / Preferred Role</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">Target / Preferred Role</Label>
                   {editMode ? (
                     <Input 
                       value={formData.preferences?.preferred_role || ''} 
@@ -461,7 +461,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400">Preferred Location</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400">Preferred Location</Label>
                   {editMode ? (
                     <Input 
                       value={formData.preferences?.preferred_location || ''} 
@@ -478,7 +478,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1"><Landmark size={11} className="text-slate-450" /> Salary Range Min ($)</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400 flex items-center gap-1"><Landmark size={11} className="text-slate-450" /> Salary Range Min ($)</Label>
                   {editMode ? (
                     <Input 
                       type="number"
@@ -498,7 +498,7 @@ export const CandidateProfile = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1"><Landmark size={11} className="text-slate-450" /> Salary Range Max ($)</Label>
+                  <Label className="text-[10px] font-semibold uppercase text-slate-400 flex items-center gap-1"><Landmark size={11} className="text-slate-450" /> Salary Range Max ($)</Label>
                   {editMode ? (
                     <Input 
                       type="number"

@@ -24,8 +24,8 @@ export const CompanyAnalyticsPage = () => {
   }, []);
 
   if (loading) return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+    <div className="flex flex-col min-h-screen">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span><span>&rsaquo;</span><span className="text-slate-600 font-semibold">Analytics</span>
@@ -71,9 +71,9 @@ export const CompanyAnalyticsPage = () => {
   }));
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
       {/* Workspace Header Bar */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span>
@@ -93,7 +93,7 @@ export const CompanyAnalyticsPage = () => {
           {metrics.map((m, i) => (
             <div key={i} className="bg-white rounded-xl border border-slate-200/80 p-4 flex items-center justify-between shadow-sm">
               <div>
-                <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider mb-0.5">{m.label}</p>
+                <p className="text-[9px] font-semibold uppercase text-slate-400 tracking-wider mb-0.5">{m.label}</p>
                 <p className="text-xl font-black text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>{m.value}</p>
               </div>
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${m.color}`}>
@@ -109,7 +109,7 @@ export const CompanyAnalyticsPage = () => {
           {/* Funnel Pipeline Chart */}
           <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-4">
             <div>
-              <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Hiring Funnel</h3>
+              <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider">Hiring Funnel</h3>
               <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Application count by current status.</p>
             </div>
             
@@ -133,7 +133,7 @@ export const CompanyAnalyticsPage = () => {
           {/* Applications Over Time */}
           <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-4 flex flex-col">
             <div>
-              <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Applications Over Time</h3>
+              <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider">Applications Over Time</h3>
               <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Trend of applications received in the last 30 days.</p>
             </div>
 

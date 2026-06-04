@@ -131,10 +131,10 @@ export const UsersPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
 
       {/* ── Workspace Header ── */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
             Workspace &rsaquo; <span className="text-slate-600">Team</span>
@@ -266,7 +266,7 @@ export const UsersPage = () => {
         </div>
 
         {/* ── Search Toolbar ── */}
-        <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-3 flex items-center gap-3">
+        <div className="surface-raised !rounded-xl p-3 flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={13} />
             <input
@@ -280,15 +280,15 @@ export const UsersPage = () => {
         </div>
 
         {/* ── Users Table ── */}
-        <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="surface-raised !rounded-xl overflow-hidden">
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow>
-                <TableHead className="w-[300px] text-[10px] font-black uppercase tracking-wider text-slate-500">Member</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Role</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Joined</TableHead>
-                <TableHead className="text-right text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+                <TableHead className="w-[300px] text-[10px] font-semibold uppercase tracking-wider text-slate-500">Member</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Role</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Status</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Joined</TableHead>
+                <TableHead className="text-right text-[10px] font-semibold uppercase tracking-wider text-slate-500">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

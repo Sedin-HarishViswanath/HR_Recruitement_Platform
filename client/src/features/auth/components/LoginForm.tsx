@@ -105,25 +105,25 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
         )}
         
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-[11px] font-black uppercase text-slate-500 ml-1">Email</Label>
+          <Label htmlFor="email" className="text-[11px] font-semibold uppercase text-slate-500 ml-1">Email</Label>
           <Input 
             id="email" 
             type="email" 
             placeholder="you@company.com" 
-            className="h-10 rounded-xl bg-white border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all font-medium text-sm"
-            {...register('email')} 
+            className="h-10 rounded-xl bg-white border-slate-200 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all font-medium text-sm"
+            {...register('email')}
           />
           {errors.email && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="password" className="text-[11px] font-black uppercase text-slate-500 ml-1">Password</Label>
+          <Label htmlFor="password" className="text-[11px] font-semibold uppercase text-slate-500 ml-1">Password</Label>
           <Input 
             id="password" 
             type="password" 
             placeholder="••••••••"
-            className="h-10 rounded-xl bg-white border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all text-sm"
-            {...register('password')} 
+            className="h-10 rounded-xl bg-white border-slate-200 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all text-sm"
+            {...register('password')}
           />
           {errors.password && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.password.message}</p>}
         </div>
@@ -131,7 +131,7 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
         <Button 
           type="submit" 
           disabled={isLoading}
-          className="w-full h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black tracking-tight text-base shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]"
+          className="w-full h-11 rounded-2xl btn-primary !text-base !font-bold tracking-tight"
         >
           {isLoading ? 'Signing In...' : 'Sign In'}
         </Button>
@@ -140,7 +140,7 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
       <div className="text-center pt-1">
         <p className="text-[13px] font-bold text-slate-400">
           Don't have an account?{' '}
-          <button onClick={() => navigate('/register')} className="text-blue-600 hover:underline">
+          <button onClick={() => navigate('/register')} className="text-violet-600 hover:underline">
             Register
           </button>
         </p>
@@ -148,7 +148,7 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
 
       <div className="relative pt-2">
         <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100" /></div>
-        <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
+        <div className="relative flex justify-center text-[10px] uppercase font-semibold tracking-widest">
           <span className="bg-white px-4 text-slate-400">Or continue with</span>
         </div>
       </div>

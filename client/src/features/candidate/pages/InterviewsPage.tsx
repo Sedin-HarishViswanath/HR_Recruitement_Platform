@@ -68,9 +68,9 @@ export const CandidateInterviewsPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
       {/* Workspace Header Bar */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Candidate</span>
@@ -118,7 +118,7 @@ export const CandidateInterviewsPage = () => {
               {loading ? (
                  [1, 2, 3].map(i => <div key={i} className="h-28 rounded-xl bg-white border border-slate-200 animate-pulse" />)
               ) : filteredInterviews.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-xl border border-slate-200/80 shadow-sm max-w-xl mx-auto w-full">
+                <div className="text-center py-20 surface-raised !rounded-xl max-w-xl mx-auto w-full">
                   <Calendar size={36} className="mx-auto text-slate-250 mb-3" />
                   <h3 className="text-sm font-bold text-slate-800" style={{ fontFamily: 'Sora, sans-serif' }}>No interviews found</h3>
                   <p className="text-xs text-slate-400 mt-1">You don't have any {activeTab} interviews at the moment.</p>
@@ -195,14 +195,14 @@ export const CandidateInterviewsPage = () => {
                         )}
                         
                         {isPendingReschedule && (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 text-[9px] font-black uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 text-[9px] font-semibold uppercase tracking-wider">
                             <RefreshCw size={10} className="animate-spin text-blue-500" />
                             Reschedule Pending
                           </span>
                         )}
 
                         {!isScheduled && !isPendingReschedule && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-50 text-slate-500 border border-slate-200 text-[9px] font-black uppercase tracking-wider">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-50 text-slate-500 border border-slate-200 text-[9px] font-semibold uppercase tracking-wider">
                             {interview.status || 'Completed'}
                           </span>
                         )}
@@ -221,7 +221,7 @@ export const CandidateInterviewsPage = () => {
             <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-4">
               <div className="flex items-center gap-1.5 border-b border-slate-100 pb-3">
                 <Sparkles size={13} className="text-violet-500 animate-float" />
-                <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                <h3 className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider">
                   AI prep assistant
                 </h3>
               </div>
@@ -276,7 +276,7 @@ export const CandidateInterviewsPage = () => {
 
             {/* General tips card */}
             <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-sm space-y-3">
-              <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Hiring Tips</h4>
+              <h4 className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider">Hiring Tips</h4>
               <ul className="space-y-2.5 text-[10.5px] text-slate-650 font-medium">
                 <li className="leading-normal">&bull; <strong>STAR Method:</strong> Answer behavioral questions with Situation, Task, Action, and Result.</li>
                 <li className="leading-normal">&bull; <strong>Ask Questions:</strong> Prepare 2-3 thoughtful questions about design structures or team culture.</li>

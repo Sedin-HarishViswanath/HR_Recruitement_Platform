@@ -164,7 +164,7 @@ export const InterviewWorkspace = () => {
           </>
         )}
       </div>
-      <span className="shrink-0 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest rounded-full bg-violet-900/40 text-violet-300 border border-violet-800">
+      <span className="shrink-0 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-widest rounded-full bg-violet-900/40 text-violet-300 border border-violet-800">
         {interview.round_type} Round
       </span>
     </div>
@@ -308,7 +308,7 @@ export const InterviewWorkspace = () => {
             <span className="text-slate-700">·</span>
             <span className="text-[11px] text-slate-500 truncate">{interview.job_title}</span>
           </div>
-          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-800 bg-emerald-900/20 px-3 py-1 rounded-full shrink-0">
+          <span className="text-[9px] font-semibold uppercase tracking-widest text-emerald-400 border border-emerald-800 bg-emerald-900/20 px-3 py-1 rounded-full shrink-0">
             Technical
           </span>
         </div>
@@ -318,6 +318,7 @@ export const InterviewWorkspace = () => {
             <CodeEditor
               interviewId={interview.id}
               isReadOnly={!isCandidate}
+              accessToken={accessToken ?? undefined}
             />
           </div>
           <div className="w-[340px] shrink-0 h-full border-l border-[#252840]">

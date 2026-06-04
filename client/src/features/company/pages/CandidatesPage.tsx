@@ -173,9 +173,9 @@ export const CompanyCandidatesPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
       {/* Search Header Bar matching Image 1 */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span>
@@ -426,7 +426,7 @@ export const CompanyCandidatesPage = () => {
                             {candidate.ai_score}
                           </span>
                         </div>
-                        <span className="text-[8px] font-black uppercase text-slate-400 mt-1 tracking-wider">AI FIT</span>
+                        <span className="text-[8px] font-semibold uppercase text-slate-400 mt-1 tracking-wider">AI FIT</span>
                       </div>
 
                       {/* Source */}

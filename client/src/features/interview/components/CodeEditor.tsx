@@ -8,6 +8,7 @@ import { Play, ChevronDown, Terminal, Clock, AlertCircle, CheckCircle2, WifiOff 
 interface CodeEditorProps {
   interviewId: string;
   isReadOnly?: boolean;
+  accessToken?: string;
 }
 
 // Language config: UI label | Piston ID (sent to backend) | Monaco syntax | starter code
@@ -110,7 +111,7 @@ interface ExecutionResult {
 // In prod: the same server serves both frontend and backend (or use VITE_API_URL).
 const BACKEND_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
-export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps) => {
+export const CodeEditor = ({ interviewId, isReadOnly = false, accessToken }: CodeEditorProps) => {
   const [langIndex, setLangIndex] = useState(0);
   const [code, setCode] = useState(LANGUAGES[0].starter);
   const [stdin, setStdin] = useState('');
@@ -130,6 +131,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      auth: accessToken ? { token: accessToken } : {},
     });
     socketRef.current = socket;
 
@@ -154,7 +156,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
     });
 
     return () => { socket.disconnect(); };
-  }, [interviewId, isReadOnly]);
+  }, [interviewId, isReadOnly, accessToken]);
 
   const emitCodeChange = (newCode: string, newLangIndex: number) => {
     if (!isReadOnly && socketRef.current?.connected) {
@@ -233,7 +235,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
           </div>
 
           {isReadOnly && (
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-violet-400 bg-violet-50 px-2 py-1 rounded border border-violet-200 animate-pulse">
+            <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-violet-400 bg-violet-50 px-2 py-1 rounded border border-violet-200 animate-pulse">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
               Live View
             </span>

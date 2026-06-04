@@ -185,9 +185,9 @@ export const CompanyInterviewsPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
       {/* Workspace Header Bar */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span>
@@ -231,7 +231,7 @@ export const CompanyInterviewsPage = () => {
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${metric.color}`}>
                   <metric.icon size={15} />
                 </div>
-                <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.12em] pt-0.5">{metric.label}</p>
+                <p className="text-[9px] font-semibold uppercase text-slate-400 tracking-[0.12em] pt-0.5">{metric.label}</p>
               </div>
               <p className="text-[28px] font-extrabold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {metric.value}

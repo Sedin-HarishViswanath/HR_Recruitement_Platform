@@ -25,7 +25,7 @@ export const PendingApproval = () => {
   const isRevoked = user?.companyStatus?.toLowerCase() === 'revoked';
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] font-sans text-slate-900 flex flex-col">
+    <div className="min-h-screen font-sans text-slate-900 flex flex-col">
       {/* Header bar matching Image 4 */}
       <nav className="w-full bg-[#0b0f19] px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-2.5">
@@ -97,7 +97,7 @@ export const PendingApproval = () => {
                       <ShieldCheck size={16} />
                     </div>
                     <div>
-                      <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Status</p>
+                      <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest">Status</p>
                       <p className="text-xs font-bold text-slate-800">{isRevoked ? 'Revoked' : 'In Progress'}</p>
                     </div>
                   </div>
@@ -107,7 +107,7 @@ export const PendingApproval = () => {
                       <Clock size={16} />
                     </div>
                     <div>
-                      <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Action Required</p>
+                      <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest">Action Required</p>
                       <p className="text-xs font-bold text-slate-800">{isRevoked ? 'Contact Support' : 'Wait for Email'}</p>
                     </div>
                   </div>
@@ -158,7 +158,7 @@ export const PendingApproval = () => {
                     <Building2 size={16} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Name</p>
+                    <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest leading-none mb-1">Name</p>
                     <p className="text-xs font-bold text-slate-800 truncate">
                       {user?.name ? `${user.name}'s Company` : 'Harish Viswanath\'s Company'}
                     </p>
@@ -170,7 +170,7 @@ export const PendingApproval = () => {
                     <ShieldCheck size={16} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Admin</p>
+                    <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest leading-none mb-1">Admin</p>
                     <p className="text-xs font-bold text-slate-800 truncate">{user?.name || 'Harish Viswanath'}</p>
                     <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">{user?.email || 'harishviswanath017@gmail.com'}</p>
                   </div>

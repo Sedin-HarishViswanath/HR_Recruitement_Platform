@@ -98,7 +98,7 @@ export const PublicCareersPage = () => {
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-violet-600 transition-colors">{job.title}</h3>
-                    <span className="px-2 py-1 bg-violet-50 text-violet-600 text-[9px] font-black uppercase tracking-wider rounded border border-amber-100">
+                    <span className="px-2 py-1 bg-violet-50 text-violet-600 text-[9px] font-semibold uppercase tracking-wider rounded border border-amber-100">
                       {job.employment_type || 'Full Time'}
                     </span>
                   </div>

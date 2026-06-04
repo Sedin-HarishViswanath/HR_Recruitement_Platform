@@ -40,7 +40,7 @@ export const CandidateCompareModal = ({
       <DialogContent className="max-w-5xl p-0 border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="topbar-frost px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-violet-50 rounded-xl flex items-center justify-center border border-violet-100">
               <Users size={15} className="text-violet-600" />
@@ -98,7 +98,7 @@ export const CandidateCompareModal = ({
             <div className="flex items-center text-[11px] font-bold text-slate-500 py-3 border-t border-slate-100">Status</div>
             {candidates.map((c) => (
               <div key={c.id} className="flex items-center justify-center py-3 border-t border-slate-100">
-                <span className="text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                <span className="text-[9.5px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                   {(c.status || 'applied').replace(/_/g, ' ')}
                 </span>
               </div>
@@ -140,7 +140,7 @@ export const CandidateCompareModal = ({
             {candidates.map((c) => (
               <div key={c.id} className="flex items-center justify-center py-3 border-t border-slate-100">
                 {c.latest_recommendation ? (
-                  <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_COLOR[c.latest_recommendation] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+                  <span className={`text-[9px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_COLOR[c.latest_recommendation] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
                     {REC_LABEL[c.latest_recommendation] || c.latest_recommendation}
                   </span>
                 ) : (

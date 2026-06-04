@@ -262,7 +262,7 @@ export const AptitudeTest = ({
           {/* Category + difficulty badge */}
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{q.category}</span>
-            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${DIFFICULTY_COLOR[q.difficulty] || 'text-slate-400 bg-slate-100 border-slate-200'}`}>
+            <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded border ${DIFFICULTY_COLOR[q.difficulty] || 'text-slate-400 bg-slate-100 border-slate-200'}`}>
               {q.difficulty}
             </span>
           </div>

@@ -111,10 +111,10 @@ export const CandidateOffersPage = () => {
     : offers.filter(o => o.status === activeFilter.toLowerCase() as Offer['status']);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fb]">
+    <div className="flex flex-col min-h-screen">
 
       {/* Header */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 sticky top-0 z-40">
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
           Candidate &rsaquo; <span className="text-slate-600">Offers</span>
         </p>
@@ -215,7 +215,7 @@ export const CandidateOffersPage = () => {
                         </div>
                       </div>
 
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.color}`}>
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.color}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot} ${isPending ? 'animate-pulse' : ''}`} />
                         {cfg.label}
                       </span>

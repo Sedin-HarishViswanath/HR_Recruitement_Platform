@@ -5,7 +5,7 @@ export const UnauthorizedPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-[28px] border border-slate-200/60 p-10 text-center animate-scale-in" style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)' }}>
 
         <div className="w-16 h-16 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-center text-red-500 mx-auto mb-7 shadow-inner">

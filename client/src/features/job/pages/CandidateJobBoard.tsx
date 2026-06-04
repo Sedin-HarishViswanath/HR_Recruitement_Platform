@@ -55,7 +55,7 @@ export const CandidateJobBoard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
         
         {/* Header Section */}
@@ -69,7 +69,7 @@ export const CandidateJobBoard = () => {
           </div>
           <h1 className="text-[32px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight" style={{ fontFamily: 'Sora' }}>
             Find your next<br />
-            <span className="bg-gradient-to-r from-violet-600 via-purple-500 to-violet-500 bg-clip-text text-transparent">great opportunity</span>
+            <span className="text-violet-700">great opportunity</span>
           </h1>
           <p className="text-[14px] text-slate-500 max-w-md mx-auto font-normal leading-relaxed">
             Browse open positions from top companies on our platform.

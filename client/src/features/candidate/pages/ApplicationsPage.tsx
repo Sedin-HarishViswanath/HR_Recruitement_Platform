@@ -106,9 +106,9 @@ export const CandidateApplicationsPage = () => {
   const stagesList = ['Applied', 'Screening', 'Interview', 'Offer', 'Hired'];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
       {/* Workspace Header Bar */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Candidate</span>
@@ -146,7 +146,7 @@ export const CandidateApplicationsPage = () => {
             <p className="text-xs text-slate-400 font-medium">Loading your applications...</p>
           </div>
         ) : filteredApps.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-xl border border-slate-200/80 shadow-sm max-w-xl mx-auto w-full">
+          <div className="py-20 text-center surface-raised !rounded-xl max-w-xl mx-auto w-full">
             <Building2 size={36} className="mx-auto text-slate-250 mb-3" />
             <h3 className="text-sm font-bold text-slate-800" style={{ fontFamily: 'Sora, sans-serif' }}>No applications found</h3>
             <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
@@ -161,7 +161,7 @@ export const CandidateApplicationsPage = () => {
               const dateApplied = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
               return (
-                <div key={app.id} className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden p-5 space-y-5 transition-all duration-300 hover:shadow-md hover:border-slate-300">
+                <div key={app.id} className="surface-raised !rounded-xl overflow-hidden p-5 space-y-5 transition-all duration-300 hover:shadow-md hover:border-slate-300">
                   
                   {/* Top card block */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -175,7 +175,7 @@ export const CandidateApplicationsPage = () => {
                           <h3 className="text-sm font-black text-slate-900 leading-none group-hover:text-violet-600 transition-colors">
                             {app.job_title}
                           </h3>
-                          <span className={`inline-flex items-center text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${getStatusBadgeStyle(app.status)}`}>
+                          <span className={`inline-flex items-center text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${getStatusBadgeStyle(app.status)}`}>
                             {app.status || 'Applied'}
                           </span>
                         </div>

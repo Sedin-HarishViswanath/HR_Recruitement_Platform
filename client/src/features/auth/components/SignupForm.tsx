@@ -108,48 +108,48 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
           )}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Name</Label>
+              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">Name</Label>
               <Input placeholder="Full Name" className="h-10 rounded-xl text-sm" {...register('name')} />
               {errors.name && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.name.message}</p>}
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Email</Label>
+              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">Email</Label>
               <Input placeholder="you@example.com" className="h-10 rounded-xl text-sm" {...register('email')} />
               {errors.email && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.email.message}</p>}
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Phone</Label>
+              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">Phone</Label>
               <Input placeholder="Contact Number" className="h-10 rounded-xl text-sm" {...register('phone')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Location</Label>
+              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">Location</Label>
               <Input placeholder="City, Country" className="h-10 rounded-xl text-sm" {...register('location')} />
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Skills</Label>
+            <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">Skills</Label>
             <Input placeholder="e.g. Ruby, Rails, React" className="h-10 rounded-xl text-sm" {...register('skills')} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Password</Label>
+              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">Password</Label>
               <Input type="password" placeholder="••••••••" className="h-10 rounded-xl text-sm" {...register('password')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Confirm</Label>
+              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">Confirm</Label>
               <Input type="password" placeholder="••••••••" className="h-10 rounded-xl text-sm" {...register('confirmPassword')} />
             </div>
           </div>
 
-          <Button type="submit" disabled={isLoading} className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[13px] shadow-md shadow-blue-600/20 mt-2">
+          <Button type="submit" disabled={isLoading} className="w-full h-10 rounded-xl btn-primary !rounded-xl !text-[13px] mt-2">
             {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
 
         <p className="text-center text-[12px] font-medium text-slate-500">
-          Already have an account? <button onClick={() => navigate('/login')} className="text-blue-600 font-bold hover:underline">Sign in</button>
+          Already have an account? <button onClick={() => navigate('/login')} className="text-violet-600 font-bold hover:underline">Sign in</button>
         </p>
       </div>
     );
@@ -165,7 +165,7 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
         )}
         {/* Company Details Section */}
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full inline-block">Company Details</h4>
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full inline-block">Company Details</h4>
           <div className="grid grid-cols-2 gap-3 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
             <div className="space-y-1">
               <Label className="text-[10px] font-bold text-slate-500">Company name</Label>
@@ -236,7 +236,7 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
 
         {/* Admin User Section */}
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full inline-block">Admin User Details</h4>
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full inline-block">Admin User Details</h4>
           <div className="grid grid-cols-2 gap-3 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
             <div className="space-y-1">
               <Label className="text-[10px] font-bold text-slate-500">Name</Label>
@@ -257,12 +257,12 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
           </div>
         </div>
 
-        <Button type="submit" disabled={isLoading} className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[13px] shadow-md shadow-blue-600/20">
+        <Button type="submit" disabled={isLoading} className="w-full h-10 rounded-xl btn-primary !rounded-xl !text-[13px]">
           {isLoading ? 'Processing...' : 'Register'}
         </Button>
 
         <p className="text-center text-[12px] font-medium text-slate-500">
-          Already have an account? <button type="button" onClick={() => navigate('/login')} className="text-blue-600 font-bold hover:underline">Sign in</button>
+          Already have an account? <button type="button" onClick={() => navigate('/login')} className="text-violet-600 font-bold hover:underline">Sign in</button>
         </p>
       </form>
     </div>

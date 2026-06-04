@@ -6,7 +6,7 @@ export const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#fafbfc]">
+    <div className="flex min-h-screen">
       {sidebarOpen && (
         <div
           className="sidebar-mobile-overlay"

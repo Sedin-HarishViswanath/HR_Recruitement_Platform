@@ -13,8 +13,8 @@ const BarChart = ({ data }: { data: { label: string; value: number }[] }) => {
         <div key={i} className="flex flex-col items-center gap-1.5 flex-1 group">
           <div className="relative w-full">
             <div
-              className="w-full bg-violet-500 rounded-t-md transition-all duration-700 ease-out cursor-pointer group-hover:bg-violet-600"
-              style={{ height: `${(d.value / max) * 140}px`, minHeight: d.value > 0 ? '6px' : '0', animationDelay: `${i * 80}ms` }}
+              className="w-full rounded-t-md transition-all duration-700 ease-out cursor-pointer group-hover:brightness-110"
+              style={{ height: `${(d.value / max) * 140}px`, minHeight: d.value > 0 ? '6px' : '0', animationDelay: `${i * 80}ms`, background: 'linear-gradient(180deg, #a78bfa 0%, #7c3aed 100%)' }}
             />
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{d.value}</div>
           </div>
@@ -54,10 +54,10 @@ const DonutChart = ({ segments }: { segments: { label: string; value: number; co
 };
 
 const statMeta = [
-  { title: 'APPLICATIONS', icon: Users, color: 'text-violet-600 bg-violet-50' },
-  { title: 'OPEN POSITIONS', icon: Briefcase, color: 'text-teal-600 bg-teal-50' },
-  { title: 'INTERVIEWS SCHEDULED', icon: Calendar, color: 'text-blue-600 bg-blue-50' },
-  { title: 'TOTAL CANDIDATES', icon: TrendingUp, color: 'text-emerald-600 bg-emerald-50' },
+  { title: 'Applications', icon: Users },
+  { title: 'Open positions', icon: Briefcase },
+  { title: 'Interviews scheduled', icon: Calendar },
+  { title: 'Total candidates', icon: TrendingUp },
 ];
 
 export const CompanyDashboard = () => {
@@ -84,7 +84,7 @@ export const CompanyDashboard = () => {
   }, []);
 
   if (loading) return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+    <div className="flex flex-col min-h-screen">
       <DashboardHeader title="Dashboard" subtitle="Loading..." />
       <div className="flex-1 flex items-center justify-center"><div className="w-7 h-7 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" /></div>
     </div>
@@ -108,22 +108,19 @@ export const CompanyDashboard = () => {
   const avatarGradients = ['from-violet-500 to-purple-500', 'from-teal-500 to-emerald-500', 'from-rose-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-orange-500 to-amber-500'];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafbfc] font-sans">
+    <div className="flex flex-col min-h-screen font-sans">
       <DashboardHeader title="Dashboard" subtitle="Overview of your hiring pipeline" />
       <main className="p-4 sm:p-6 space-y-6 animate-fade-in-up">
 
         {/* ── Stat Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-stagger">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200/70 rounded-2xl overflow-hidden border border-slate-200/70 shadow-[var(--shadow-xs)]">
           {statMeta.map((card, i) => (
-            <div key={i} className="metric-card p-5 group cursor-default">
-              <div className="metric-card-accent" />
-              <div className="flex items-start justify-between mb-4">
-                <div className={`w-10 h-10 rounded-xl ${card.color} flex items-center justify-center transition-transform group-hover:scale-105`}>
-                  <card.icon size={17} />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-400 pt-0.5">{card.title}</span>
+            <div key={i} className="bg-white p-5 sm:p-6 group cursor-default relative transition-colors hover:bg-slate-50/60">
+              <div className="flex items-center gap-2 text-slate-400 mb-3">
+                <card.icon size={14} strokeWidth={2.25} />
+                <span className="text-[11px] font-semibold text-slate-500">{card.title}</span>
               </div>
-              <p className="text-[32px] font-extrabold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
+              <p className="data-number text-[40px] sm:text-[44px] leading-none">
                 {statValues[i].toLocaleString()}
               </p>
             </div>
@@ -131,20 +128,25 @@ export const CompanyDashboard = () => {
         </div>
 
         {/* ── Charts ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ animationDelay: '200ms' }}>
-          <div className="lg:col-span-2 surface-raised p-5">
-            <div className="flex items-center justify-between mb-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2 panel">
+            <div className="panel-header">
               <div>
                 <h2 className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora' }}>Pipeline overview</h2>
-                <p className="text-[11px] text-slate-400 font-medium mt-0.5">Stage-by-stage conversion</p>
+                <p className="text-[12px] text-slate-500 font-medium mt-0.5">Stage-by-stage conversion</p>
               </div>
-              <span className="badge-premium badge-violet">Live</span>
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+              </span>
             </div>
-            <BarChart data={pipelineData} />
+            <div className="p-5"><BarChart data={pipelineData} /></div>
           </div>
 
-          <div className="surface-raised p-5">
-            <h2 className="text-[15px] font-bold text-slate-900 mb-5" style={{ fontFamily: 'Sora' }}>By department</h2>
+          <div className="panel">
+            <div className="panel-header">
+              <h2 className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora' }}>By department</h2>
+            </div>
+            <div className="p-5">
             <DonutChart segments={jobSegments} />
             <div className="mt-4 space-y-1">
               {jobSegments.map((seg: any, i: number) => (
@@ -157,15 +159,16 @@ export const CompanyDashboard = () => {
                 </div>
               ))}
             </div>
+            </div>
           </div>
         </div>
 
         {/* ── Recent Applications ── */}
-        <div className="surface-raised overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+        <div className="panel overflow-hidden">
+          <div className="panel-header">
             <h2 className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora' }}>Recent applications</h2>
-            <button className="text-[11px] font-bold text-violet-600 hover:text-violet-700 flex items-center gap-0.5 transition-colors active:scale-[0.98] cursor-pointer">
-              View all <ChevronRight size={12} />
+            <button className="text-[12px] font-semibold text-violet-700 hover:text-violet-800 flex items-center gap-0.5 transition-colors active:scale-[0.98] cursor-pointer">
+              View all <ChevronRight size={13} />
             </button>
           </div>
           <div className="divide-y divide-slate-50 list-slide-in">

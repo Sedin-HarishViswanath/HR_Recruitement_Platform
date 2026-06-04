@@ -96,9 +96,9 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#fafbfc]">
+    <div className="flex-1 flex flex-col">
       {/* Workspace Header Bar */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span>
@@ -151,13 +151,13 @@ export default function SettingsPage() {
             {activeTab === 'general' && (
               <div className="space-y-4 animate-fade-in">
                 <div className="border-b border-slate-100 pb-3">
-                  <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">General Information</h3>
+                  <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider">General Information</h3>
                   <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Manage your corporate details, website URL, and overview.</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Company Name</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Company Name</Label>
                     <Input 
                       placeholder="e.g. Acme Corp" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -167,7 +167,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Domain</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Domain</Label>
                     <Input 
                       placeholder="e.g. acme.com" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -177,7 +177,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Industry</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Industry</Label>
                     <Input 
                       placeholder="e.g. Technology, Healthcare" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -187,7 +187,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Company Size</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Company Size</Label>
                     <select 
                       className="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-50/20 text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-violet-500"
                       {...register('company_size')}
@@ -202,7 +202,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1 sm:col-span-2">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Website URL</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Website URL</Label>
                     <Input 
                       placeholder="https://acme.com" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -212,7 +212,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1 sm:col-span-2">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Company Bio</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Company Bio</Label>
                     <textarea 
                       rows={3}
                       placeholder="Brief description of your company..." 
@@ -228,13 +228,13 @@ export default function SettingsPage() {
             {activeTab === 'contact' && (
               <div className="space-y-4 animate-fade-in">
                 <div className="border-b border-slate-100 pb-3">
-                  <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Contact Information</h3>
+                  <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider">Contact Information</h3>
                   <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Manage contact details for recruitment and support inquiries.</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Contact Email</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Contact Email</Label>
                     <Input 
                       placeholder="info@acme.com" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -244,7 +244,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Contact Phone</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Contact Phone</Label>
                     <Input 
                       placeholder="+1 (555) 000-0000" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -259,13 +259,13 @@ export default function SettingsPage() {
             {activeTab === 'location' && (
               <div className="space-y-4 animate-fade-in">
                 <div className="border-b border-slate-100 pb-3">
-                  <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Address & Location</h3>
+                  <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider">Address & Location</h3>
                   <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Manage physical offices, headquarters address, and settings.</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1 sm:col-span-2">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Address Line 1</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Address Line 1</Label>
                     <Input 
                       placeholder="123 Corporate Blvd" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -274,7 +274,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1 sm:col-span-2">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Address Line 2</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Address Line 2</Label>
                     <Input 
                       placeholder="Suite 400" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -283,7 +283,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">City</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">City</Label>
                     <Input 
                       placeholder="San Francisco" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -292,7 +292,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">State / Province</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">State / Province</Label>
                     <Input 
                       placeholder="California" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -301,7 +301,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Country</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Country</Label>
                     <Input 
                       placeholder="United States" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"
@@ -310,7 +310,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-[10.5px] font-black uppercase text-slate-400">Postal / ZIP Code</Label>
+                    <Label className="text-[10.5px] font-semibold uppercase text-slate-400">Postal / ZIP Code</Label>
                     <Input 
                       placeholder="94107" 
                       className="rounded-lg h-9 text-xs border-slate-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:border-violet-500 bg-slate-50/20"

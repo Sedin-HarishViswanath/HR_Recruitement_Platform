@@ -12,7 +12,7 @@ export const RegisterPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] font-sans text-slate-900 flex flex-col">
+    <div className="min-h-screen font-sans text-slate-900 flex flex-col">
       {/* Navbar */}
       <nav className="w-full bg-[#0c0e14] px-8 py-3.5 flex items-center justify-between sticky top-0 z-50 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <Link to="/" className="flex items-center gap-2.5">

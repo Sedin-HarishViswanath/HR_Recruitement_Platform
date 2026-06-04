@@ -47,7 +47,7 @@ const PublicJobBoardWrapper = () => {
   }
   
   return (
-    <div className="flex min-h-screen bg-[#fafbfc]">
+    <div className="flex min-h-screen">
       <main className="flex-1 min-h-screen transition-all duration-300">
         <Outlet />
       </main>

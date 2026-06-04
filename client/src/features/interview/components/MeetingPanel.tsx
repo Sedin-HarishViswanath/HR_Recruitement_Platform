@@ -395,7 +395,7 @@ export const MeetingPanel = ({
       <div className="px-4 pt-4 pb-0 shrink-0">
         <div className="flex items-center gap-2 mb-1">
           <div className={`w-2 h-2 rounded-full ${meetingJoined && !meetingEnded ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
-          <span className={`text-[10px] font-black uppercase tracking-widest ${meetingJoined && !meetingEnded ? 'text-emerald-400' : 'text-slate-500'}`}>
+          <span className={`text-[10px] font-semibold uppercase tracking-widest ${meetingJoined && !meetingEnded ? 'text-emerald-400' : 'text-slate-500'}`}>
             {meetingJoined && !meetingEnded ? 'Live Session' : meetingEnded ? 'Session Ended' : 'Ready'}
           </span>
         </div>

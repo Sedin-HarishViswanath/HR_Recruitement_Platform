@@ -65,11 +65,14 @@ export const AuthPage = () => {
   /* ═══ LOGIN VIEW ═══ */
   if (isAuthView) {
     return (
-      <div className="min-h-screen bg-[#fafbfc] flex overflow-hidden">
+      <div className="min-h-screen bg-background flex overflow-hidden">
         {/* Left Panel */}
-        <div className="hidden lg:flex w-[420px] bg-slate-50/50 p-10 flex-col gap-6 shrink-0 relative overflow-hidden border-r border-slate-200/60">
+        <div className="hidden lg:flex w-[440px] p-10 flex-col gap-6 shrink-0 relative overflow-hidden border-r border-slate-200/60"
+          style={{ background: 'linear-gradient(165deg, #faf7ff 0%, #f4f1fb 45%, #eef2fb 100%)' }}>
+          <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-violet-400/20 blur-[120px]" />
+          <div className="absolute bottom-10 -right-16 w-64 h-64 rounded-full bg-sky-400/10 blur-[110px]" />
           <div className="flex items-center gap-2.5 relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white shadow-sm font-bold">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white shadow-md shadow-violet-300/50 ring-1 ring-white/40 font-bold">
               <span className="text-[15px]">R</span>
             </div>
             <div>
@@ -79,8 +82,8 @@ export const AuthPage = () => {
           </div>
 
           <div className="space-y-4 relative z-10 mt-4">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-violet-50 text-violet-700 text-[10px] font-semibold border border-violet-200/60 shadow-[0_1px_2px_rgba(109,40,217,0.05)]">
-              <Sparkles size={10} className="mr-1" /> v2.4 · AI co-pilot live
+            <span className="chip-brand">
+              <Sparkles size={10} /> v2.4 · AI co-pilot live
             </span>
             <h1 className="text-[32px] font-extrabold tracking-tight leading-[1.15] text-slate-900" style={{ fontFamily: 'Sora' }}>
               Welcome back.<br />Let's ship offers.
@@ -120,7 +123,7 @@ export const AuthPage = () => {
               { val: '50k', label: 'HIRES' },
               { val: '4.9★', label: 'G2' },
             ].map((s, i) => (
-              <div key={i} className="flex-1 bg-white rounded-xl border border-slate-200/80 p-3.5 shadow-sm/5">
+              <div key={i} className="flex-1 surface-raised p-3.5 hover-lift">
                 <p className="text-[16px] font-extrabold text-slate-900" style={{ fontFamily: 'Sora' }}>{s.val}</p>
                 <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{s.label}</p>
               </div>
@@ -163,11 +166,11 @@ export const AuthPage = () => {
 
   /* ═══ LANDING PAGE ═══ */
   return (
-    <div className="min-h-screen bg-[#fafbfc] text-slate-900 overflow-x-hidden flex flex-col font-sans">
+    <div className="min-h-screen bg-background text-slate-900 overflow-x-hidden flex flex-col font-sans">
       {/* ── Navbar ── */}
-      <nav className="w-full bg-white px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-50 border-b border-slate-100 shadow-sm/5">
+      <nav className="w-full topbar-frost px-4 sm:px-8 py-3.5 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-white shadow-sm font-bold">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white shadow-md shadow-violet-300/50 ring-1 ring-white/40 font-bold">
             <span className="text-[12px]">R</span>
           </div>
           <div>
@@ -177,7 +180,7 @@ export const AuthPage = () => {
         </div>
         <div className="hidden sm:flex items-center gap-2">
           <button onClick={() => handleLoginClick('candidate')} className="px-4 py-2 rounded-lg text-slate-500 hover:text-slate-800 text-[13px] font-medium transition-spring active:scale-[0.98]">Sign in</button>
-          <button onClick={() => handleLoginClick('internal')} className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-[13px] font-medium shadow-sm transition-spring active:scale-[0.98]">Get started →</button>
+          <button onClick={() => handleLoginClick('internal')} className="btn-primary !px-4 !py-2 !text-[13px] transition-spring">Get started →</button>
         </div>
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="sm:hidden text-slate-600 p-1">{mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}</button>
       </nav>
@@ -191,18 +194,19 @@ export const AuthPage = () => {
 
       {/* ── Hero ── */}
       <section ref={hero.ref} className="relative overflow-hidden py-16 sm:py-24">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-400 rounded-full blur-[300px] opacity-[0.05]" />
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-400 rounded-full blur-[200px] opacity-[0.03]" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-400 rounded-full blur-[300px] opacity-[0.07]" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-400 rounded-full blur-[200px] opacity-[0.04]" />
+        <div className="absolute inset-0 opacity-[0.4] pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(124,92,246,0.08) 1px, transparent 1px)', backgroundSize: '26px 26px', maskImage: 'radial-gradient(ellipse 70% 50% at 50% 0%, black, transparent)' }} />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-8 text-center relative z-10">
           <div className={`space-y-6 max-w-3xl mx-auto transition-all duration-1000 ${hero.vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 text-[11px] font-semibold border border-violet-200/60 shadow-[0_1px_2px_rgba(109,40,217,0.05)]">
+            <div className="chip-brand !px-3 !py-1.5">
               <Sparkles size={11} className="animate-float" /> New · AI-powered shortlisting v2 →
             </div>
 
             <h2 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight leading-[1.1] text-slate-900" style={{ fontFamily: 'Sora' }}>
               Hire faster, with<br />
-              <span className="bg-gradient-to-r from-violet-600 via-purple-500 to-violet-500 bg-clip-text text-transparent animate-gradient">data on your side.</span>
+              <span className="text-violet-700">data on your side.</span>
             </h2>
 
             <p className="text-[16px] text-slate-500 leading-relaxed font-normal max-w-xl mx-auto">
@@ -212,11 +216,11 @@ export const AuthPage = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button onClick={() => handleLoginClick('internal')}
-                className="px-6 py-3 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-semibold text-[14px] shadow-sm flex items-center gap-2 active:scale-[0.98] transition-spring">
+                className="btn-primary !px-6 !py-3 !text-[14px] transition-spring">
                 Start free trial <ArrowRight size={15} />
               </button>
               <button onClick={() => navigate('/candidate/jobs')}
-                className="px-6 py-3 rounded-lg bg-white text-slate-700 font-semibold text-[14px] border border-slate-200 hover:border-slate-350 hover:bg-slate-50 flex items-center gap-2 active:scale-[0.98] transition-spring">
+                className="btn-soft !px-6 !py-3 !text-[14px] transition-spring">
                 Browse Jobs
               </button>
             </div>
@@ -326,8 +330,8 @@ export const AuthPage = () => {
       <section ref={features.ref} className="py-24 sm:py-32 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-8">
           <div className={`text-center mb-16 transition-all duration-700 ${features.vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-violet-50 text-violet-700 text-[10px] font-semibold border border-violet-200/60 mb-4 shadow-[0_1px_2px_rgba(109,40,217,0.05)]">
-              <Layers size={11} className="mr-1.5" /> Platform
+            <span className="chip-brand mb-4">
+              <Layers size={11} /> Platform
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-3" style={{ fontFamily: 'Sora' }}>One platform, every step</h2>
             <p className="text-slate-500 text-[14px] font-normal max-w-lg mx-auto">From posting to onboarding — six modules that work as one.</p>
@@ -395,7 +399,7 @@ export const AuthPage = () => {
           <p className="text-slate-400 text-[14px] font-normal mb-8 max-w-md mx-auto leading-relaxed">Join hundreds of companies using RecruitAI to find, evaluate, and hire top talent faster.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button onClick={() => handleLoginClick('internal')}
-              className="px-8 py-3.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-semibold text-[14px] shadow-lg shadow-violet-700/10 transition-spring active:scale-[0.98] cursor-pointer">
+              className="btn-primary !px-8 !py-3.5 !text-[14px] transition-spring cursor-pointer">
               Get started free →
             </button>
             <button onClick={() => handleLoginClick('candidate')}

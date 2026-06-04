@@ -233,10 +233,10 @@ export const CompanyApplicationsPage = () => {
   }), [applications, search, activeStage]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fb]">
+    <div className="flex flex-col min-h-screen">
 
       {/* ── Page header ── */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 sticky top-0 z-40">
         <div>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
             Workspace &rsaquo; <span className="text-slate-600">Applications</span>
@@ -253,7 +253,7 @@ export const CompanyApplicationsPage = () => {
       <main className="p-5 max-w-[1400px] w-full mx-auto space-y-5 flex-1">
 
         {/* ── Toolbar ── */}
-        <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="surface-raised !rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
             {/* Search */}
             <div className="relative flex-1 min-w-[200px] max-w-sm">
@@ -331,13 +331,13 @@ export const CompanyApplicationsPage = () => {
             {[0, 1, 2, 3].map(i => <AppCardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-xl border border-slate-200/80 shadow-sm">
+          <div className="py-20 text-center surface-raised !rounded-xl">
             <Filter size={28} className="mx-auto text-slate-300 mb-3" />
             <p className="text-sm font-bold text-slate-600">No applications found</p>
             <p className="text-xs text-slate-400 mt-1">Try adjusting your search or filters.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="panel divide-y divide-slate-100 overflow-hidden">
             {filtered.map((app, i) => {
               const name = app.candidate_name || app.user_name || 'Unknown';
               const email = app.candidate_email || app.user_email || '';
@@ -359,7 +359,7 @@ export const CompanyApplicationsPage = () => {
               return (
                 <div
                   key={app.id || i}
-                  className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:border-slate-300"
+                  className="overflow-hidden transition-colors duration-200 hover:bg-slate-50/50"
                 >
                   {/* ── Main row ── */}
                   <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center gap-4">
@@ -390,7 +390,7 @@ export const CompanyApplicationsPage = () => {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-bold text-slate-900">{name}</p>
-                          <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${getStageStyle(app.status)}`}>
+                          <span className={`text-[10.5px] font-semibold px-2 py-0.5 rounded-md border ${getStageStyle(app.status)}`}>
                             {getStageLabel(app)}
                           </span>
                         </div>
@@ -518,7 +518,7 @@ export const CompanyApplicationsPage = () => {
                   {/* ── Feedback drawer ── */}
                   {isExpanded && (
                     <div className="border-t border-slate-100 bg-slate-50/40 p-5 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                      <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-slate-400 tracking-wider">
                         <MessageSquare size={12} className="text-violet-500" />
                         Interview Feedback · {name}
                       </div>
@@ -574,7 +574,7 @@ export const CompanyApplicationsPage = () => {
                                 </div>
                                 <div className="flex items-center gap-2 shrink-0">
                                   {f.recommendation && (
-                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_STYLE[f.recommendation] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_STYLE[f.recommendation] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
                                       {REC_LABEL[f.recommendation] || f.recommendation}
                                     </span>
                                   )}
@@ -628,18 +628,18 @@ export const CompanyApplicationsPage = () => {
 
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div className="p-3 rounded-lg bg-emerald-50/40 border border-emerald-100">
-                                      <p className="text-[9px] font-black uppercase tracking-wider text-emerald-600 mb-1">Strengths</p>
+                                      <p className="text-[9px] font-semibold uppercase tracking-wider text-emerald-600 mb-1">Strengths</p>
                                       <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.strengths || 'Not provided'}</p>
                                     </div>
                                     <div className="p-3 rounded-lg bg-red-50/30 border border-red-100">
-                                      <p className="text-[9px] font-black uppercase tracking-wider text-red-600 mb-1">Areas for Improvement</p>
+                                      <p className="text-[9px] font-semibold uppercase tracking-wider text-red-600 mb-1">Areas for Improvement</p>
                                       <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.weaknesses || 'Not provided'}</p>
                                     </div>
                                   </div>
 
                                   {f.additional_comments && (
                                     <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
-                                      <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">Notes</p>
+                                      <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Notes</p>
                                       <p className="text-xs font-medium text-slate-600 leading-relaxed italic">&ldquo;{f.additional_comments}&rdquo;</p>
                                     </div>
                                   )}

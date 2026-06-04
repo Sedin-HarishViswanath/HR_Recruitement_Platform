@@ -18,16 +18,6 @@ const Skeleton = ({ className = '' }: { className?: string }) => (
   />
 );
 
-const StatCardSkeleton = () => (
-  <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-    <div className="space-y-2">
-      <Skeleton className="h-2.5 w-20 rounded" />
-      <Skeleton className="h-7 w-12 rounded" />
-    </div>
-    <Skeleton className="w-9 h-9 rounded-xl" />
-  </div>
-);
-
 const JobCardSkeleton = () => (
   <div className="flex items-center gap-4 p-4 rounded-xl border border-slate-100">
     <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
@@ -143,10 +133,10 @@ export const CandidateDashboard = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fb]">
+    <div className="flex flex-col min-h-screen">
 
       {/* ── Top header ── */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40" style={{ boxShadow: '0 1px 0 rgba(0,0,0,0.04)' }}>
+      <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.12em] mb-0.5">
             Candidate · Dashboard
@@ -204,21 +194,23 @@ export const CandidateDashboard = () => {
         )}
 
         {/* ── Stats row ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200/70 rounded-2xl overflow-hidden border border-slate-200/70 shadow-[var(--shadow-xs)]">
           {loading
-            ? [0, 1, 2, 3].map(i => <StatCardSkeleton key={i} />)
+            ? [0, 1, 2, 3].map(i => (
+                <div key={i} className="bg-white p-5">
+                  <Skeleton className="h-3 w-20 rounded mb-3" />
+                  <Skeleton className="h-9 w-14 rounded" />
+                </div>
+              ))
             : STAT_CARDS.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <div key={card.label} className="metric-card p-4 group">
-                    <div className="metric-card-accent" />
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${card.bg} border ${card.border} transition-transform group-hover:scale-105 duration-200`}>
-                        <Icon size={15} className={card.color} />
-                      </div>
-                      <p className="text-[9.5px] font-black text-slate-400 uppercase tracking-[0.12em] pt-0.5 text-right leading-tight max-w-[80px]">{card.label}</p>
+                  <div key={card.label} className="bg-white p-5 group transition-colors hover:bg-slate-50/60">
+                    <div className="flex items-center gap-2 text-slate-400 mb-3">
+                      <Icon size={14} strokeWidth={2.25} />
+                      <span className="text-[11px] font-semibold text-slate-500">{card.label}</span>
                     </div>
-                    <p className="text-[28px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
+                    <p className="data-number text-[36px] sm:text-[40px] leading-none">
                       {card.value}
                     </p>
                   </div>
@@ -233,7 +225,7 @@ export const CandidateDashboard = () => {
           <div className="space-y-6">
 
             {/* Recommended jobs */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+            <div className="surface-raised p-5">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-lg bg-violet-50 flex items-center justify-center">
@@ -317,7 +309,7 @@ export const CandidateDashboard = () => {
             </div>
 
             {/* Applications tracker */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+            <div className="surface-raised p-5">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -413,7 +405,7 @@ export const CandidateDashboard = () => {
           <div className="space-y-5">
 
             {/* Next interview */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm">
+            <div className="surface-raised overflow-hidden">
               <div className="px-5 pt-4 pb-3 border-b border-slate-100">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Next Interview</p>
               </div>
@@ -485,7 +477,7 @@ export const CandidateDashboard = () => {
 
             {/* Quick stats compact */}
             {!loading && upcomingInterviews.length > 1 && (
-              <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm">
+              <div className="surface-raised p-4">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">All upcoming</p>
                 <div className="space-y-2">
                   {upcomingInterviews.slice(1, 4).map((iv: any) => (

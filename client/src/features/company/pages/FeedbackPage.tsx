@@ -79,10 +79,10 @@ export const FeedbackPage = () => {
   }, [feedback]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fb]">
+    <div className="flex flex-col min-h-screen">
 
       {/* Header */}
-      <div className="bg-white border-b border-slate-100 px-6 py-4 sticky top-0 z-40">
+      <div className="topbar-frost px-6 py-4 sticky top-0 z-40">
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
           Workspace &rsaquo; <span className="text-slate-600">Feedback</span>
         </p>
@@ -97,7 +97,7 @@ export const FeedbackPage = () => {
       <main className="p-5 max-w-[1400px] w-full mx-auto space-y-5 flex-1">
 
         {/* Filter bar */}
-        <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-3.5 flex items-center gap-3 flex-wrap">
+        <div className="surface-raised !rounded-xl p-3.5 flex items-center gap-3 flex-wrap">
           <div className="flex items-center bg-slate-50 border border-slate-200/60 rounded-lg p-0.5 gap-0.5">
             {[
               { key: 'all', label: 'All' },
@@ -130,7 +130,7 @@ export const FeedbackPage = () => {
             {[0, 1, 2, 3].map(i => <FeedbackCardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 flex flex-col items-center justify-center bg-white rounded-xl border border-slate-200/80 shadow-sm">
+          <div className="py-20 flex flex-col items-center justify-center surface-raised !rounded-xl">
             <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-3 border border-slate-100">
               <CheckCircle2 size={22} className="text-slate-300" />
             </div>
@@ -171,7 +171,7 @@ export const FeedbackPage = () => {
                       </div>
                     </div>
 
-                    <span className={`shrink-0 inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${rec.bg} ${rec.border} ${rec.color}`}>
+                    <span className={`shrink-0 inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${rec.bg} ${rec.border} ${rec.color}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${rec.dot}`} />
                       {rec.label}
                     </span>

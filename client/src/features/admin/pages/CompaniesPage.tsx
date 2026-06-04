@@ -100,25 +100,25 @@ export const CompaniesPage = () => {
     switch (status) {
       case 'active': 
         return (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-600 border border-green-100 text-[11px] font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-600 border border-green-100 text-[11px] font-semibold uppercase tracking-wider">
             <CheckCircle2 size={12} /> Active
           </div>
         );
       case 'pending':
         return (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100 text-[11px] font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100 text-[11px] font-semibold uppercase tracking-wider">
             <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Pending
           </div>
         );
       case 'rejected': 
         return (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-100 text-[11px] font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-100 text-[11px] font-semibold uppercase tracking-wider">
             <XCircle size={12} /> Rejected
           </div>
         );
       case 'revoked': 
         return (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-black uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-semibold uppercase tracking-wider">
             <XCircle size={12} /> Revoked
           </div>
         );
@@ -264,7 +264,7 @@ export const CompaniesPage = () => {
                       <td className="px-6 py-5">
                         <div className="space-y-1">
                            <p className="text-xs font-bold text-slate-600">{company.industry}</p>
-                           <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{company.company_size} Employees</p>
+                           <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">{company.company_size} Employees</p>
                         </div>
                       </td>
                       <td className="px-6 py-5">
@@ -320,7 +320,7 @@ export const CompaniesPage = () => {
           </div>
           
           <div className="bg-slate-50/50 px-8 py-5 border-t border-slate-100 flex items-center justify-between">
-             <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest">
+             <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-widest">
                Showing {companies.length} organizations
              </p>
              <div className="flex items-center gap-2">

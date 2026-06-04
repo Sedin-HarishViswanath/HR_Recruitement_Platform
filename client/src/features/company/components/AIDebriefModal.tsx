@@ -162,7 +162,7 @@ export const AIDebriefModal = ({
                 <ScoreRing score={debrief.overall_score} />
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${rec.bg} ${rec.border} ${rec.color}`}>
+                    <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full border ${rec.bg} ${rec.border} ${rec.color}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${rec.dot}`} />
                       {rec.label}
                     </span>
@@ -193,7 +193,7 @@ export const AIDebriefModal = ({
               {/* Strengths + Areas */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 space-y-2.5">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
                     <CheckCircle2 size={11} /> Key Strengths
                   </p>
                   <ul className="space-y-1.5">
@@ -206,7 +206,7 @@ export const AIDebriefModal = ({
                   </ul>
                 </div>
                 <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 space-y-2.5">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
                     <TrendingUp size={11} /> Areas to Improve
                   </p>
                   <ul className="space-y-1.5">
@@ -222,7 +222,7 @@ export const AIDebriefModal = ({
 
               {/* Next steps */}
               <div className="bg-violet-50/50 border border-violet-100 rounded-xl p-4">
-                <p className="text-[10px] font-black uppercase tracking-wider text-violet-700 mb-2 flex items-center gap-1.5">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-700 mb-2 flex items-center gap-1.5">
                   <ArrowRight size={11} /> Suggested Next Steps
                 </p>
                 <p className="text-[12px] text-slate-700 font-medium leading-relaxed">{debrief.suggested_next_steps}</p>
