@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import {
@@ -27,14 +27,25 @@ import {
   SelectValue,
 } from '../../../components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Search, MoreVertical, Shield, UserX, UserCheck, CheckCircle2 } from 'lucide-react';
-import { 
+import { Plus, Search, MoreVertical, Shield, UserX, UserCheck, CheckCircle2, Users, UserCog, UserCheck2 } from 'lucide-react';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../../components/ui/dropdown-menu';
 import { unwrapArray } from '../../../shared/lib/response';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../app/store';
+
+const GRADIENTS = [
+  'from-violet-500 to-purple-500',
+  'from-blue-500 to-cyan-500',
+  'from-emerald-500 to-teal-500',
+  'from-rose-500 to-pink-500',
+  'from-amber-500 to-orange-500',
+  'from-sky-500 to-indigo-500',
+];
 
 interface User {
   id: string;
@@ -46,6 +57,7 @@ interface User {
 }
 
 export const UsersPage = () => {
+  const { user: currentUser } = useSelector((state: RootState) => state.auth);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -53,6 +65,14 @@ export const UsersPage = () => {
   const [inviteData, setInviteData] = useState({ name: '', email: '', role: 'Recruiter', password: '' });
   const [invitedLink, setInvitedLink] = useState<string | null>(null);
   const [isInviting, setIsInviting] = useState(false);
+
+  const metrics = useMemo(() => ({
+    total: users.length,
+    active: users.filter(u => u.is_active).length,
+    admins: users.filter(u => u.role_name === 'Admin').length,
+    recruiters: users.filter(u => u.role_name === 'Recruiter').length,
+    interviewers: users.filter(u => u.role_name === 'Interviewer').length,
+  }), [users]);
 
   const fetchUsers = async () => {
     try {
@@ -88,13 +108,17 @@ export const UsersPage = () => {
   };
 
   const handleToggleActive = async (user: User) => {
-     try {
-       await api.patch(`/companies/me/users/${user.id}/deactivate`);
-       toast.success(`User ${user.is_active ? 'deactivated' : 'activated'}`);
-       fetchUsers();
-     } catch (err) {
-       toast.error('Failed to update user status');
-     }
+    if (user.id === currentUser?.id) {
+      toast.error('You cannot deactivate your own account.');
+      return;
+    }
+    try {
+      await api.patch(`/companies/me/users/${user.id}/deactivate`);
+      toast.success(`User ${user.is_active ? 'deactivated' : 'activated'}`);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to update user status');
+    }
   };
 
   const getRoleBadge = (role: string) => {
@@ -107,13 +131,20 @@ export const UsersPage = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in bg-[#fafbfc] min-h-screen">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div className="flex flex-col min-h-screen bg-[#fafbfc]">
+
+      {/* ── Workspace Header ── */}
+      <div className="bg-white border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>User Management</h1>
-          <p className="text-slate-500 mt-1 text-[13px]">Manage your team members and their access levels.</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
+            Workspace &rsaquo; <span className="text-slate-600">Team</span>
+          </p>
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>Team</h1>
+            <span className="text-xs text-slate-400 font-medium">{users.length} members</span>
+          </div>
         </div>
-        
+
         <Dialog open={isInviteOpen} onOpenChange={(open) => {
           setIsInviteOpen(open);
           if (!open) {
@@ -122,8 +153,8 @@ export const UsersPage = () => {
           }
         }}>
           <DialogTrigger asChild>
-            <Button className="bg-violet-500 hover:bg-violet-700 text-white font-bold rounded-xl shadow-sm btn-premium">
-              <Plus size={16} className="mr-1.5" /> Invite User
+            <Button className="bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl shadow-sm btn-premium text-xs h-9 px-4">
+              <Plus size={14} className="mr-1.5" /> Invite Member
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
@@ -206,87 +237,132 @@ export const UsersPage = () => {
         </Dialog>
       </div>
 
-      <div className="flex gap-4 items-center bg-white p-4 rounded-xl border shadow-sm">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <Input 
-            placeholder="Search by name or email..." 
-            className="pl-10"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
+      <main className="p-5 max-w-[1400px] w-full mx-auto space-y-5 flex-1 animate-fade-in-up">
 
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-slate-50/50">
-            <TableRow>
-              <TableHead className="w-[300px]">User</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined Date</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-20 text-slate-500">Loading users...</TableCell></TableRow>
-            ) : users.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-20 text-slate-500">No team members found.</TableCell></TableRow>
-            ) : (
-              users.map((user) => (
-                <TableRow key={user.id} className="hover:bg-slate-50/50 transition-colors">
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-semibold text-sm">
-                        {user.name[0]}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-900">{user.name}</p>
-                        <p className="text-xs text-slate-500">{user.email}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getRoleBadge(user.role_name)}</TableCell>
-                  <TableCell>
-                    {user.is_active ? (
-                      <Badge className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">Active</Badge>
-                    ) : (
-                      <Badge className="bg-slate-100 text-slate-500 hover:bg-slate-100 border-slate-200">Deactivated</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-slate-500 text-sm">
-                    {new Date(user.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical size={16} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="cursor-pointer">Edit Profile</DropdownMenuItem>
-                        <DropdownMenuItem 
-                          className="cursor-pointer text-red-600 focus:text-red-600"
-                          onClick={() => handleToggleActive(user)}
-                        >
-                          {user.is_active ? (
-                            <><UserX size={14} className="mr-2" /> Deactivate</>
-                          ) : (
-                            <><UserCheck size={14} className="mr-2" /> Activate</>
-                          )}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+        {/* ── Metric Cards ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: 'Total Members', value: metrics.total, icon: Users, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
+            { label: 'Active', value: metrics.active, icon: UserCheck2, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+            { label: 'Recruiters', value: metrics.recruiters, icon: UserCog, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
+            { label: 'Interviewers', value: metrics.interviewers, icon: Shield, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
+          ].map((card) => {
+            const Icon = card.icon;
+            return (
+              <div key={card.label} className="metric-card p-4 group cursor-default">
+                <div className="metric-card-accent" />
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${card.bg} border ${card.border}`}>
+                    <Icon size={15} className={card.color} />
+                  </div>
+                  <p className="text-[9.5px] font-black text-slate-400 uppercase tracking-[0.12em] pt-0.5 text-right">{card.label}</p>
+                </div>
+                <p className="text-[28px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
+                  {loading ? '—' : card.value}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Search Toolbar ── */}
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-3 flex items-center gap-3">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={13} />
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 font-medium text-slate-700 placeholder:text-slate-400 transition-all"
+            />
+          </div>
+        </div>
+
+        {/* ── Users Table ── */}
+        <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader className="bg-slate-50/50">
+              <TableRow>
+                <TableHead className="w-[300px] text-[10px] font-black uppercase tracking-wider text-slate-500">Member</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Role</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Status</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-wider text-slate-500">Joined</TableHead>
+                <TableHead className="text-right text-[10px] font-black uppercase tracking-wider text-slate-500">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-20">
+                    <div className="w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                    <p className="text-xs text-slate-400 font-medium">Loading team...</p>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : users.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-20">
+                    <Users size={28} className="mx-auto text-slate-200 mb-2" />
+                    <p className="text-sm font-bold text-slate-600">No team members found</p>
+                    <p className="text-xs text-slate-400 mt-1">Invite your first team member to get started.</p>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                users.map((user, i) => (
+                  <TableRow key={user.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0 shadow-sm`}>
+                          {user.name[0]?.toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm text-slate-900 group-hover:text-violet-700 transition-colors">{user.name}</p>
+                          <p className="text-[10.5px] text-slate-400 font-semibold">{user.email}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{getRoleBadge(user.role_name)}</TableCell>
+                    <TableCell>
+                      {user.is_active ? (
+                        <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200 text-[9.5px] font-bold">Active</Badge>
+                      ) : (
+                        <Badge className="bg-slate-100 text-slate-500 hover:bg-slate-100 border-slate-200 text-[9.5px] font-bold">Deactivated</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-[11px] text-slate-500 font-semibold">
+                      {new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreVertical size={15} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {user.id !== currentUser?.id && (
+                            <DropdownMenuItem
+                              className="cursor-pointer text-red-600 focus:text-red-600 text-xs"
+                              onClick={() => handleToggleActive(user)}
+                            >
+                              {user.is_active ? (
+                                <><UserX size={13} className="mr-2" /> Deactivate</>
+                              ) : (
+                                <><UserCheck size={13} className="mr-2" /> Activate</>
+                              )}
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+      </main>
     </div>
   );
 };

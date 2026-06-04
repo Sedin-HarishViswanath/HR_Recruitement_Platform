@@ -536,8 +536,13 @@ export const CompanyApplicationsPage = () => {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {appFeedback.map((f: any, fi: number) => (
-                            <div key={f.id || fi} className="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm space-y-3">
+                          {appFeedback.map((f: any, fi: number) => {
+                            const hasFeedback = !!f.rating;
+                            const isAptitude = (f.round_type || '').toLowerCase() === 'aptitude';
+                            const aptitudePct = f.aptitude_score != null ? Math.round((f.aptitude_score / 20) * 100) : null;
+                            return (
+                            <div key={f.interview_id || f.id || fi} className="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm space-y-3">
+                              {/* Round header */}
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                                 <div className="flex items-center gap-3">
                                   <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
@@ -554,7 +559,7 @@ export const CompanyApplicationsPage = () => {
                                         </span>
                                       )}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold mt-0.5">
+                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold mt-0.5 flex-wrap">
                                       <User size={10} />
                                       {f.interviewer_name || 'Interviewer'}
                                       {f.scheduled_at && (
@@ -564,52 +569,92 @@ export const CompanyApplicationsPage = () => {
                                           {new Date(f.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                         </>
                                       )}
-                                      {f.aptitude_score != null && (
-                                        <>
-                                          <span className="text-slate-300">·</span>
-                                          <span className="text-violet-600 font-extrabold">Aptitude {f.aptitude_score}/20</span>
-                                        </>
-                                      )}
                                     </div>
                                   </div>
                                 </div>
-                                {f.recommendation && (
-                                  <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_STYLE[f.recommendation] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
-                                    {REC_LABEL[f.recommendation] || f.recommendation}
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Stars */}
-                              <div className="flex items-center gap-1">
-                                {[1, 2, 3, 4, 5].map(s => (
-                                  <Star key={s} size={13} className={s <= (f.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'} />
-                                ))}
-                                <span className="ml-1.5 text-[10.5px] font-bold text-slate-500">
-                                  {f.rating}/5 · {['', 'Poor', 'Below Avg', 'Average', 'Good', 'Excellent'][f.rating] || ''}
-                                </span>
-                              </div>
-
-                              {/* Strengths & weaknesses */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="p-3 rounded-lg bg-emerald-50/40 border border-emerald-100">
-                                  <p className="text-[9px] font-black uppercase tracking-wider text-emerald-600 mb-1">Strengths</p>
-                                  <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.strengths || 'Not provided'}</p>
-                                </div>
-                                <div className="p-3 rounded-lg bg-red-50/30 border border-red-100">
-                                  <p className="text-[9px] font-black uppercase tracking-wider text-red-600 mb-1">Areas for Improvement</p>
-                                  <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.weaknesses || 'Not provided'}</p>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {f.recommendation && (
+                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_STYLE[f.recommendation] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                                      {REC_LABEL[f.recommendation] || f.recommendation}
+                                    </span>
+                                  )}
+                                  {!hasFeedback && (
+                                    <span className="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                                      {f.interview_status === 'completed' || isAptitude ? 'Completed' : 'Pending feedback'}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
 
-                              {f.additional_comments && (
-                                <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
-                                  <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">Notes</p>
-                                  <p className="text-xs font-medium text-slate-600 leading-relaxed italic">"{f.additional_comments}"</p>
+                              {/* Aptitude score block */}
+                              {isAptitude && f.aptitude_score != null && (
+                                <div className="flex items-center gap-4 p-3 rounded-lg bg-violet-50 border border-violet-100">
+                                  <div className="text-center">
+                                    <p className="text-2xl font-black text-violet-700">{f.aptitude_score}<span className="text-sm font-bold text-violet-400">/20</span></p>
+                                    <p className="text-[9px] font-bold text-violet-500 uppercase tracking-wider">Aptitude Score</p>
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="w-full bg-violet-100 rounded-full h-2 mb-1">
+                                      <div
+                                        className={`h-2 rounded-full transition-all ${aptitudePct != null && aptitudePct >= 70 ? 'bg-emerald-500' : 'bg-violet-500'}`}
+                                        style={{ width: `${aptitudePct ?? 0}%` }}
+                                      />
+                                    </div>
+                                    <p className={`text-[10px] font-bold ${aptitudePct != null && aptitudePct >= 70 ? 'text-emerald-600' : 'text-violet-600'}`}>
+                                      {aptitudePct}% &mdash; {aptitudePct != null && aptitudePct >= 70 ? 'Above threshold' : 'Below threshold'}
+                                    </p>
+                                  </div>
                                 </div>
                               )}
+
+                              {/* Aptitude pending */}
+                              {isAptitude && f.aptitude_score == null && (
+                                <div className="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+                                  <p className="text-xs text-slate-400 font-medium">Aptitude test not yet completed</p>
+                                </div>
+                              )}
+
+                              {/* Feedback details — only when feedback was submitted */}
+                              {hasFeedback && (
+                                <>
+                                  <div className="flex items-center gap-1">
+                                    {[1, 2, 3, 4, 5].map(s => (
+                                      <Star key={s} size={13} className={s <= (f.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'} />
+                                    ))}
+                                    <span className="ml-1.5 text-[10.5px] font-bold text-slate-500">
+                                      {f.rating}/5 &middot; {['', 'Poor', 'Below Avg', 'Average', 'Good', 'Excellent'][f.rating] || ''}
+                                    </span>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div className="p-3 rounded-lg bg-emerald-50/40 border border-emerald-100">
+                                      <p className="text-[9px] font-black uppercase tracking-wider text-emerald-600 mb-1">Strengths</p>
+                                      <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.strengths || 'Not provided'}</p>
+                                    </div>
+                                    <div className="p-3 rounded-lg bg-red-50/30 border border-red-100">
+                                      <p className="text-[9px] font-black uppercase tracking-wider text-red-600 mb-1">Areas for Improvement</p>
+                                      <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.weaknesses || 'Not provided'}</p>
+                                    </div>
+                                  </div>
+
+                                  {f.additional_comments && (
+                                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                                      <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">Notes</p>
+                                      <p className="text-xs font-medium text-slate-600 leading-relaxed italic">&ldquo;{f.additional_comments}&rdquo;</p>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+
+                              {/* Non-aptitude round with no feedback yet */}
+                              {!hasFeedback && !isAptitude && (
+                                <p className="text-xs text-slate-400 font-medium text-center py-2">
+                                  Interviewer feedback pending
+                                </p>
+                              )}
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>

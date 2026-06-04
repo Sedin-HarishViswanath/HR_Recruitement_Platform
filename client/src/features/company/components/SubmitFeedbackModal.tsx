@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import { Star, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
@@ -22,10 +22,10 @@ interface SubmitFeedbackModalProps {
 }
 
 const recommendationOptions = [
-  { value: 'strong_hire', label: 'Strong Hire', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'ðŸŒŸ' },
-  { value: 'hire', label: 'Hire', color: 'bg-green-50 text-green-700 border-green-200', icon: 'ðŸ‘' },
-  { value: 'no_hire', label: 'No Hire', color: 'bg-orange-50 text-orange-700 border-orange-200', icon: 'ðŸ‘Ž' },
-  { value: 'strong_no_hire', label: 'Strong No Hire', color: 'bg-red-50 text-red-700 border-red-200', icon: 'ðŸš«' },
+  { value: 'strong_hire', label: 'Strong Hire', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: '🌟' },
+  { value: 'hire', label: 'Hire', color: 'bg-green-50 text-green-700 border-green-200', icon: '👍' },
+  { value: 'no_hire', label: 'No Hire', color: 'bg-orange-50 text-orange-700 border-orange-200', icon: '👎' },
+  { value: 'strong_no_hire', label: 'Strong No Hire', color: 'bg-red-50 text-red-700 border-red-200', icon: '🚫' },
 ];
 
 export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: SubmitFeedbackModalProps) => {
@@ -49,7 +49,6 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
     }
   }, [isOpen]);
 
-  // Guard against accidentally closing a partially-filled form
   const isDirty =
     rating > 0 ||
     strengths.trim().length > 0 ||
@@ -97,7 +96,6 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
       toast.success('Feedback submitted successfully!');
       onSuccess();
       onClose();
-      // Reset form
       setRating(0);
       setStrengths('');
       setWeaknesses('');
@@ -128,7 +126,9 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold text-slate-900 truncate">{interview.candidate_name || 'Candidate'}</p>
-            <p className="text-xs text-slate-500 font-medium">{interview.job_title || 'Position'} Â· {(interview.round_type || 'Interview').charAt(0).toUpperCase() + (interview.round_type || 'Interview').slice(1)} Round</p>
+            <p className="text-xs text-slate-500 font-medium">
+              {interview.job_title || 'Position'} &middot; {(interview.round_type || 'Interview').charAt(0).toUpperCase() + (interview.round_type || 'Interview').slice(1)} Round
+            </p>
           </div>
         </div>
 
@@ -160,7 +160,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
               ))}
               {rating > 0 && (
                 <span className="ml-2 text-sm font-bold text-slate-600">
-                  {rating}/5 â€” {['', 'Poor', 'Below Average', 'Average', 'Good', 'Excellent'][rating]}
+                  {rating}/5 &ndash; {['', 'Poor', 'Below Average', 'Average', 'Good', 'Excellent'][rating]}
                 </span>
               )}
             </div>

@@ -45,7 +45,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post('/:id/transcript', authenticate, interviewController.saveTranscript.bind(interviewController));
-router.get('/:id/transcript', authenticate, authorize('Admin', 'Recruiter'), interviewController.getTranscript.bind(interviewController));
+router.get('/:id/transcript', authenticate, interviewController.getTranscript.bind(interviewController));
 
 router.post('/:id/recording', authenticate, authorize('Interviewer', 'Recruiter', 'Admin'), upload.single('recording'), interviewController.uploadRecording.bind(interviewController));
 

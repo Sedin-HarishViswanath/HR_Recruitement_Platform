@@ -121,19 +121,35 @@ const router = createBrowserRouter([
           },
           {
             path: 'settings',
-            element: <SettingsPage />,
+            element: (
+              <RoleGuard allowedRoles={['Admin', 'Recruiter']}>
+                <SettingsPage />
+              </RoleGuard>
+            ),
           },
           {
             path: 'jobs',
-            element: <CompanyJobsPage />,
+            element: (
+              <RoleGuard allowedRoles={['Admin', 'Recruiter']}>
+                <CompanyJobsPage />
+              </RoleGuard>
+            ),
           },
           {
             path: 'candidates',
-            element: <CompanyCandidatesPage />,
+            element: (
+              <RoleGuard allowedRoles={['Admin', 'Recruiter']}>
+                <CompanyCandidatesPage />
+              </RoleGuard>
+            ),
           },
           {
             path: 'applications',
-            element: <CompanyApplicationsPage />,
+            element: (
+              <RoleGuard allowedRoles={['Admin', 'Recruiter']}>
+                <CompanyApplicationsPage />
+              </RoleGuard>
+            ),
           },
           {
             path: 'interviews',
@@ -141,11 +157,19 @@ const router = createBrowserRouter([
           },
           {
             path: 'feedback',
-            element: <FeedbackPage />,
+            element: (
+              <RoleGuard allowedRoles={['Admin', 'Recruiter']}>
+                <FeedbackPage />
+              </RoleGuard>
+            ),
           },
           {
             path: 'analytics',
-            element: <CompanyAnalyticsPage />,
+            element: (
+              <RoleGuard allowedRoles={['Admin', 'Recruiter']}>
+                <CompanyAnalyticsPage />
+              </RoleGuard>
+            ),
           },
         ],
       },

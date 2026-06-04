@@ -2,15 +2,15 @@ import { db } from '../../config/db';
 
 export class InterviewRepository {
   async listInterviews(companyId: string, query: any) {
-    const { 
-      status, 
-      round_type, 
-      interviewer_id, 
-      search, 
-      date_from, 
-      date_to, 
-      page = 1, 
-      limit = 20 
+    const {
+      status,
+      round_type,
+      interviewer_id,
+      search,
+      date_from,
+      date_to,
+      page = 1,
+      limit = 20
     } = query;
 
     let q = db('interviews')
@@ -18,7 +18,8 @@ export class InterviewRepository {
         'interviews.*',
         'candidates.name as candidate_name',
         'jobs.title as job_title',
-        'users.name as interviewer_name'
+        'users.name as interviewer_name',
+        'applications.status as application_status'
       )
       .join('applications', 'interviews.application_id', 'applications.id')
       .join('candidates', 'applications.candidate_id', 'candidates.id')
@@ -33,7 +34,7 @@ export class InterviewRepository {
     if (search) {
       q = q.where((builder) => {
         builder.whereILike('candidates.name', `%${search}%`)
-               .orWhereILike('jobs.title', `%${search}%`);
+          .orWhereILike('jobs.title', `%${search}%`);
       });
     }
 
@@ -69,17 +70,17 @@ export class InterviewRepository {
 
   async checkConflict(interviewerId: string, scheduledAt: Date, duration: number, excludeId?: string) {
     const endTime = new Date(scheduledAt.getTime() + duration * 60000);
-    
+
     let q = db('interviews')
       .where('interviewer_id', interviewerId)
       .where('status', 'scheduled')
       .where((builder) => {
         builder.whereBetween('scheduled_at', [scheduledAt, endTime])
-               .orWhereRaw('scheduled_at + (duration * interval \'1 minute\') BETWEEN ? AND ?', [scheduledAt, endTime]);
+          .orWhereRaw('scheduled_at + (duration * interval \'1 minute\') BETWEEN ? AND ?', [scheduledAt, endTime]);
       });
 
     if (excludeId) q = q.whereNot('id', excludeId);
-    
+
     return q.first();
   }
 
@@ -110,6 +111,7 @@ export class InterviewRepository {
         'interviews.*',
         'candidates.name as candidate_name',
         'jobs.title as job_title',
+        'applications.status as application_status',
         db.raw('CASE WHEN feedbacks.id IS NULL THEN false ELSE true END as feedback_submitted')
       )
       .join('applications', 'interviews.application_id', 'applications.id')

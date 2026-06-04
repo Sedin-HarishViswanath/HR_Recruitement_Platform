@@ -137,6 +137,9 @@ export class CompanyController {
     try {
       const companyId = req.user.companyId;
       const { userId } = req.params;
+      if (userId === req.user.userId) {
+        throw new AppError('You cannot deactivate your own account', 400);
+      }
       await companyService.deactivateCompanyUser(companyId!, userId as string);
       return sendResponse(res, 200, true, 'User deactivated successfully');
     } catch (error: any) {

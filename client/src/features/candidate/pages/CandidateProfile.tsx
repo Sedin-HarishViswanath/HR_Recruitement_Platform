@@ -177,13 +177,13 @@ export const CandidateProfile = () => {
 
           {/* Overlapping Avatar details */}
           <div className="px-6 pb-6 relative">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12 sm:-mt-10">
-              <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 -mt-12 sm:-mt-10">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 text-center sm:text-left">
                 {/* Initials circle avatar */}
                 <div className="w-24 h-24 rounded-2xl bg-slate-900 border-4 border-white text-white flex items-center justify-center font-black text-2xl shadow-md shrink-0">
                   {initials || 'A'}
                 </div>
-                <div className="mb-2 space-y-1">
+                <div className="space-y-1 pt-1">
                   <h2 className="text-lg font-black text-slate-900 leading-tight" style={{ fontFamily: 'Sora' }}>{profile.name}</h2>
                   <p className="text-xs text-violet-600 font-extrabold uppercase tracking-wider">{profile.preferences?.preferred_role || 'Developer'}</p>
                   <p className="text-[11px] text-slate-400 font-semibold flex items-center justify-center sm:justify-start gap-1">
@@ -192,7 +192,7 @@ export const CandidateProfile = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2 self-center sm:self-end mb-2">
+              <div className="flex gap-2 self-center sm:self-center">
                 {profile.linkedin_url && (
                   <a href={profile.linkedin_url} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-violet-600 hover:bg-slate-50 transition-all shadow-sm">
                     <LinkIcon size={14} />

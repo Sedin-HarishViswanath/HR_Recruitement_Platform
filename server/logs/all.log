@@ -1,0 +1,20 @@
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 1/3. Retrying in 2000ms","module":"Practice","timestamp":"2026-06-02 04:54:19:5419"}
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 2/3. Retrying in 4000ms","module":"Practice","timestamp":"2026-06-02 04:54:22:5422"}
+{"level":"warn","message":"Gemini rate limit exhausted. Falling back to mock coach response.","module":"Practice","timestamp":"2026-06-02 04:54:26:5426"}
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 1/3. Retrying in 2000ms","module":"Practice","timestamp":"2026-06-02 05:23:48:2348"}
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 2/3. Retrying in 4000ms","module":"Practice","timestamp":"2026-06-02 05:23:50:2350"}
+{"level":"warn","message":"Gemini rate limit exhausted. Falling back to mock coach response.","module":"Practice","timestamp":"2026-06-02 05:23:54:2354"}
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 1/3. Retrying in 2000ms","module":"Practice","timestamp":"2026-06-02 05:47:36:4736"}
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 2/3. Retrying in 4000ms","module":"Practice","timestamp":"2026-06-02 05:47:38:4738"}
+{"level":"warn","message":"Gemini rate limit exhausted. Attempting Groq fallback...","module":"Practice","timestamp":"2026-06-02 05:47:42:4742"}
+{"level":"info","message":"Groq fallback succeeded","module":"Practice","timestamp":"2026-06-02 05:47:43:4743"}
+{"level":"warn","message":"Gemini rate limit — retrying in 2s","module":"ATS","timestamp":"2026-06-02 15:02:29:229"}
+{"level":"warn","message":"Gemini rate limit — retrying in 4s","module":"ATS","timestamp":"2026-06-02 15:02:31:231"}
+{"level":"warn","message":"Gemini scoring error Request failed with status code 429","module":"ATS","status":429,"timestamp":"2026-06-02 15:02:35:235"}
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 1/3. Retrying in 2000ms","module":"Practice","timestamp":"2026-06-02 15:09:21:921"}
+{"level":"warn","message":"Gemini rate limit hit (429). Attempt 2/3. Retrying in 4000ms","module":"Practice","timestamp":"2026-06-02 15:09:23:923"}
+{"level":"warn","message":"Gemini rate limit exhausted. Attempting Groq fallback...","module":"Practice","timestamp":"2026-06-02 15:09:27:927"}
+{"level":"info","message":"Groq fallback succeeded","module":"Practice","timestamp":"2026-06-02 15:09:28:928"}
+{"level":"warn","message":"Gemini rate limit — retrying in 2s","module":"ATS","timestamp":"2026-06-02 15:28:30:2830"}
+{"level":"warn","message":"Gemini rate limit — retrying in 4s","module":"ATS","timestamp":"2026-06-02 15:28:32:2832"}
+{"level":"warn","message":"Gemini scoring error Request failed with status code 429","module":"ATS","status":429,"timestamp":"2026-06-02 15:28:36:2836"}

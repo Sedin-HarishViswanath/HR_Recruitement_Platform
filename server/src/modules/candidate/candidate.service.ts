@@ -140,7 +140,7 @@ export class CandidateService {
     const profile = await this.getProfile(candidateId);
     const recentApplications = await candidateRepository.getRecentApplications(candidateId);
     const upcomingInterviews = await candidateRepository.getUpcomingInterviews(candidateId);
-    const recommendedJobs = await candidateRepository.getRecommendedJobs(profile.skills || []);
+    const recommendedJobs = await candidateRepository.getRecommendedJobs(candidateId, profile.skills || []);
     const stats = await candidateRepository.getStats(candidateId);
 
     return {

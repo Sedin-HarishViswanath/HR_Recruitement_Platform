@@ -55,10 +55,14 @@ const OfferCardSkeleton = () => (
   </div>
 );
 
+const OFFER_FILTERS = ['All', 'Pending', 'Accepted', 'Declined'] as const;
+type OfferFilter = typeof OFFER_FILTERS[number];
+
 export const CandidateOffersPage = () => {
   usePageTitle('Job Offers');
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<OfferFilter>('All');
   const [confirm, setConfirm] = useState<{
     open: boolean; offerId: string; action: 'accepted' | 'declined'; company: string; loading: boolean;
   }>({ open: false, offerId: '', action: 'accepted', company: '', loading: false });
@@ -95,6 +99,17 @@ export const CandidateOffersPage = () => {
 
   const pendingCount = offers.filter(o => o.status === 'pending').length;
 
+  const filterCounts: Record<OfferFilter, number> = {
+    All: offers.length,
+    Pending: offers.filter(o => o.status === 'pending').length,
+    Accepted: offers.filter(o => o.status === 'accepted').length,
+    Declined: offers.filter(o => o.status === 'declined').length,
+  };
+
+  const filteredOffers = activeFilter === 'All'
+    ? offers
+    : offers.filter(o => o.status === activeFilter.toLowerCase() as Offer['status']);
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9fb]">
 
@@ -103,15 +118,43 @@ export const CandidateOffersPage = () => {
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
           Candidate &rsaquo; <span className="text-slate-600">Offers</span>
         </p>
-        <div className="flex items-baseline gap-2">
-          <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
-            Job Offers
-          </h1>
-          {pendingCount > 0 && (
-            <span className="flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-              {pendingCount} awaiting response
-            </span>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+              Job Offers
+            </h1>
+            {pendingCount > 0 && (
+              <span className="flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                {pendingCount} awaiting response
+              </span>
+            )}
+          </div>
+
+          {/* Filter tabs */}
+          {!loading && offers.length > 0 && (
+            <div className="flex items-center bg-slate-50 border border-slate-200/60 rounded-lg p-0.5 gap-0.5">
+              {OFFER_FILTERS.map((filter) => {
+                const count = filterCounts[filter];
+                const isActive = activeFilter === filter;
+                return (
+                  <button
+                    key={filter}
+                    onClick={() => setActiveFilter(filter)}
+                    className={`px-3 py-1.5 rounded-md text-[10.5px] font-bold transition-all flex items-center gap-1 ${
+                      isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-700'
+                    }`}
+                  >
+                    {filter}
+                    {filter !== 'All' && count > 0 && (
+                      <span className={`text-[9px] font-bold px-1.5 rounded-full ${isActive ? 'bg-violet-100 text-violet-700' : 'bg-slate-200 text-slate-500'}`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
@@ -122,19 +165,23 @@ export const CandidateOffersPage = () => {
           <div className="space-y-4">
             {[0, 1].map(i => <OfferCardSkeleton key={i} />)}
           </div>
-        ) : offers.length === 0 ? (
+        ) : filteredOffers.length === 0 ? (
           <div className="py-24 text-center bg-white rounded-2xl border border-slate-200/80 shadow-sm">
             <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-violet-100">
               <Gift size={28} className="text-violet-400" />
             </div>
-            <h3 className="text-sm font-bold text-slate-700">No offers yet</h3>
+            <h3 className="text-sm font-bold text-slate-700">
+              {activeFilter === 'All' ? 'No offers yet' : `No ${activeFilter.toLowerCase()} offers`}
+            </h3>
             <p className="text-xs text-slate-400 font-medium mt-1.5 max-w-xs mx-auto leading-relaxed">
-              Job offers from companies will appear here after completing your interview rounds.
+              {activeFilter === 'All'
+                ? 'Job offers from companies will appear here after completing your interview rounds.'
+                : `You have no ${activeFilter.toLowerCase()} offers at the moment.`}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {offers.map((offer) => {
+            {filteredOffers.map((offer) => {
               const cfg = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.pending;
               const isPending = offer.status === 'pending';
 

@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { api } from '../../../shared/lib/api';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../app/store';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
@@ -29,6 +31,8 @@ const companySettingsSchema = z.object({
 type SettingsFormValues = z.infer<typeof companySettingsSchema>;
 
 export default function SettingsPage() {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isAdmin = user?.role === 'Admin';
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'location'>('general');
@@ -104,6 +108,11 @@ export default function SettingsPage() {
           <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
             Company Settings
           </h1>
+          {!isAdmin && (
+            <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg font-semibold ml-3">
+              View only — contact your Admin to make changes
+            </span>
+          )}
         </div>
       </div>
 
@@ -312,15 +321,17 @@ export default function SettingsPage() {
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-              <Button 
-                type="submit" 
-                disabled={isSaving}
-                className="px-5 h-9 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs shadow-sm hover:scale-[1.01] transition-all"
-              >
-                {isSaving ? 'Saving Changes...' : 'Save Settings'}
-              </Button>
-            </div>
+            {isAdmin && (
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <Button
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-5 h-9 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs shadow-sm hover:scale-[1.01] transition-all"
+                >
+                  {isSaving ? 'Saving Changes...' : 'Save Settings'}
+                </Button>
+              </div>
+            )}
 
           </div>
         </form>

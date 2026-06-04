@@ -132,9 +132,18 @@ export class ApplicationController {
     try {
       const { id } = req.params;
       const { db } = await import('../../config/db');
-      const feedback = await db('feedbacks')
+      // Use interviews as the base with LEFT JOIN to feedbacks so all rounds appear
+      // (including aptitude rounds which have scores but no feedback record)
+      const feedback = await db('interviews')
         .select(
-          'feedbacks.*',
+          'feedbacks.id',
+          'feedbacks.rating',
+          'feedbacks.strengths',
+          'feedbacks.weaknesses',
+          'feedbacks.recommendation',
+          'feedbacks.additional_comments',
+          'feedbacks.created_at',
+          'interviews.id as interview_id',
           'interviews.round_type',
           'interviews.round_number',
           'interviews.scheduled_at',
@@ -142,10 +151,11 @@ export class ApplicationController {
           'interviews.status as interview_status',
           'users.name as interviewer_name'
         )
-        .join('interviews', 'feedbacks.interview_id', 'interviews.id')
+        .leftJoin('feedbacks', 'feedbacks.interview_id', 'interviews.id')
         .leftJoin('users', 'interviews.interviewer_id', 'users.id')
         .where('interviews.application_id', id)
-        .orderBy('interviews.scheduled_at', 'asc');
+        .whereNot('interviews.status', 'cancelled')
+        .orderBy('interviews.round_number', 'asc');
       return sendResponse(res, 200, true, 'Application feedback retrieved', feedback);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);

@@ -343,7 +343,7 @@ export const CodeEditor = ({ interviewId, isReadOnly = false }: CodeEditorProps)
           'text-gray-600'
         }`}>
           {running
-            ? 'âŸ³  Executing your code...'
+            ? '⏳  Executing your code...'
             : result?.output || '// Press Run to execute your code'}
         </pre>
       </div>

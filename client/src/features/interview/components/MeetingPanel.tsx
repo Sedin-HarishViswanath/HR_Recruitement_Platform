@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../../../shared/lib/api';
 import {
   Video, Mic, ExternalLink, Radio,
@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { io, Socket } from 'socket.io-client';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../app/store';
 
 interface MeetingPanelProps {
   interviewId: string;
@@ -24,10 +26,8 @@ interface TranscriptEntry {
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
-// How often to poll the Jitsi window for navigation (ms)
 const JITSI_POLL_INTERVAL = 1000;
 
-// Check if browser supports SpeechRecognition
 const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 export const MeetingPanel = ({
@@ -46,7 +46,7 @@ export const MeetingPanel = ({
   const [meetingJoined, setMeetingJoined] = useState(false);
   const [meetingEnded, setMeetingEnded] = useState(false);
 
-  // Transcription state (Web Speech API â€” free, no key required)
+  // Transcription state (Web Speech API — free, no key required)
   const [transcribing, setTranscribing] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [micError, setMicError] = useState<string | null>(null);
@@ -65,13 +65,11 @@ export const MeetingPanel = ({
 
   const startVideoRecording = async () => {
     try {
-      // 1. Get Display Media (Screen + Tab Audio)
       const displayStream = await navigator.mediaDevices.getDisplayMedia({
         video: { displaySurface: 'browser' },
         audio: { echoCancellation: true, noiseSuppression: true }
       });
 
-      // 2. Get Microphone Media
       let micStream: MediaStream | null = null;
       try {
         micStream = await navigator.mediaDevices.getUserMedia({
@@ -81,7 +79,6 @@ export const MeetingPanel = ({
         toast.warning('Microphone permission denied. Your voice will not be in the recording.');
       }
 
-      // 3. Mix Audio using Web Audio API
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       const audioCtx = new AudioContextClass();
       const dest = audioCtx.createMediaStreamDestination();
@@ -101,7 +98,6 @@ export const MeetingPanel = ({
         ...dest.stream.getAudioTracks()
       ]);
 
-      // 4. Setup MediaRecorder
       const mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
       mediaRecorderRef.current = mediaRecorder;
       recordedChunksRef.current = [];
@@ -134,15 +130,13 @@ export const MeetingPanel = ({
         }
       };
 
-      // Stop recording if user stops screen sharing via browser native UI
       displayStream.getVideoTracks()[0].onended = () => {
         stopVideoRecording();
       };
 
-      mediaRecorder.start(1000); // collect 1s chunks
+      mediaRecorder.start(1000);
       setRecordingVideo(true);
     } catch (err) {
-      console.error('Failed to start recording:', err);
       toast.error('Screen recording permission denied or not supported.');
       throw err;
     }
@@ -155,7 +149,6 @@ export const MeetingPanel = ({
     }
   };
 
-  // Fetch the configured meeting room.
   useEffect(() => {
     const fetchRoom = async () => {
       try {
@@ -172,7 +165,6 @@ export const MeetingPanel = ({
     fetchRoom();
   }, [interviewId]);
 
-  // Fetch existing transcript history
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -182,13 +174,12 @@ export const MeetingPanel = ({
           setTranscript(data);
         }
       } catch (err) {
-        // Ignore error, it will just start empty
+        // Ignore error
       }
     };
     fetchHistory();
   }, [interviewId]);
 
-  // Connect to Socket.IO for transcript sharing
   useEffect(() => {
     const socket = io(BACKEND_URL, {
       transports: ['websocket', 'polling'],
@@ -201,7 +192,6 @@ export const MeetingPanel = ({
       socket.emit('join-interview', interviewId);
     });
 
-    // Listen for transcript entries from the other participant
     socket.on('transcript-entry', (data: { speaker: string; text: string; timestamp: string }) => {
       setTranscript(prev => [
         ...prev,
@@ -212,18 +202,20 @@ export const MeetingPanel = ({
     return () => { socket.disconnect(); };
   }, [interviewId]);
 
-  // â”€â”€ Auto-scroll transcript
+  // Auto-scroll transcript
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [transcript]);
 
+  const user = useSelector((state: RootState) => state.auth.user);
+  const displayName = user?.name || (participantRole === 'candidate' ? candidateName : 'Interviewer');
+
   const joinUrl = roomUrl
     ? token
       ? `${roomUrl}?t=${token}`
-      : `${roomUrl}#config.enableClosePage=false&config.prejoinPageEnabled=false&config.disableDeepLinking=true`
+      : `${roomUrl}#config.enableClosePage=false&config.prejoinPageEnabled=false&config.disableDeepLinking=true&userInfo.displayName="${encodeURIComponent(displayName)}"`
     : null;
 
-  // â”€â”€ Copy link to clipboard
   const handleCopy = async () => {
     if (!roomUrl) return;
     await navigator.clipboard.writeText(roomUrl);
@@ -231,7 +223,6 @@ export const MeetingPanel = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // â”€â”€ Start Web Speech API transcription (auto-triggered on meeting join)
   const startTranscription = useCallback(() => {
     if (!SpeechRecognition) {
       setMicError('Your browser does not support speech recognition. Please use Chrome or Edge.');
@@ -250,7 +241,6 @@ export const MeetingPanel = ({
     };
 
     recognition.onresult = (event: any) => {
-      // Process only the latest result
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
           const text = event.results[i][0].transcript.trim();
@@ -259,10 +249,8 @@ export const MeetingPanel = ({
           const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           const entry: TranscriptEntry = { speaker: participantRole, text, timestamp: now };
 
-          // Add to local transcript
           setTranscript(prev => [...prev, entry]);
 
-          // Send to other participants via socket
           if (socketRef.current?.connected) {
             socketRef.current.emit('transcript-entry', {
               interviewId,
@@ -272,7 +260,6 @@ export const MeetingPanel = ({
             });
           }
 
-          // Auto-switch to transcript tab on first entry
           if (!hasAutoSwitchedRef.current) {
             setTab('transcript');
             hasAutoSwitchedRef.current = true;
@@ -285,19 +272,17 @@ export const MeetingPanel = ({
       if (event.error === 'not-allowed') {
         setMicError('Microphone permission denied. Please allow microphone access.');
         setTranscribing(false);
-        recognitionRef.current = null; // Fix: prevent infinite restart loop
+        recognitionRef.current = null;
       } else if (event.error === 'no-speech') {
-        // Ignore â€” just silence, recognition continues
+        // silence — recognition continues
       } else if (event.error === 'network') {
-        // Web Speech API requires internet for Chrome
-        setMicError('Network error â€” speech recognition requires an internet connection.');
+        setMicError('Network error — speech recognition requires an internet connection.');
         setTranscribing(false);
-        recognitionRef.current = null; // Fix: prevent infinite restart loop on network error
+        recognitionRef.current = null;
       }
     };
 
     recognition.onend = () => {
-      // Auto-restart if still supposed to be transcribing (Web Speech API stops after silence)
       if (recognitionRef.current && !meetingEnded) {
         try {
           recognition.start();
@@ -316,29 +301,23 @@ export const MeetingPanel = ({
     }
   }, [participantRole, interviewId, meetingEnded]);
 
-  // â”€â”€ Stop transcription
   const stopTranscription = useCallback(() => {
     if (recognitionRef.current) {
       const ref = recognitionRef.current;
-      recognitionRef.current = null; // Prevent auto-restart in onend
+      recognitionRef.current = null;
       try { ref.stop(); } catch { /* already stopped */ }
     }
     setTranscribing(false);
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => () => stopTranscription(), [stopTranscription]);
 
-  // â”€â”€ Auto-start transcription when meeting is joined
   useEffect(() => {
     if (meetingJoined && !meetingEnded && speechSupported && !transcribing) {
       startTranscription();
     }
   }, [meetingJoined, meetingEnded, speechSupported]);
 
-  /**
-   * Poll the Jitsi window.
-   */
   const startJitsiPolling = useCallback((meetingWindow: Window) => {
     if (!onMeetingWindowClosed) return;
     const timer = window.setInterval(() => {
@@ -359,17 +338,9 @@ export const MeetingPanel = ({
     return timer;
   }, [onMeetingWindowClosed, meetingEnded]);
 
-  // â”€â”€ Open video call in new tab
+  // Open video call in new tab
   const handleJoin = async () => {
     if (!joinUrl) return;
-
-    if (participantRole === 'interviewer') {
-      try {
-        await startVideoRecording();
-      } catch (err) {
-        // If they refuse recording, we still let them join, just show toast which is already handled
-      }
-    }
 
     const meetingWindow = window.open(joinUrl, '_blank');
     if (!meetingWindow) {
@@ -382,7 +353,16 @@ export const MeetingPanel = ({
     startJitsiPolling(meetingWindow);
   };
 
-  // â”€â”€ Manual "End Meeting" for interviewers
+  // Optional recording — separate from join
+  const handleStartRecording = async () => {
+    try {
+      await startVideoRecording();
+      toast.success('Screen recording started. Switch to the meeting tab to record.');
+    } catch {
+      // error already toasted inside startVideoRecording
+    }
+  };
+
   const handleEndMeeting = () => {
     if (meetingWindowRef.current && !meetingWindowRef.current.closed) {
       try { meetingWindowRef.current.close(); } catch { /* cross-origin */ }
@@ -393,7 +373,6 @@ export const MeetingPanel = ({
     onMeetingWindowClosed?.();
   };
 
-  // â”€â”€ Save transcript to Notes tab
   const handleSaveTranscriptToNotes = () => {
     if (transcript.length === 0) return;
     const formatted = transcript
@@ -412,7 +391,7 @@ export const MeetingPanel = ({
 
   return (
     <div className="flex flex-col h-full bg-[#0f111a] text-white border-l border-[#1e2130]">
-      {/* â”€â”€ Header â”€â”€ */}
+      {/* Header */}
       <div className="px-4 pt-4 pb-0 shrink-0">
         <div className="flex items-center gap-2 mb-1">
           <div className={`w-2 h-2 rounded-full ${meetingJoined && !meetingEnded ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
@@ -444,10 +423,10 @@ export const MeetingPanel = ({
         </div>
       </div>
 
-      {/* â”€â”€ Tab content â”€â”€ */}
+      {/* Tab content */}
       <div className="flex-1 overflow-y-auto min-h-0">
 
-        {/* â”€â”€ MEETING TAB â”€â”€ */}
+        {/* MEETING TAB */}
         {tab === 'meeting' && (
           <div className="p-4 space-y-4">
             {/* Video Call Card */}
@@ -466,7 +445,7 @@ export const MeetingPanel = ({
                   <>
                     <p className="text-xs font-bold text-slate-400">Video call opens in a separate window</p>
                     <p className="text-[10px] text-slate-600 mt-1">
-                      {meetingJoined ? 'Meeting is active â€” return to this tab anytime' : 'Click Join to open the video room'}
+                      {meetingJoined ? 'Meeting is active — return to this tab anytime' : 'Click Join to open the video room'}
                     </p>
                   </>
                 )}
@@ -512,7 +491,7 @@ export const MeetingPanel = ({
                     )}
                     {meetingEnded && participantRole === 'interviewer' && (
                       <div className="text-center py-2 text-[11px] text-emerald-400 font-bold">
-                        âœ“ Feedback form is open
+                        ✓ Feedback form is open
                       </div>
                     )}
                   </div>
@@ -541,7 +520,7 @@ export const MeetingPanel = ({
                   <div>
                     <p className="text-xs font-black text-white">Live Transcription</p>
                     <p className="text-[10px] text-slate-500">
-                      {speechSupported ? 'Auto-recording Â· Browser Speech API (Free)' : 'Not supported in this browser'}
+                      {speechSupported ? 'Auto-recording · Browser Speech API (Free)' : 'Not supported in this browser'}
                     </p>
                   </div>
                   {transcribing && (
@@ -579,20 +558,36 @@ export const MeetingPanel = ({
               </div>
             )}
 
-            {/* Video Recording Status Card */}
+            {/* Video Recording Card — optional, separate from join */}
             {participantRole === 'interviewer' && (
               <div className="bg-[#1a1d2e] rounded-2xl border border-[#2a2d3e] p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-black text-white">Full Meeting Recording</p>
+                  <p className="text-xs font-black text-white">Meeting Recording</p>
                   {recordingVideo && (
                     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/20 text-rose-400 border border-rose-600/30">
                       <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" /> Recording
                     </div>
                   )}
                 </div>
-                <p className="text-[10px] text-slate-500 mb-2">
-                  When you join, you will be prompted to share the meeting tab. Select the "Share tab audio" option to ensure the candidate's voice is recorded.
+                <p className="text-[10px] text-slate-500 mb-3">
+                  Optionally record the meeting after joining. Select the meeting tab when prompted.
                 </p>
+                {!recordingVideo ? (
+                  <button
+                    onClick={handleStartRecording}
+                    disabled={!meetingJoined || meetingEnded}
+                    className="w-full flex items-center justify-center gap-2 py-1.5 bg-[#252840] hover:bg-[#2a2d50] disabled:opacity-40 text-slate-300 font-bold text-xs rounded-xl transition-all border border-[#3a3d5e]"
+                  >
+                    Start Recording
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopVideoRecording}
+                    className="w-full flex items-center justify-center gap-2 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold text-xs rounded-xl transition-all border border-rose-600/30"
+                  >
+                    Stop Recording
+                  </button>
+                )}
                 {videoUploadStatus === 'uploading' && (
                   <div className="flex items-center gap-2 text-[10px] text-violet-400 mt-2">
                     <Loader2 size={12} className="animate-spin" /> Uploading recording to server...
@@ -605,7 +600,7 @@ export const MeetingPanel = ({
                 )}
                 {videoUploadStatus === 'error' && (
                   <div className="flex items-center gap-2 text-[10px] text-red-400 mt-2">
-                    âŒ Failed to upload recording.
+                    ✗ Failed to upload recording.
                   </div>
                 )}
               </div>
@@ -613,10 +608,9 @@ export const MeetingPanel = ({
           </div>
         )}
 
-        {/* â”€â”€ TRANSCRIPT TAB â”€â”€ */}
+        {/* TRANSCRIPT TAB */}
         {tab === 'transcript' && (
           <div className="flex flex-col h-full">
-            {/* Toolbar */}
             {transcript.length > 0 && (
               <div className="flex items-center justify-between px-4 py-2 border-b border-[#1e2130] shrink-0">
                 <span className="text-[10px] text-slate-500 font-medium">{transcript.length} entries</span>
@@ -636,7 +630,7 @@ export const MeetingPanel = ({
                   <Mic size={28} className="text-slate-700 mb-3" />
                   <p className="text-xs font-bold text-slate-500">No transcript yet</p>
                   <p className="text-[10px] text-slate-600 mt-1">
-                    {meetingJoined ? 'Transcription is active â€” speak into your microphone' : 'Join the meeting to begin transcription'}
+                    {meetingJoined ? 'Transcription is active — speak into your microphone' : 'Join the meeting to begin transcription'}
                   </p>
                 </div>
               ) : (
@@ -672,12 +666,12 @@ export const MeetingPanel = ({
           </div>
         )}
 
-        {/* â”€â”€ NOTES TAB â”€â”€ */}
+        {/* NOTES TAB */}
         {tab === 'notes' && (
           <div className="p-4 h-full">
             <textarea
               className="w-full h-full min-h-[200px] bg-[#1a1d2e] border border-[#2a2d3e] rounded-2xl p-4 text-sm text-slate-300 font-mono placeholder-slate-700 resize-none outline-none focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 transition-all leading-relaxed"
-              placeholder={`Interviewer notes for ${candidateName}...\n\nâ€¢ Technical skills:\nâ€¢ Communication:\nâ€¢ Problem solving:\nâ€¢ Overall impression:`}
+              placeholder={`Interviewer notes for ${candidateName}...\n\n• Technical skills:\n• Communication:\n• Problem solving:\n• Overall impression:`}
               value={notes}
               onChange={e => setNotes(e.target.value)}
             />
@@ -686,7 +680,7 @@ export const MeetingPanel = ({
 
       </div>
 
-      {/* â”€â”€ Footer status â”€â”€ */}
+      {/* Footer status */}
       {participantRole !== 'candidate' && (
         <div className="px-4 py-2.5 border-t border-[#1e2130] flex items-center gap-2 shrink-0">
           {transcribing ? (

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import { unwrapArray } from '../../../shared/lib/response';
-import { 
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import {
   Building2, Calendar, MapPin, Search, Trash2, AlertCircle
 } from 'lucide-react';
 
@@ -10,6 +11,9 @@ export const CandidateApplicationsPage = () => {
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [withdrawConfirm, setWithdrawConfirm] = useState<{ open: boolean; id: string; jobTitle: string; loading: boolean }>({
+    open: false, id: '', jobTitle: '', loading: false,
+  });
 
   const fetchApplications = async () => {
     try {
@@ -23,24 +27,22 @@ export const CandidateApplicationsPage = () => {
   };
 
   useEffect(() => {
-    const handleSync = () => {
-      fetchApplications();
-    };
+    const handleSync = () => { fetchApplications(); };
     window.addEventListener('sync-applications', handleSync);
     fetchApplications();
-    return () => {
-      window.removeEventListener('sync-applications', handleSync);
-    };
+    return () => { window.removeEventListener('sync-applications', handleSync); };
   }, []);
 
-  const handleWithdraw = async (id: string) => {
-    if (!window.confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) return;
+  const confirmWithdraw = async () => {
+    setWithdrawConfirm(prev => ({ ...prev, loading: true }));
     try {
-      await api.patch(`/candidate/applications/${id}/withdraw`);
+      await api.patch(`/candidate/applications/${withdrawConfirm.id}/withdraw`);
       toast.success('Application withdrawn successfully');
       fetchApplications();
+      setWithdrawConfirm({ open: false, id: '', jobTitle: '', loading: false });
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to withdraw application');
+      setWithdrawConfirm(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -191,7 +193,7 @@ export const CandidateApplicationsPage = () => {
                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                       {!isWithdrawnOrRejected && (
                         <button
-                          onClick={() => handleWithdraw(app.id)}
+                          onClick={() => setWithdrawConfirm({ open: true, id: app.id, jobTitle: app.job_title, loading: false })}
                           className="h-8 px-3 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-[10.5px] font-bold transition-all flex items-center gap-1"
                         >
                           <Trash2 size={11} />
@@ -253,6 +255,17 @@ export const CandidateApplicationsPage = () => {
           </div>
         )}
       </main>
+
+      <ConfirmDialog
+        isOpen={withdrawConfirm.open}
+        onClose={() => setWithdrawConfirm({ open: false, id: '', jobTitle: '', loading: false })}
+        onConfirm={confirmWithdraw}
+        title={`Withdraw application${withdrawConfirm.jobTitle ? ` for ${withdrawConfirm.jobTitle}` : ''}?`}
+        description="This will permanently remove your application. The company will no longer be able to review it. This action cannot be undone."
+        confirmLabel="Yes, Withdraw"
+        variant="danger"
+        loading={withdrawConfirm.loading}
+      />
     </div>
   );
 };

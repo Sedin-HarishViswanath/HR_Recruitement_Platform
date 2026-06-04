@@ -83,7 +83,7 @@ export const TranscriptViewerModal = ({
               <p className="text-[11px] text-slate-500 font-medium">
                 {(roundType || 'Interview').charAt(0).toUpperCase() + (roundType || '').slice(1)} Round
                 {roundNumber ? ` (Round ${roundNumber})` : ''}
-                {dateStr ? ` Â· ${dateStr}` : ''}
+                {dateStr ? ` · ${dateStr}` : ''}
               </p>
             </div>
           </div>

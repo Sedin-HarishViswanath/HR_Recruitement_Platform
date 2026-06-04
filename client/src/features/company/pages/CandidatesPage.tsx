@@ -46,9 +46,9 @@ export const CompanyCandidatesPage = () => {
   const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);
   
   // Sidebar active selections
-  const [activeSavedSearch, setActiveSavedSearch] = useState('Top performers');
+  const [activeSavedSearch, setActiveSavedSearch] = useState('All candidates');
   const [selectedDepts, setSelectedDepts] = useState<string[]>([]);
-  const [aiScoreRange, setAiScoreRange] = useState<number>(80);
+  const [aiScoreRange, setAiScoreRange] = useState<number>(0);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 
   // Transcript state
@@ -217,6 +217,7 @@ export const CompanyCandidatesPage = () => {
             <h3 className="section-eyebrow">Saved Searches</h3>
             <div className="space-y-0.5">
               {[
+                { name: 'All candidates', count: dbCandidates.length },
                 { name: 'Top performers', count: dbCandidates.filter(c => (c.ai_match_score || 0) >= 85).length },
                 { name: 'Diverse pipeline', count: dbCandidates.filter(c => {
                     const skills = Array.isArray(c.skills) ? c.skills : (c.skills ? String(c.skills).split(',') : []);

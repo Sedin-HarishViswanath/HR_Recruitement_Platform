@@ -46,15 +46,19 @@ export class CandidateRepository {
       .where('applications.candidate_id', candidateId)
       .where('interviews.status', 'scheduled')
       .where('interviews.scheduled_at', '>', knex.fn.now())
+      .whereNotIn('applications.status', ['rejected', 'withdrawn'])
       .orderBy('interviews.scheduled_at', 'asc')
       .limit(limit);
   }
 
-  async getRecommendedJobs(skills: string[], limit = 4) {
+  async getRecommendedJobs(candidateId: string, skills: string[], limit = 4) {
     if (!skills || skills.length === 0) return [];
 
-    // Using Postgres array overlap operator '&&'
-    return knex('jobs')
+    const appliedJobIds = await knex('applications')
+      .where('candidate_id', candidateId)
+      .pluck('job_id');
+
+    let q = knex('jobs')
       .select(
         'jobs.id',
         'jobs.title',
@@ -64,8 +68,13 @@ export class CandidateRepository {
       )
       .join('companies', 'jobs.company_id', 'companies.id')
       .where('jobs.status', 'published')
-      .whereRaw('jobs.required_skills && ?::text[]', [skills])
-      .limit(limit);
+      .whereRaw('jobs.required_skills && ?::text[]', [skills]);
+
+    if (appliedJobIds.length > 0) {
+      q = q.whereNotIn('jobs.id', appliedJobIds);
+    }
+
+    return q.limit(limit);
   }
 
   async getStats(candidateId: string) {
@@ -150,6 +159,7 @@ export class CandidateRepository {
       .join('companies', 'jobs.company_id', 'companies.id')
       .leftJoin('users', 'interviews.interviewer_id', 'users.id')
       .where('applications.candidate_id', candidateId)
+      .whereNotIn('applications.status', ['rejected', 'withdrawn'])
       .orderBy('interviews.scheduled_at', 'asc');
 
     if (query.status) {

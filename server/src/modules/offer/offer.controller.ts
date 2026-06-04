@@ -34,7 +34,7 @@ export class OfferController {
   async getOffer(req: Request, res: Response) {
     try {
       const { applicationId } = req.params;
-      const offer = await offerService.getOfferByApplicationId(applicationId);
+      const offer = await offerService.getOfferByApplicationId(applicationId as string);
       if (!offer) throw new AppError('No offer found for this application', 404);
       return sendResponse(res, 200, true, 'Offer retrieved', offer);
     } catch (error: any) {
@@ -89,7 +89,7 @@ export class OfferController {
       if (!offer) throw new AppError('Offer not found', 404);
       if (offer.status !== 'pending') throw new AppError('This offer has already been responded to', 400);
 
-      const updated = await offerService.updateOfferStatus(offerId, action);
+      const updated = await offerService.updateOfferStatus(offerId as string, action);
       return sendResponse(res, 200, true, `Offer ${action} successfully`, updated);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);

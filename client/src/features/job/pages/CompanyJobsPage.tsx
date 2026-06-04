@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
@@ -8,6 +8,7 @@ import { JobCard } from '../components/JobCard';
 import type { Job } from '../components/JobCard';
 import { JobForm } from '../components/JobForm';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { unwrapArray } from '../../../shared/lib/response';
 
 export const CompanyJobsPage = () => {
@@ -17,7 +18,11 @@ export const CompanyJobsPage = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showForm, setShowForm] = useState(false);
-  
+  const [editingJob, setEditingJob] = useState<any | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; id: string; title: string; loading: boolean }>({
+    open: false, id: '', title: '', loading: false,
+  });
+
   const fetchJobs = async () => {
     try {
       setLoading(true);
@@ -42,14 +47,21 @@ export const CompanyJobsPage = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [search, statusFilter]);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this job?')) return;
+  const handleDelete = (id: string) => {
+    const job = jobs.find(j => j.id === id);
+    setDeleteConfirm({ open: true, id, title: job?.title || 'this job', loading: false });
+  };
+
+  const confirmDelete = async () => {
+    setDeleteConfirm(prev => ({ ...prev, loading: true }));
     try {
-      await api.delete(`/jobs/${id}`);
+      await api.delete(`/jobs/${deleteConfirm.id}`);
       toast.success('Job deleted');
       fetchJobs();
+      setDeleteConfirm({ open: false, id: '', title: '', loading: false });
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to delete job');
+      setDeleteConfirm(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -74,11 +86,40 @@ export const CompanyJobsPage = () => {
     }
   };
 
+  const handleEditClick = async (id: string) => {
+    try {
+      const { data } = await api.get(`/jobs/${id}`);
+      const job = data?.data || data;
+      setEditingJob(job);
+    } catch (err: any) {
+      toast.error('Failed to load job details');
+    }
+  };
+
+  const handleEditJob = async (data: any) => {
+    if (!editingJob) return;
+    try {
+      await api.patch(`/jobs/${editingJob.id}`, data);
+      toast.success('Job updated successfully');
+      setEditingJob(null);
+      fetchJobs();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to update job');
+    }
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingJob(null);
+  };
+
+  const showModal = showForm || !!editingJob;
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fafc]">
-      <DashboardHeader 
-        title="Job Positions" 
-        subtitle="Manage open roles and postings" 
+      <DashboardHeader
+        title="Job Positions"
+        subtitle="Manage open roles and postings"
       />
 
       <main className="p-8 space-y-8 animate-in fade-in duration-500">
@@ -103,7 +144,7 @@ export const CompanyJobsPage = () => {
               <option value="published">Open</option>
               <option value="closed">Closed</option>
             </select>
-            <Button 
+            <Button
               className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl h-10 px-6 shadow-sm shadow-violet-500/20 active:scale-95 transition-all btn-premium"
               onClick={() => setShowForm(true)}
             >
@@ -112,20 +153,37 @@ export const CompanyJobsPage = () => {
           </div>
         </div>
 
-        {showForm && (
+        {showModal && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 animate-in zoom-in duration-300">
-                <div className="p-8">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Create New Job</h2>
-                    <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600 font-bold">Close</button>
-                  </div>
-                  <JobForm 
-                    onSubmit={handleCreateJob} 
-                    onCancel={() => setShowForm(false)} 
-                  />
+            <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 animate-in zoom-in duration-300">
+              <div className="p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                    {editingJob ? 'Edit Job' : 'Create New Job'}
+                  </h2>
+                  <button onClick={closeForm} className="text-slate-400 hover:text-slate-600 font-bold">Close</button>
                 </div>
-             </div>
+                <JobForm
+                  initialData={editingJob ? {
+                    title: editingJob.title,
+                    description: editingJob.description,
+                    department: editingJob.department || '',
+                    location: editingJob.location || '',
+                    employment_type: editingJob.employment_type || 'full_time',
+                    experience_level: editingJob.experience_level || 'mid',
+                    required_skills: editingJob.required_skills || [],
+                    salary_min: editingJob.salary_min,
+                    salary_max: editingJob.salary_max,
+                    deadline: editingJob.deadline ? editingJob.deadline.split('T')[0] : '',
+                    remote: editingJob.remote || false,
+                    status: editingJob.status || 'draft',
+                    interview_rounds: editingJob.interview_rounds || 1,
+                  } : undefined}
+                  onSubmit={editingJob ? handleEditJob : handleCreateJob}
+                  onCancel={closeForm}
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -140,7 +198,7 @@ export const CompanyJobsPage = () => {
             <BriefcaseBusiness size={64} className="mx-auto text-slate-200 mb-6" />
             <h3 className="text-2xl font-black text-slate-900 tracking-tight">No jobs found</h3>
             <p className="text-slate-500 max-w-sm mx-auto mt-2 font-medium">
-              You haven't created any job postings yet matching your criteria.
+              You haven&apos;t created any job postings yet matching your criteria.
             </p>
             <Button className="mt-8 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl h-12 px-8 shadow-sm shadow-violet-500/20 transition-all active:scale-95 btn-premium" onClick={() => setShowForm(true)}>
               Post First Job
@@ -149,10 +207,10 @@ export const CompanyJobsPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {jobs.map((job) => (
-              <JobCard 
-                key={job.id} 
-                job={job} 
-                onEdit={() => console.log('Edit', job.id)}
+              <JobCard
+                key={job.id}
+                job={job}
+                onEdit={() => handleEditClick(job.id)}
                 onView={() => navigate(`/company/applications?job_id=${job.id}`)}
                 onDelete={handleDelete}
                 onChangeStatus={handleChangeStatus}
@@ -161,6 +219,17 @@ export const CompanyJobsPage = () => {
           </div>
         )}
       </main>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, id: '', title: '', loading: false })}
+        onConfirm={confirmDelete}
+        title={`Delete "${deleteConfirm.title}"?`}
+        description="This will permanently remove the job posting and all associated data. This action cannot be undone."
+        confirmLabel="Delete Job"
+        variant="danger"
+        loading={deleteConfirm.loading}
+      />
     </div>
   );
 };

@@ -28,25 +28,24 @@ const NAV_SECTIONS = [
   {
     label: 'Overview',
     items: [
-      { icon: LayoutDashboard, label: 'Dashboard', path: '/company/dashboard' },
+      { icon: LayoutDashboard, label: 'Dashboard', path: '/company/dashboard', roles: ['Admin', 'Recruiter', 'Interviewer'] },
     ],
   },
   {
     label: 'Pipeline',
     items: [
-      { icon: FileText, label: 'Applications', path: '/company/applications' },
-      { icon: Briefcase, label: 'Jobs', path: '/company/jobs' },
-      { icon: Calendar, label: 'Interviews', path: '/company/interviews' },
-      { icon: MessageSquare, label: 'Feedback', path: '/company/feedback' },
-      { icon: UserSearch, label: 'Candidates', path: '/company/candidates' },
+      { icon: FileText, label: 'Applications', path: '/company/applications', roles: ['Admin', 'Recruiter'] },
+      { icon: Briefcase, label: 'Jobs', path: '/company/jobs', roles: ['Admin', 'Recruiter'] },
+      { icon: Calendar, label: 'Interviews', path: '/company/interviews', roles: ['Admin', 'Recruiter', 'Interviewer'] },
+      { icon: MessageSquare, label: 'Feedback', path: '/company/feedback', roles: ['Admin', 'Recruiter'] },
+      { icon: UserSearch, label: 'Candidates', path: '/company/candidates', roles: ['Admin', 'Recruiter'] },
     ],
   },
   {
     label: 'Reporting',
     items: [
-      { icon: BarChart3, label: 'Analytics', path: '/company/analytics' },
+      { icon: BarChart3, label: 'Analytics', path: '/company/analytics', roles: ['Admin', 'Recruiter'] },
     ],
-    adminOnly: false,
   },
 ];
 
@@ -58,6 +57,7 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   const isAdmin = user?.role === 'Admin';
+  const isInterviewer = user?.role === 'Interviewer';
 
   const isActive = (path: string) =>
     location.pathname === path || location.pathname.startsWith(path + '/');
@@ -88,10 +88,7 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
         </div>
         <button
           onClick={onClose}
-          className="lg:hidden p-1.5 rounded-lg transition-colors"
-          style={{ color: 'rgba(148,163,184,0.7)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(148,163,184,0.7)')}
+          className="lg:hidden p-1.5 rounded-lg transition-colors text-slate-500 hover:text-slate-300 cursor-pointer"
         >
           <X size={16} />
         </button>
@@ -102,11 +99,16 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
 
       {/* ── Nav ── */}
       <nav className="flex-1 px-3 overflow-y-auto space-y-4 pb-3">
-        {NAV_SECTIONS.map((section) => (
+        {NAV_SECTIONS.map((section) => {
+          const visibleItems = section.items.filter(item =>
+            !item.roles || item.roles.includes(user?.role || '')
+          );
+          if (visibleItems.length === 0) return null;
+          return (
           <div key={section.label}>
             <p className="sidebar-dark-section-label">{section.label}</p>
             <div className="space-y-0.5 mt-1">
-              {section.items.map((item) => {
+              {visibleItems.map((item) => {
                 const active = isActive(item.path);
                 return (
                   <Link
@@ -135,7 +137,8 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
               })}
             </div>
           </div>
-        ))}
+          );
+        })}
 
         {isAdmin && (
           <div>
@@ -171,18 +174,20 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
       <div className="px-3 pb-4 mt-auto shrink-0">
         <div className="h-px mb-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
 
-        {/* Settings */}
-        <Link
-          to="/company/settings"
-          onClick={onClose}
-          className="sidebar-dark-link group mb-0.5"
-        >
-          <Settings
-            size={15}
-            className="text-slate-500 group-hover:text-slate-300 transition-all group-hover:rotate-45 duration-500 shrink-0"
-          />
-          <span>Settings</span>
-        </Link>
+        {/* Settings — Admin only */}
+        {!isInterviewer && (
+          <Link
+            to="/company/settings"
+            onClick={onClose}
+            className="sidebar-dark-link group mb-0.5"
+          >
+            <Settings
+              size={15}
+              className="text-slate-500 group-hover:text-slate-300 transition-all group-hover:rotate-45 duration-500 shrink-0"
+            />
+            <span>Settings</span>
+          </Link>
+        )}
 
         {/* User card */}
         <div

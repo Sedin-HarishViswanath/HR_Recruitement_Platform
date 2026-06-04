@@ -189,9 +189,8 @@ export class CompanyService {
   async deactivateCompanyUser(companyId: string, userId: string) {
     const user = await db('users').where({ id: userId, company_id: companyId }).first();
     if (!user) throw new AppError('User not found in your company', 404);
-    
-    // Using is_active column (assuming it's added via migration)
-    await db('users').where({ id: userId }).update({ is_active: false });
+    // Toggle active status
+    await db('users').where({ id: userId }).update({ is_active: !user.is_active });
   }
 
   async inviteUser(companyId: string, data: any) {

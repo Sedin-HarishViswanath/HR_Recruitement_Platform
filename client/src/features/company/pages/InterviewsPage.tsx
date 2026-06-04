@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../app/store';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import {
@@ -34,6 +36,10 @@ const avatarColors = [
 
 export const CompanyInterviewsPage = () => {
   const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isInterviewer = user?.role === 'Interviewer';
+  const canSchedule = user?.role === 'Admin' || user?.role === 'Recruiter';
+
   const [interviews, setInterviews] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{ isOpen: boolean; interview: any }>({ isOpen: false, interview: null });
@@ -41,21 +47,23 @@ export const CompanyInterviewsPage = () => {
   const [newTime, setNewTime] = useState('');
   const [isHandlingRequest, setIsHandlingRequest] = useState(false);
 
-  // Selected candidate to display in the Right Panel (AI Assist / Call view)
   const [selectedActiveInterview, setSelectedActiveInterview] = useState<any | null>(null);
 
   const fetchInterviews = async () => {
     try {
-      const { data } = await api.get('/interviews');
+      // Interviewers only see their assigned interviews
+      const endpoint = isInterviewer ? '/interviews/assigned' : '/interviews';
+      const { data } = await api.get(endpoint);
       const fetchedInts = unwrapArray(data, ['interviews']);
       setInterviews(fetchedInts);
-      
-      // Select the first scheduled one as active preview by default if none is selected
+
       if (fetchedInts.length > 0 && !selectedActiveInterview) {
         setSelectedActiveInterview(fetchedInts[0]);
       }
-    } catch (err) {
-      // Graceful fallback if api is down
+    } catch (err: any) {
+      if (err?.response?.status !== 403) {
+        toast.error('Failed to load interviews');
+      }
     }
   };
 
@@ -81,55 +89,13 @@ export const CompanyInterviewsPage = () => {
     }
   };
 
-
-
-  // Render dummy calendar days for the right sidebar calendar widget
-  const renderCalendarWidget = () => {
-    const days = [];
-    // Render blocks for May 2026 starting from Friday
-    const totalDays = 31;
-    const startOffset = 5; // Friday offset
-    
-    // Add empty spacer blocks
-    for (let i = 0; i < startOffset; i++) {
-      days.push(<div key={`empty-${i}`} className="h-7 w-7" />);
-    }
-    
-    // Add day numbers
-    for (let d = 1; d <= totalDays; d++) {
-      const isToday = d === 21;
-      const hasInterview = [4, 12, 15, 18, 21, 22, 26, 28].includes(d);
-      days.push(
-        <div
-          key={d}
-          className={`h-7 w-7 rounded-md flex flex-col items-center justify-center text-[10px] font-bold relative cursor-pointer hover:bg-slate-50 transition-colors ${
-            isToday 
-              ? 'bg-violet-600 text-white hover:bg-violet-700' 
-              : 'text-slate-700'
-          }`}
-        >
-          <span>{d}</span>
-          {hasInterview && !isToday && (
-            <span className="absolute bottom-0.5 w-1 h-1 bg-violet-400 rounded-full" />
-          )}
-          {isToday && (
-            <span className="absolute bottom-0.5 w-1 h-1 bg-white rounded-full" />
-          )}
-        </div>
-      );
-    }
-    return days;
-  };
-
   const now = new Date();
   const todayStr = now.toDateString();
-  
-  // Start of week (Sunday)
+
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - now.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
-  
-  // End of week (Saturday 11:59:59 PM)
+
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 7);
 
@@ -141,6 +107,51 @@ export const CompanyInterviewsPage = () => {
     const isNoShow = item.status === 'scheduled' && nowMs > schedTime + durationMs;
     return { ...item, isLive, isNoShow };
   });
+
+  const calendarDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const calendarMonth = calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const startOffset = calendarDate.getDay();
+  const interviewDays = new Set(
+    processedInterviews
+      .filter(i => {
+        const d = new Date(i.scheduled_at);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+      })
+      .map(i => new Date(i.scheduled_at).getDate())
+  );
+
+  const renderCalendarWidget = () => {
+    const days = [];
+
+    for (let i = 0; i < startOffset; i++) {
+      days.push(<div key={`empty-${i}`} className="h-7 w-7" />);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isToday = d === now.getDate();
+      const hasInterview = interviewDays.has(d);
+      days.push(
+        <div
+          key={d}
+          className={`h-7 w-7 rounded-md flex flex-col items-center justify-center text-[10px] font-bold relative cursor-pointer hover:bg-slate-50 transition-colors ${
+            isToday
+              ? 'bg-violet-600 text-white hover:bg-violet-700'
+              : 'text-slate-700'
+          }`}
+        >
+          <span>{d}</span>
+          {hasInterview && !isToday && (
+            <span className="absolute bottom-0.5 w-1 h-1 bg-violet-400 rounded-full" />
+          )}
+          {isToday && hasInterview && (
+            <span className="absolute bottom-0.5 w-1 h-1 bg-white rounded-full" />
+          )}
+        </div>
+      );
+    }
+    return days;
+  };
 
   const todayInterviews = processedInterviews.filter(
     item => new Date(item.scheduled_at).toDateString() === todayStr && item.status !== 'cancelled'
@@ -185,25 +196,27 @@ export const CompanyInterviewsPage = () => {
           </div>
           <div className="flex items-baseline gap-2">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
-              Interviews
+              {isInterviewer ? 'My Interviews' : 'Interviews'}
             </h1>
-            <span className="text-xs text-slate-400 font-medium">{weekInterviews.length} this week · {todayInterviews.length} today</span>
+            <span className="text-xs text-slate-400 font-medium">{weekInterviews.length} this week &middot; {todayInterviews.length} today</span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="text-[12px] font-bold text-white bg-violet-600 hover:bg-violet-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm shadow-violet-500/10 hover:scale-[1.01]"
-          >
-            <Plus size={13} />
-            Schedule
-          </button>
+          {canSchedule && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="text-[12px] font-bold text-white bg-violet-600 hover:bg-violet-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm shadow-violet-500/10 hover:scale-[1.01]"
+            >
+              <Plus size={13} />
+              Schedule
+            </button>
+          )}
         </div>
       </div>
 
       <main className="p-5 max-w-[1600px] w-full mx-auto space-y-6 flex-1 flex flex-col">
-        
+
         {/* Top metrics bar */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
@@ -229,8 +242,8 @@ export const CompanyInterviewsPage = () => {
 
         {/* Dynamic Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
-          
-          {/* Left panel: Daily Timeline */}
+
+          {/* Left panel: Timeline */}
           <div className="surface-raised p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
               <div>
@@ -240,7 +253,6 @@ export const CompanyInterviewsPage = () => {
                 <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{todayScheduledCount} scheduled &middot; {todayInProgressCount} in progress</p>
               </div>
 
-              {/* Day, Week, Month tabs */}
               <div className="flex bg-slate-50 border border-slate-200/60 rounded-lg p-0.5">
                 {['Day', 'Week', 'Month'].map((tab) => (
                   <button
@@ -257,11 +269,18 @@ export const CompanyInterviewsPage = () => {
               </div>
             </div>
 
+            {/* Interviewer notice */}
+            {isInterviewer && (
+              <div className="bg-violet-50 border border-violet-100 rounded-xl px-4 py-2.5 text-xs text-violet-700 font-semibold">
+                Showing your assigned interviews only.
+              </div>
+            )}
+
             {/* List of interviews */}
             <div className="divide-y divide-slate-100">
               {displayInterviews.length === 0 && (
                 <div className="py-8 text-center text-sm text-slate-400">
-                  No interviews available
+                  {isInterviewer ? 'No interviews assigned to you yet.' : 'No interviews available'}
                 </div>
               )}
               {displayInterviews.map((item, idx) => {
@@ -280,13 +299,11 @@ export const CompanyInterviewsPage = () => {
                   >
                     {/* Time & Candidate Info */}
                     <div className="flex items-start gap-4">
-                      {/* Time indicators */}
                       <div className="text-left min-w-[56px] leading-tight shrink-0 pt-0.5">
                         <p className="text-xs font-bold text-slate-900">{time}</p>
                         <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{item.duration}min</p>
                       </div>
 
-                      {/* Candidate Avatar & Details */}
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`w-9 h-9 rounded-full ${avatarBg} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0`}>
                           {initials}
@@ -315,29 +332,47 @@ export const CompanyInterviewsPage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          if (item.application_status === 'rejected' || item.application_status === 'withdrawn') return;
                           navigate(`/interview/${item.id}`);
                         }}
+                        disabled={item.application_status === 'rejected' || item.application_status === 'withdrawn'}
                         className={`text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all ${
-                          item.isLive 
+                          (item.application_status === 'rejected' || item.application_status === 'withdrawn')
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
+                            : item.isLive
                             ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-sm shadow-violet-500/10'
                             : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                       >
                         <Video size={12} />
-                        {item.isLive ? 'Join' : 'Open'} &rarr;
+                        {(item.application_status === 'rejected' || item.application_status === 'withdrawn') ? 'Application Closed' : (item.isLive ? 'Join' : 'Open')}
+                        {!(item.application_status === 'rejected' || item.application_status === 'withdrawn') && <>&rarr;</>}
                       </button>
-                    </div>
 
+                      {/* Interviewers can submit feedback directly */}
+                      {isInterviewer && item.status !== 'completed' && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFeedbackModal({ isOpen: true, interview: item });
+                          }}
+                          className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                        >
+                          <MessageSquare size={12} />
+                          Feedback
+                        </button>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Right panel: Live Video Call & Calendar */}
+          {/* Right panel: Details & Calendar */}
           <div className="space-y-6">
-            
-            {/* Live Now Assistant Panel */}
+
+            {/* Details Panel */}
             {activeInt ? (
             <div className="surface-raised p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -347,16 +382,10 @@ export const CompanyInterviewsPage = () => {
                     {activeInt.isLive ? 'Live Now' : 'Details View'} &middot; {new Date(activeInt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </h3>
                 </div>
-                {activeInt.isLive && (
-                  <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
-                    23:14 elapsed
-                  </span>
-                )}
               </div>
 
-              {/* Call Mockup Image / Info */}
+              {/* Video preview mockup */}
               <div className="bg-[#111827] rounded-xl overflow-hidden aspect-[4/3] flex flex-col justify-between p-4 relative group">
-                {/* Visual Video stream preview */}
                 <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center select-none pointer-events-none">
                   <div className="w-16 h-16 rounded-full bg-violet-600/35 border-2 border-violet-500/50 flex items-center justify-center text-white font-black text-lg backdrop-blur-sm group-hover:scale-105 transition-transform duration-300">
                     {getInitials(activeInt.candidate_name)}
@@ -368,44 +397,56 @@ export const CompanyInterviewsPage = () => {
                     {activeInt.candidate_name}
                   </span>
                   <span className="bg-violet-600 text-white text-[9px] font-bold px-2 py-0.5 rounded flex items-center gap-1 shadow-sm">
-                    AI score {activeInt.ai_score || 'N/A'}
+                    {activeInt.round_type} Round
                   </span>
                 </div>
 
                 <div className="flex items-end justify-between relative z-10">
                   <span className="bg-slate-950/80 text-slate-300 text-[9px] font-medium px-2 py-0.5 rounded backdrop-blur">
-                    {activeInt.location || 'Remote'}
+                    {new Date(activeInt.scheduled_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} &middot; {new Date(activeInt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
 
+              {/* Warning banner for rejected candidates */}
+              {(activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') && (
+                <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-2 text-xs text-rose-700 font-semibold text-center leading-normal">
+                  Candidate was rejected. Interview meeting is disabled.
+                </div>
+              )}
+
               {/* Action triggers */}
               <div className="flex gap-2">
                 <button
-                  onClick={() => navigate(`/interview/${activeInt.id}`)}
-                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm"
+                  onClick={() => {
+                    if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
+                    navigate(`/interview/${activeInt.id}`);
+                  }}
+                  disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
+                  className={`flex-1 text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm ${
+                    (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
+                      ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                      : 'bg-violet-600 hover:bg-violet-700 text-white'
+                  }`}
                 >
                   <Video size={13} />
-                  Open call
+                  {(activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') ? 'Call Disabled' : 'Open call'}
                 </button>
                 <button
-                  onClick={() => setFeedbackModal({ isOpen: true, interview: activeInt })}
-                  className="flex-1 border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1"
+                  onClick={() => {
+                    if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
+                    setFeedbackModal({ isOpen: true, interview: activeInt });
+                  }}
+                  disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
+                  className={`flex-1 border text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 ${
+                    (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
+                      ? 'border-slate-100 bg-slate-50/50 text-slate-350 cursor-not-allowed'
+                      : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                  }`}
                 >
-                  <CheckSquare size={13} className="text-slate-400" />
+                  <CheckSquare size={13} className={(activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') ? 'text-slate-300' : 'text-slate-400'} />
                   Scorecard
                 </button>
-              </div>
-
-              {/* Live AI notes panel */}
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 space-y-1.5">
-                <div className="flex items-center gap-1 text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                  <MessageSquare size={11} />
-                  Live AI notes
-                </div>
-                <p className="text-[11.5px] text-slate-600 leading-relaxed font-semibold">
-                  {activeInt.ai_notes || 'No live notes available yet for this interview.'}
-                </p>
               </div>
             </div>
             ) : (
@@ -418,7 +459,7 @@ export const CompanyInterviewsPage = () => {
             <div className="surface-raised p-5 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <h4 className="font-bold text-slate-900 text-xs" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  May 2026
+                  {calendarMonth}
                 </h4>
                 <div className="flex items-center gap-1">
                   <button className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-600"><ChevronLeft size={14} /></button>
@@ -426,7 +467,6 @@ export const CompanyInterviewsPage = () => {
                 </div>
               </div>
 
-              {/* Weekly headers */}
               <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-black text-slate-400 uppercase">
                 <span>S</span>
                 <span>M</span>
@@ -437,7 +477,6 @@ export const CompanyInterviewsPage = () => {
                 <span>S</span>
               </div>
 
-              {/* Days grid */}
               <div className="grid grid-cols-7 gap-1 text-center">
                 {renderCalendarWidget()}
               </div>
@@ -449,7 +488,9 @@ export const CompanyInterviewsPage = () => {
 
       </main>
 
-      <ScheduleInterviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchInterviews} />
+      {canSchedule && (
+        <ScheduleInterviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchInterviews} />
+      )}
       {feedbackModal.interview && (
         <SubmitFeedbackModal
           isOpen={feedbackModal.isOpen}
@@ -462,8 +503,8 @@ export const CompanyInterviewsPage = () => {
         />
       )}
 
-      {/* Review Reschedule Request Modal */}
-      {selectedRequest && (
+      {/* Reschedule Request Modal — Admin/Recruiter only */}
+      {selectedRequest && canSchedule && (
         <Dialog open={!!selectedRequest} onOpenChange={(open) => { if (!open) setSelectedRequest(null); }}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
@@ -483,17 +524,17 @@ export const CompanyInterviewsPage = () => {
               </div>
 
               <div className="space-y-1 bg-blue-50 border border-blue-100 p-3 rounded-xl">
-                <p className="text-xs font-bold text-blue-800">Candidate's Requested New Time:</p>
+                <p className="text-xs font-bold text-blue-800">Candidate&apos;s Requested New Time:</p>
                 <p className="text-sm font-bold text-slate-900">{new Date(selectedRequest.preferred_date).toLocaleString()}</p>
                 {selectedRequest.reason && (
                   <div className="text-xs text-slate-600 bg-white/70 rounded-lg p-2 mt-2 border border-slate-100 italic">
-                    "{selectedRequest.reason}"
+                    &ldquo;{selectedRequest.reason}&rdquo;
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Confirm or Adjust New Date & Time</Label>
+                <Label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Confirm or Adjust New Date &amp; Time</Label>
                 <Input
                   type="datetime-local"
                   required
@@ -510,7 +551,7 @@ export const CompanyInterviewsPage = () => {
                   onClick={() => handleRescheduleAction(selectedRequest.id, 'reject')}
                   className="px-4 py-2 border border-red-200 text-red-600 text-xs font-bold rounded-xl hover:bg-red-50 transition-colors"
                 >
-                  Reject & Keep Original
+                  Reject &amp; Keep Original
                 </button>
                 <div className="flex gap-2">
                   <Button
