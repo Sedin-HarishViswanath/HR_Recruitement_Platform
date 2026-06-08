@@ -134,7 +134,7 @@ export const CandidateInterviewsPage = () => {
                     <div key={interview.id} className="bg-white rounded-xl border border-slate-200/80 p-5 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between shadow-sm hover:shadow-md hover:border-slate-350 transition-all">
                       {/* Left: Company & Profile Avatar */}
                       <div className="flex items-center gap-4 min-w-[200px]">
-                        <div className="w-11 h-11 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center font-extrabold text-[15px] border border-violet-100 shrink-0">
+                        <div className="w-11 h-11 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center font-extrabold text-[15px] border border-violet-500/20 shrink-0">
                           {interview.company_name?.[0] || 'C'}
                         </div>
                         <div>
@@ -195,14 +195,14 @@ export const CandidateInterviewsPage = () => {
                         )}
                         
                         {isPendingReschedule && (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 text-[9px] font-semibold uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/10 text-blue-700 border border-blue-500/20 text-[9px] font-semibold uppercase tracking-wider">
                             <RefreshCw size={10} className="animate-spin text-blue-500" />
                             Reschedule Pending
                           </span>
                         )}
 
                         {!isScheduled && !isPendingReschedule && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-50 text-slate-500 border border-slate-200 text-[9px] font-semibold uppercase tracking-wider">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-500/10 text-slate-500 border border-slate-500/20 text-[9px] font-semibold uppercase tracking-wider">
                             {interview.status || 'Completed'}
                           </span>
                         )}

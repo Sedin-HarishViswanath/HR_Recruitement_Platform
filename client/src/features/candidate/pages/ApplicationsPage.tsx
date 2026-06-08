@@ -58,13 +58,13 @@ export const CandidateApplicationsPage = () => {
 
   const getStatusBadgeStyle = (status: string) => {
     const s = String(status || '').toLowerCase();
-    if (s === 'applied' || s === 'new') return 'bg-blue-50 text-blue-700 border-blue-100';
-    if (s === 'screening') return 'bg-amber-50 text-amber-700 border-amber-100';
-    if (s === 'interview' || s.startsWith('interview_')) return 'bg-violet-50 text-violet-700 border-violet-100';
-    if (s === 'offer') return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+    if (s === 'applied' || s === 'new') return 'bg-blue-500/10 text-blue-700 border-blue-500/20';
+    if (s === 'screening') return 'bg-amber-500/10 text-amber-700 border-amber-500/20';
+    if (s === 'interview' || s.startsWith('interview_')) return 'bg-violet-500/10 text-violet-700 border-violet-500/20';
+    if (s === 'offer') return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20';
     if (s === 'hired') return 'bg-emerald-600 text-white border-emerald-600';
-    if (s === 'rejected') return 'bg-rose-50 text-rose-700 border-rose-100';
-    return 'bg-slate-100 text-slate-600 border-slate-200';
+    if (s === 'rejected') return 'bg-rose-500/10 text-rose-700 border-rose-500/20';
+    return 'bg-slate-500/10 text-slate-600 border-slate-500/20';
   };
 
   const getStageStyle = (stageIdx: number, currentIdx: number, isWithdrawnOrRejected: boolean) => {
@@ -84,7 +84,7 @@ export const CandidateApplicationsPage = () => {
     }
     if (stageIdx === currentIdx) {
       return {
-        dot: 'bg-violet-600 border-violet-600 ring-4 ring-violet-100 text-white',
+        dot: 'bg-violet-650 border-violet-600 ring-4 ring-violet-500/10 text-white',
         text: 'text-violet-600 font-black',
         line: 'bg-slate-100'
       };
