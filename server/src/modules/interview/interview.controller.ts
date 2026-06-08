@@ -250,6 +250,17 @@ export class InterviewController {
       return sendResponse(res, 500, false, 'Failed to generate AI debrief');
     }
   }
+
+  async getPlagiarismReport(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const report = await interviewService.getPlagiarismReport(id as string);
+      return sendResponse(res, 200, true, 'Plagiarism report retrieved', report);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to retrieve plagiarism report');
+    }
+  }
 }
 
 export const interviewController = new InterviewController();

@@ -36,6 +36,13 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_FROM=${SMTP_FROM}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - JDOODLE_CLIENT_ID=${JDOODLE_CLIENT_ID}
+      - JDOODLE_CLIENT_SECRET=${JDOODLE_CLIENT_SECRET}
+      - USE_CUSTOM_ML=${USE_CUSTOM_ML:-false}
+      - PLAGIARISM_THRESHOLD=${PLAGIARISM_THRESHOLD:-70}
     depends_on:
       db:
         condition: service_healthy

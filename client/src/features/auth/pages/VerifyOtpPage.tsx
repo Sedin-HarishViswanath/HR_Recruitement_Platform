@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
@@ -152,7 +152,7 @@ export const VerifyOtpPage = () => {
                 onChange={e => handleChange(i, e.target.value)}
                 onKeyDown={e => handleKeyDown(i, e)}
                 className={`w-12 h-14 text-center text-xl font-black rounded-xl border-2 outline-none transition-all bg-white/5 text-white
-                  ${digit ? 'border-violet-400 bg-violet-50' : 'border-white/20 focus:border-violet-400'}`}
+                  ${digit ? 'border-violet-400 bg-violet-500/10 text-violet-300' : 'border-white/20 focus:border-violet-400'}`}
               />
             ))}
           </div>

@@ -24,6 +24,10 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   FRONTEND_URL: z.string().default('http://localhost:5173'),
+
+  // Custom ML flags
+  USE_CUSTOM_ML: z.string().default('false').transform(v => v === 'true'),
+  PLAGIARISM_THRESHOLD: z.string().default('70').transform(v => parseInt(v, 10)),
 });
 
 const envVars = envSchema.safeParse(process.env);

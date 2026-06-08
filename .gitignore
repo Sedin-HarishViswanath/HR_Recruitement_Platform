@@ -10,3 +10,5 @@ server/dist/
 .DS_Store
 .agent/
 server/uploads/
+server/logs/
+

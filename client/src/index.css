@@ -86,10 +86,13 @@
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1, "cv05" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     letter-spacing: -0.011em;
+    line-height: 1.6;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(at 100% 0%, hsla(256, 70%, 64%, 0.05) 0px, transparent 45%);
+      radial-gradient(at 100% 0%, hsla(256, 70%, 64%, 0.04) 0px, transparent 45%),
+      radial-gradient(at 0% 100%, hsla(220, 60%, 60%, 0.03) 0px, transparent 40%);
     background-attachment: fixed;
   }
   button,
@@ -522,9 +525,16 @@
   .panel {
     @apply bg-white rounded-2xl border border-slate-200/80;
     box-shadow: var(--shadow-xs);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .panel:hover {
+    box-shadow: var(--shadow-sm);
   }
   .panel-header {
     @apply flex items-center justify-between px-5 py-4 border-b border-slate-100;
+  }
+  .panel-header h3 {
+    letter-spacing: -0.01em;
   }
   .section-body {
     @apply text-[13px] text-slate-500 font-normal leading-relaxed;
@@ -621,10 +631,38 @@
 
   /* ── Frosted app top bar ── */
   .topbar-frost {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: saturate(180%) blur(14px);
-    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
     border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    transition: background 0.25s ease;
+  }
+
+  /* ── Smooth link highlight ── */
+  a.link-subtle {
+    @apply text-violet-600 font-semibold;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  a.link-subtle:hover {
+    @apply text-violet-800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    @apply text-center py-12;
+  }
+  .empty-state-icon {
+    @apply w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200/80 mx-auto flex items-center justify-center mb-4;
+  }
+  .empty-state-title {
+    @apply text-sm font-bold text-slate-700 mt-1;
+    font-family: 'Sora', sans-serif;
+  }
+  .empty-state-desc {
+    @apply text-[12px] text-slate-400 font-medium mt-1 max-w-xs mx-auto;
   }
 }
 

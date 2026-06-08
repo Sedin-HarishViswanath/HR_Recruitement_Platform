@@ -1,50 +1,135 @@
 import axios from 'axios';
 import { env } from '../../config/env';
 import { logger } from '../../shared/utils/logger';
+import { tfidfMatcherService } from './tfidf-matcher.service';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class AtsScreeningService {
   /**
    * Screen a resume against a job posting.
-   * Uses Gemini for semantic scoring when the API key is set,
-   * falls back to keyword matching otherwise.
+   *
+   * Scoring cascade (default — USE_CUSTOM_ML=false):
+   *   1. Gemini (semantic AI)     → primary
+   *   2. TF-IDF (custom ML)      → fallback
+   *   3. Keyword matching         → final fallback
+   *
+   * When USE_CUSTOM_ML=true, the order flips:
+   *   1. TF-IDF (custom ML)      → primary
+   *   2. Gemini (semantic AI)     → fallback
+   *   3. Keyword matching         → final fallback
    *
    * @param candidateSkills  Array of skill strings from the candidate profile
    * @param jobData          Job object with title, description, required_skills
-   * @param resumeText       Optional extracted resume text for deeper Gemini analysis
-   * @returns { ai_score: number, matched_skills: string[] }
+   * @param resumeText       Optional extracted resume text for deeper analysis
+   * @returns { ai_score, matched_skills, scoring_method }
    */
   async screenResume(
     candidateSkills: string[],
     jobData: any,
     resumeText?: string,
-  ): Promise<{ ai_score: number; matched_skills: string[] }> {
-    // Always compute keyword score as the baseline / fallback
+  ): Promise<{ ai_score: number; matched_skills: string[]; scoring_method?: string }> {
+    // Always compute keyword score as the last-resort fallback
     const keywordResult = this.computeKeywordScore(candidateSkills, jobData);
 
-    // Try Gemini-powered scoring if key is available
+    if (env.USE_CUSTOM_ML) {
+      // ── Custom ML is PRIMARY ──
+      return this.cascadeTfIdfFirst(candidateSkills, jobData, resumeText, keywordResult);
+    } else {
+      // ── Gemini is PRIMARY (existing behavior) ──
+      return this.cascadeGeminiFirst(candidateSkills, jobData, resumeText, keywordResult);
+    }
+  }
+
+  /**
+   * Default cascade: Gemini → TF-IDF → Keyword
+   */
+  private async cascadeGeminiFirst(
+    candidateSkills: string[],
+    jobData: any,
+    resumeText: string | undefined,
+    keywordResult: { ai_score: number; matched_skills: string[] },
+  ): Promise<{ ai_score: number; matched_skills: string[]; scoring_method: string }> {
+    // 1. Try Gemini
     if (env.GEMINI_API_KEY) {
       try {
-        const geminiScore = await this.computeGeminiScore(
-          candidateSkills,
-          jobData,
-          resumeText,
-        );
+        const geminiScore = await this.computeGeminiScore(candidateSkills, jobData, resumeText);
         if (geminiScore !== null) {
-          // Blend Gemini (70%) + keyword (30%) for a robust score
           const blended = Math.round(geminiScore * 0.7 + keywordResult.ai_score * 0.3);
           return {
             ai_score: Math.min(100, Math.max(0, blended)),
             matched_skills: keywordResult.matched_skills,
+            scoring_method: 'gemini',
           };
         }
       } catch (err) {
-        logger.warn('Gemini scoring failed, falling back to keyword match', { module: 'ATS', err });
+        logger.warn('Gemini scoring failed, falling back to TF-IDF', { module: 'ATS', err });
       }
     }
 
-    return keywordResult;
+    // 2. Fallback: TF-IDF
+    try {
+      const tfidfResult = tfidfMatcherService.computeTfIdfScore(candidateSkills, jobData, resumeText);
+      if (tfidfResult.ai_score > 0) {
+        logger.info('Using TF-IDF fallback for ATS scoring', { module: 'ATS' });
+        return {
+          ai_score: tfidfResult.ai_score,
+          matched_skills: tfidfResult.matched_skills,
+          scoring_method: 'tfidf',
+        };
+      }
+    } catch (err) {
+      logger.warn('TF-IDF scoring failed, falling back to keyword match', { module: 'ATS', err });
+    }
+
+    // 3. Final fallback: Keyword
+    return { ...keywordResult, scoring_method: 'keyword' };
+  }
+
+  /**
+   * Custom ML cascade: TF-IDF → Gemini → Keyword
+   * Activated when USE_CUSTOM_ML=true
+   */
+  private async cascadeTfIdfFirst(
+    candidateSkills: string[],
+    jobData: any,
+    resumeText: string | undefined,
+    keywordResult: { ai_score: number; matched_skills: string[] },
+  ): Promise<{ ai_score: number; matched_skills: string[]; scoring_method: string }> {
+    // 1. Try TF-IDF (primary)
+    try {
+      const tfidfResult = tfidfMatcherService.computeTfIdfScore(candidateSkills, jobData, resumeText);
+      if (tfidfResult.ai_score > 0) {
+        logger.info('Using TF-IDF as primary scorer', { module: 'ATS' });
+        return {
+          ai_score: tfidfResult.ai_score,
+          matched_skills: tfidfResult.matched_skills,
+          scoring_method: 'tfidf',
+        };
+      }
+    } catch (err) {
+      logger.warn('TF-IDF primary scoring failed, falling back to Gemini', { module: 'ATS', err });
+    }
+
+    // 2. Fallback: Gemini
+    if (env.GEMINI_API_KEY) {
+      try {
+        const geminiScore = await this.computeGeminiScore(candidateSkills, jobData, resumeText);
+        if (geminiScore !== null) {
+          const blended = Math.round(geminiScore * 0.7 + keywordResult.ai_score * 0.3);
+          return {
+            ai_score: Math.min(100, Math.max(0, blended)),
+            matched_skills: keywordResult.matched_skills,
+            scoring_method: 'gemini',
+          };
+        }
+      } catch (err) {
+        logger.warn('Gemini fallback scoring failed', { module: 'ATS', err });
+      }
+    }
+
+    // 3. Final fallback: Keyword
+    return { ...keywordResult, scoring_method: 'keyword' };
   }
 
   /**

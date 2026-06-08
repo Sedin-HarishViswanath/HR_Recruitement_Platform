@@ -4,7 +4,9 @@ import { notificationService } from '../notification/notification.service';
 import { interviewRepository } from './interview.repository';
 import { AppError } from '../../shared/errors/AppError';
 import { executeWithPiston } from './code-execution.service';
+import { codePlagiarismService } from './code-plagiarism.service';
 import { getIO } from '../../socket';
+import { logger } from '../../shared/utils/logger';
 
 import { 
   ScheduleInterviewInput, 
@@ -187,11 +189,22 @@ export class InterviewService {
   }
 
   async saveCodeSnapshot(id: string, snapshot: any) {
-    return db('interviews')
+    const result = await db('interviews')
       .where({ id })
       .update({
         code_snapshots: db.raw('code_snapshots || ?::jsonb', [JSON.stringify(snapshot)])
       });
+
+    // Run plagiarism check asynchronously (non-blocking)
+    if (snapshot?.code || snapshot?.script) {
+      const code = snapshot.code || snapshot.script;
+      const language = snapshot.language || 'javascript';
+      this.runPlagiarismCheck(id, code, language).catch(err =>
+        logger.warn('Background plagiarism check failed', { module: 'Interview', err: err?.message })
+      );
+    }
+
+    return result;
   }
 
   async submitAptitudeResult(id: string, result: any) {
@@ -240,9 +253,88 @@ export class InterviewService {
   }
 
   async executeCode(data: any) {
-    const { script, language, stdin } = data;
+    const { script, language, stdin, interviewId } = data;
     const result = await executeWithPiston({ language, code: script, stdin });
+
+    // If an interviewId was provided, run plagiarism check asynchronously
+    if (interviewId && script) {
+      this.runPlagiarismCheck(interviewId, script, language).catch(err =>
+        logger.warn('Plagiarism check after code execution failed', { module: 'Interview', err: err?.message })
+      );
+    }
+
     return result;
+  }
+
+  /**
+   * Run plagiarism check and store results in the interview record.
+   */
+  private async runPlagiarismCheck(interviewId: string, code: string, language: string) {
+    try {
+      const report = await codePlagiarismService.checkPlagiarism(interviewId, code, language);
+
+      // Store the plagiarism report in the interview metadata
+      await db('interviews')
+        .where({ id: interviewId })
+        .update({
+          plagiarism_report: JSON.stringify(report),
+          updated_at: db.fn.now(),
+        });
+
+      // If flagged, broadcast a real-time warning to the interview room
+      if (report.is_flagged) {
+        try {
+          const io = getIO();
+          io.to(`interview_${interviewId}`).emit('plagiarism-warning', {
+            interviewId,
+            similarity_score: report.similarity_score,
+            is_flagged: true,
+          });
+        } catch {
+          // Socket may not be initialized — non-fatal
+        }
+      }
+
+      return report;
+    } catch (err: any) {
+      logger.error('Plagiarism check error', { module: 'Interview', err: err?.message });
+      throw err;
+    }
+  }
+
+  /**
+   * Get the plagiarism report for a specific interview.
+   */
+  async getPlagiarismReport(interviewId: string) {
+    const interview = await db('interviews')
+      .select('id', 'plagiarism_report', 'code_snapshots')
+      .where({ id: interviewId })
+      .first();
+
+    if (!interview) throw new AppError('Interview not found', 404);
+
+    const report = interview.plagiarism_report
+      ? (typeof interview.plagiarism_report === 'string'
+          ? JSON.parse(interview.plagiarism_report)
+          : interview.plagiarism_report)
+      : null;
+
+    // Also provide the code analysis metadata
+    let codeAnalysis = null;
+    if (interview.code_snapshots && Array.isArray(interview.code_snapshots) && interview.code_snapshots.length > 0) {
+      const lastSnapshot = interview.code_snapshots[interview.code_snapshots.length - 1];
+      const code = lastSnapshot?.code || lastSnapshot?.script || '';
+      const language = lastSnapshot?.language || 'javascript';
+      if (code) {
+        codeAnalysis = codePlagiarismService.analyzeCode(code, language);
+      }
+    }
+
+    return {
+      interview_id: interviewId,
+      report,
+      code_analysis: codeAnalysis,
+    };
   }
 
   // ─── Transcript Methods ───
