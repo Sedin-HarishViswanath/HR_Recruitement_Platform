@@ -113,18 +113,25 @@ export const CompanyDashboard = () => {
       <main className="p-4 sm:p-6 space-y-6 animate-fade-in-up">
 
         {/* ── Stat Cards ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200/70 rounded-2xl overflow-hidden border border-slate-200/70 shadow-[var(--shadow-xs)]">
-          {statMeta.map((card, i) => (
-            <div key={i} className="bg-white p-5 sm:p-6 group cursor-default relative transition-colors hover:bg-slate-50/60">
-              <div className="flex items-center gap-2 text-slate-400 mb-3">
-                <card.icon size={14} strokeWidth={2.25} />
-                <span className="text-[11px] font-semibold text-slate-500">{card.title}</span>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {statMeta.map((card, i) => {
+            const Icon = card.icon;
+            const bgs = ['bg-blue-50', 'bg-violet-50', 'bg-emerald-50', 'bg-sky-50'];
+            const colors = ['text-blue-600', 'text-violet-600', 'text-emerald-600', 'text-sky-600'];
+            return (
+              <div key={i} className="stat-card bg-white p-5 sm:p-6 group cursor-default">
+                <div className="flex items-center gap-2 text-slate-400 mb-3">
+                  <div className={`w-7 h-7 rounded-lg ${bgs[i % 4]} flex items-center justify-center shrink-0`}>
+                    <Icon size={13} className={colors[i % 4]} strokeWidth={2.25} />
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500">{card.title}</span>
+                </div>
+                <p className="data-number text-[32px] sm:text-[36px] leading-none font-black text-slate-900" style={{ fontFamily: 'Sora' }}>
+                  {statValues[i].toLocaleString()}
+                </p>
               </div>
-              <p className="data-number text-[40px] sm:text-[44px] leading-none">
-                {statValues[i].toLocaleString()}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* ── Charts ── */}

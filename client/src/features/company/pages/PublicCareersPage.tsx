@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Briefcase, MapPin, Clock, DollarSign, ArrowRight, Building2, Globe, Search } from 'lucide-react';
@@ -73,7 +73,7 @@ export const PublicCareersPage = () => {
                 placeholder="Search by role or location..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-4 focus:ring-amber-500/5 focus:border-violet-400 outline-none transition-all font-bold text-slate-700 text-sm"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-4 focus:ring-violet-500/5 focus:border-violet-400 outline-none transition-all font-bold text-slate-700 text-sm"
               />
            </div>
         </div>
@@ -98,7 +98,7 @@ export const PublicCareersPage = () => {
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-violet-600 transition-colors">{job.title}</h3>
-                    <span className="px-2 py-1 bg-violet-50 text-violet-600 text-[9px] font-semibold uppercase tracking-wider rounded border border-amber-100">
+                    <span className="px-2 py-1 bg-violet-50 text-violet-600 text-[9px] font-semibold uppercase tracking-wider rounded border border-violet-100">
                       {job.employment_type || 'Full Time'}
                     </span>
                   </div>

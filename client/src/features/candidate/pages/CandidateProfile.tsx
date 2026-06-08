@@ -5,9 +5,9 @@ import { Label } from '../../../components/ui/label';
 import { Textarea } from '../../../components/ui/textarea';
 import { toast } from 'sonner';
 import { 
-  User, Mail, Phone, MapPin, Link as LinkIcon, Briefcase, Globe, 
+  User, Mail, Phone, MapPin, Briefcase, Globe, 
   Code, Sparkles, Plus, X, Landmark, CheckCircle2, Shield, 
-  Calendar, Award, ExternalLink, Edit3, Save, XCircle
+  Award, ExternalLink, Edit3, Save, XCircle
 } from 'lucide-react';
 
 const GithubIcon = ({ size }: { size: number }) => (
@@ -198,16 +198,21 @@ export const CandidateProfile = () => {
         {/* ═══ Hero Profile Card ═══ */}
         <div className="surface-raised !rounded-2xl overflow-hidden">
           {/* Cover */}
-          <div className="h-36 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-700" />
+          <div className="h-36 relative overflow-hidden bg-[#0d0e12]">
+            {/* High-end Dark Carbon & Slate mesh gradient (Apple/Linear style) */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-950" />
+            <div className="absolute inset-0 opacity-40" style={{
+              backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(45,212,191,0.1) 0%, transparent 45%)'
+            }} />
             <div className="absolute inset-0" style={{
-              backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.12) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%)',
+              backgroundImage: 'radial-gradient(circle at 50% 120%, rgba(139,92,246,0.12) 0%, transparent 60%)'
             }} />
-            {/* Subtle mesh dots overlay */}
-            <div className="absolute inset-0 opacity-[0.07]" style={{
-              backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
+            {/* Subtle carbon grid lines overlay */}
+            <div className="absolute inset-0 opacity-[0.06]" style={{
+              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
             }} />
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent pointer-events-none" />
           </div>
 
           {/* Profile info overlapping cover */}

@@ -194,10 +194,10 @@ export const CandidateDashboard = () => {
         )}
 
         {/* ── Stats row ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200/70 rounded-2xl overflow-hidden border border-slate-200/70 shadow-[var(--shadow-xs)]">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {loading
             ? [0, 1, 2, 3].map(i => (
-                <div key={i} className="bg-white p-5">
+                <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200/60 animate-pulse">
                   <Skeleton className="h-3 w-20 rounded mb-3" />
                   <Skeleton className="h-9 w-14 rounded" />
                 </div>
@@ -205,12 +205,14 @@ export const CandidateDashboard = () => {
             : STAT_CARDS.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <div key={card.label} className="bg-white p-5 group transition-colors hover:bg-slate-50/60">
+                  <div key={card.label} className="stat-card p-5 bg-white group cursor-pointer">
                     <div className="flex items-center gap-2 text-slate-400 mb-3">
-                      <Icon size={14} strokeWidth={2.25} />
+                      <div className={`w-7 h-7 rounded-lg ${card.bg} flex items-center justify-center shrink-0`}>
+                        <Icon size={13} className={card.color} strokeWidth={2.25} />
+                      </div>
                       <span className="text-[11px] font-semibold text-slate-500">{card.label}</span>
                     </div>
-                    <p className="data-number text-[36px] sm:text-[40px] leading-none">
+                    <p className="data-number text-[32px] sm:text-[36px] leading-none font-black text-slate-900" style={{ fontFamily: 'Sora' }}>
                       {card.value}
                     </p>
                   </div>
