@@ -111,7 +111,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquare size={20} className="text-violet-500" />
