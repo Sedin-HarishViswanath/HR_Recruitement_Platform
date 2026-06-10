@@ -19,22 +19,11 @@ const avatarColors = [
   'bg-purple-500', 'bg-teal-500', 'bg-red-500', 'bg-blue-500',
 ];
 
-const getSkillStyle = (_skill: string, i: number) => {
-  const colors = [
-    'bg-slate-100 text-slate-700',
-    'bg-slate-100 text-slate-700',
-    'bg-slate-100 text-slate-700'
-  ];
-  return colors[i % colors.length];
-};
 
 const roundTypeColor: Record<string, string> = {
   aptitude: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   technical: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   hr: 'bg-violet-50 text-violet-700 border-violet-200',
-  behavioral: 'bg-pink-50 text-pink-700 border-pink-200',
-  screening: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  phone: 'bg-sky-50 text-sky-700 border-sky-200',
   final: 'bg-violet-50 text-violet-700 border-violet-200',
 };
 
@@ -386,7 +375,7 @@ export const CompanyCandidatesPage = () => {
                             <Star size={13} className="fill-amber-400 text-amber-400 shrink-0" />
                           )}
                           {matchingJobs > 0 && (
-                            <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-violet-100 text-violet-600 shrink-0 uppercase tracking-wide">
+                            <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-violet-500/10 text-violet-700 border border-violet-500/20 shrink-0 uppercase tracking-wide">
                               {matchingJobs} matching jobs
                             </span>
                           )}
@@ -399,10 +388,10 @@ export const CompanyCandidatesPage = () => {
                         {/* Skill Tags */}
                         {candidate.skills && candidate.skills.length > 0 && (
                           <div className="flex flex-wrap gap-1 pt-1">
-                            {candidate.skills.map((skill: string, si: number) => (
+                            {candidate.skills.map((skill: string) => (
                               <span
                                 key={skill}
-                                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md ${getSkillStyle(skill, si)}`}
+                                className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-slate-500/10 text-slate-650 border border-slate-500/20"
                               >
                                 {skill}
                               </span>

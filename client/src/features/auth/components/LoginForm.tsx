@@ -46,10 +46,16 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
       const userRole = (user.role || '').toLowerCase().trim();
       
       if (userRole === 'candidate') {
-        navigate('/candidate/dashboard');
+        if (user.onboardingCompleted === false) {
+          navigate('/candidate/onboarding');
+        } else {
+          navigate('/candidate/dashboard');
+        }
       } else if (userRole === 'super admin' || userRole === 'superadmin') {
         navigate('/superadmin/dashboard');
-      } else if (user.companyStatus?.toLowerCase() === 'pending') {
+      } else if (user.onboardingCompleted === false) {
+        navigate('/company/onboarding');
+      } else if (['pending', 'revoked', 'rejected'].includes(user.companyStatus?.toLowerCase() || '')) {
         navigate('/pending-approval');
       } else {
         navigate('/company/dashboard');
@@ -73,7 +79,7 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
        const isNewUser = res.data.data.isNewUser;
        const userRole = (user.role || '').toLowerCase().trim();
        
-       if (isNewUser) {
+       if (isNewUser || user.onboardingCompleted === false) {
          if (userRole === 'candidate') {
            navigate('/candidate/onboarding');
          } else {
@@ -84,7 +90,7 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
            navigate('/candidate/dashboard');
          } else if (userRole === 'super admin' || userRole === 'superadmin') {
            navigate('/superadmin/dashboard');
-         } else if (user.companyStatus?.toLowerCase() === 'pending' || user.companyStatus?.toLowerCase() === 'revoked') {
+         } else if (['pending', 'revoked', 'rejected'].includes(user.companyStatus?.toLowerCase() || '')) {
            navigate('/pending-approval');
          } else {
            navigate('/company/dashboard');
@@ -105,7 +111,9 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
         )}
         
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-[11px] font-semibold uppercase text-slate-500 ml-1">Email</Label>
+          <Label htmlFor="email" className="text-[11px] font-semibold uppercase text-slate-500 ml-1">
+            Email <span className="text-red-500">*</span>
+          </Label>
           <Input 
             id="email" 
             type="email" 
@@ -117,7 +125,9 @@ export const LoginForm = ({ role }: { role: 'internal' | 'candidate', onToggleMo
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="password" className="text-[11px] font-semibold uppercase text-slate-500 ml-1">Password</Label>
+          <Label htmlFor="password" className="text-[11px] font-semibold uppercase text-slate-500 ml-1">
+            Password <span className="text-red-500">*</span>
+          </Label>
           <Input 
             id="password" 
             type="password" 

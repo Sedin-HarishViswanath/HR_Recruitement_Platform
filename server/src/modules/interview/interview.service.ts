@@ -8,20 +8,24 @@ import { codePlagiarismService } from './code-plagiarism.service';
 import { getIO } from '../../socket';
 import { logger } from '../../shared/utils/logger';
 
-import { 
-  ScheduleInterviewInput, 
-  RescheduleInterviewInput, 
-  FeedbackInput 
+import {
+  ScheduleInterviewInput,
+  RescheduleInterviewInput,
+  FeedbackInput,
+  isAutomatedRound,
 } from './interview.schema';
 
 export class InterviewService {
   async scheduleInterview(data: ScheduleInterviewInput) {
     const { application_id, interviewer_id, scheduled_at, duration } = data;
-    const date = new Date(scheduled_at);
+    const automated = isAutomatedRound(data.round_type);
+    const date = scheduled_at ? new Date(scheduled_at) : null;
 
-    // 1. Conflict Check
-    const conflict = await interviewRepository.checkConflict(interviewer_id, date, duration);
-    if (conflict) throw new AppError('Interviewer has a scheduling conflict at this time', 400);
+    // Conflict check only applies to live rounds with an interviewer and time
+    if (!automated && interviewer_id && date) {
+      const conflict = await interviewRepository.checkConflict(interviewer_id, date, duration);
+      if (conflict) throw new AppError('Interviewer has a scheduling conflict at this time', 400);
+    }
 
     return await db.transaction(async (trx) => {
       const application = await trx('applications')
@@ -40,45 +44,47 @@ export class InterviewService {
       const totalRounds = Number(application.interview_rounds || 1);
       const roundNumber = Math.min(maxRound + 1, totalRounds);
 
-      // 2. Candidate Same-Day Sequential / Conflict Check
-      const startOfDay = new Date(date);
-      startOfDay.setUTCHours(0, 0, 0, 0);
-      const endOfDay = new Date(date);
-      endOfDay.setUTCHours(23, 59, 59, 999);
+      // Sequential candidate conflict check only for scheduled live rounds
+      if (!automated && date) {
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999);
 
-      const candidateInterviewsToday = await trx('interviews')
-        .join('applications', 'interviews.application_id', 'applications.id')
-        .where('applications.candidate_id', application.candidate_id)
-        .whereNot('interviews.status', 'cancelled')
-        .whereBetween('interviews.scheduled_at', [startOfDay, endOfDay])
-        .select('interviews.*');
+        const candidateInterviewsToday = await trx('interviews')
+          .join('applications', 'interviews.application_id', 'applications.id')
+          .where('applications.candidate_id', application.candidate_id)
+          .whereNotIn('interviews.status', ['cancelled', 'completed'])
+          .whereBetween('interviews.scheduled_at', [startOfDay, endOfDay])
+          .select('interviews.*');
 
-      for (const existing of candidateInterviewsToday) {
-        const existingStart = new Date(existing.scheduled_at).getTime();
-        const existingEnd = existingStart + Number(existing.duration || 60) * 60000;
-        const newStart = date.getTime();
-        const newEnd = newStart + Number(duration || 60) * 60000;
+        for (const existing of candidateInterviewsToday) {
+          const existingStart = new Date(existing.scheduled_at).getTime();
+          const existingEnd = existingStart + Number(existing.duration || 60) * 60000;
+          const newStart = date.getTime();
+          const newEnd = newStart + Number(duration || 60) * 60000;
 
-        if (roundNumber > existing.round_number) {
-          if (newStart < existingEnd) {
-            throw new AppError(
-              `Conflict: Round ${roundNumber} must be scheduled after Round ${existing.round_number} ends (ends at ${new Date(existingEnd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
-              400
-            );
-          }
-        } else if (roundNumber < existing.round_number) {
-          if (newEnd > existingStart) {
-            throw new AppError(
-              `Conflict: Round ${roundNumber} must be scheduled before Round ${existing.round_number} starts (starts at ${new Date(existingStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
-              400
-            );
-          }
-        } else {
-          const hasOverlap = (newStart >= existingStart && newStart < existingEnd) || 
-                            (newEnd > existingStart && newEnd <= existingEnd) ||
-                            (newStart <= existingStart && newEnd >= existingEnd);
-          if (hasOverlap) {
-            throw new AppError('Candidate already has an interview scheduled during this time', 400);
+          if (roundNumber > existing.round_number) {
+            if (newStart < existingEnd) {
+              throw new AppError(
+                `Conflict: Round ${roundNumber} must be scheduled after Round ${existing.round_number} ends (ends at ${new Date(existingEnd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
+                400
+              );
+            }
+          } else if (roundNumber < existing.round_number) {
+            if (newEnd > existingStart) {
+              throw new AppError(
+                `Conflict: Round ${roundNumber} must be scheduled before Round ${existing.round_number} starts (starts at ${new Date(existingStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
+                400
+              );
+            }
+          } else {
+            const hasOverlap = (newStart >= existingStart && newStart < existingEnd) ||
+              (newEnd > existingStart && newEnd <= existingEnd) ||
+              (newStart <= existingStart && newEnd >= existingEnd);
+            if (hasOverlap) {
+              throw new AppError('Candidate already has an interview scheduled during this time', 400);
+            }
           }
         }
       }
@@ -86,32 +92,34 @@ export class InterviewService {
       const [interview] = await trx('interviews')
         .insert({
           application_id,
-          interviewer_id,
+          interviewer_id: automated ? null : interviewer_id,
           round_type: data.round_type,
           round_number: roundNumber,
           duration: duration || 60,
           scheduled_at: date,
           status: 'scheduled',
-          meeting_link: ''
+          meeting_link: '',
+          assessment_status: automated ? 'not_started' : null,
         })
         .returning('*');
 
-      const meeting_link = `${env.FRONTEND_URL}/interview/${interview.id}`;
-      await trx('interviews').where({ id: interview.id }).update({ meeting_link });
-      interview.meeting_link = meeting_link;
+      // Only live rounds get a meet link
+      if (!automated) {
+        const meeting_link = `${env.FRONTEND_URL}/interview/${interview.id}`;
+        await trx('interviews').where({ id: interview.id }).update({ meeting_link });
+        interview.meeting_link = meeting_link;
+      }
 
-      // Keep the application stage aligned with the current interview round.
       await trx('applications')
         .where({ id: application_id })
         .update({ status: `interview_${roundNumber}`, updated_at: db.fn.now() });
 
-      // Notify candidate
       const candidate = await trx('candidates')
         .join('applications', 'candidates.id', 'applications.candidate_id')
         .where('applications.id', application_id)
         .select('candidates.*')
         .first();
-      
+
       const job = await trx('jobs')
         .join('applications', 'jobs.id', 'applications.job_id')
         .where('applications.id', application_id)
@@ -119,9 +127,41 @@ export class InterviewService {
         .first();
 
       void notificationService.notifyInterviewScheduled(candidate, job, interview).catch(err => console.error('Failed to send interview notification email:', err));
-      
+
       return interview;
     });
+  }
+
+  async startAssessment(interviewId: string, candidateId: string) {
+    const interview = await db('interviews')
+      .join('applications', 'interviews.application_id', 'applications.id')
+      .where('interviews.id', interviewId)
+      .where('applications.candidate_id', candidateId)
+      .select('interviews.*')
+      .first();
+
+    if (!interview) throw new AppError('Assessment not found or unauthorized', 404);
+    if (!isAutomatedRound(interview.round_type)) {
+      throw new AppError('This interview is not an automated assessment', 400);
+    }
+    if (interview.assessment_status === 'completed') {
+      throw new AppError('This assessment has already been completed', 400);
+    }
+    // Idempotent — if already in_progress, just return current state
+    if (interview.assessment_status === 'in_progress') {
+      return interview;
+    }
+
+    const [updated] = await db('interviews')
+      .where({ id: interviewId })
+      .update({
+        assessment_status: 'in_progress',
+        scheduled_at: db.fn.now(),
+        updated_at: db.fn.now(),
+      })
+      .returning('*');
+
+    return updated;
   }
 
   async getInterviewById(id: string) {
@@ -161,7 +201,7 @@ export class InterviewService {
       const interview = await trx('interviews').where({ id: interviewId }).first();
       if (!interview) throw new AppError('Interview not found', 404);
       if (interview.interviewer_id !== userId) throw new AppError('Only the assigned interviewer can submit feedback', 403);
-      
+
       const existing = await trx('feedbacks').where({ interview_id: interviewId }).first();
       if (existing) throw new AppError('Feedback already submitted for this interview', 400);
 
@@ -195,7 +235,6 @@ export class InterviewService {
         code_snapshots: db.raw('code_snapshots || ?::jsonb', [JSON.stringify(snapshot)])
       });
 
-    // Run plagiarism check asynchronously (non-blocking)
     if (snapshot?.code || snapshot?.script) {
       const code = snapshot.code || snapshot.script;
       const language = snapshot.language || 'javascript';
@@ -210,18 +249,21 @@ export class InterviewService {
   async submitAptitudeResult(id: string, result: any) {
     const interview = await db('interviews').where({ id }).first();
     if (!interview) throw new AppError('Interview not found', 404);
-    if (interview.round_type !== 'aptitude') throw new AppError('This is not an aptitude round', 400);
+    // Accept both aptitude and technical automated assessments
+    if (!isAutomatedRound(interview.round_type) || !interview.assessment_status) {
+      throw new AppError('This is not an automated assessment round', 400);
+    }
 
     const [updated] = await db('interviews')
       .where({ id })
       .update({
         status: 'completed',
+        assessment_status: 'completed',
         aptitude_score: result.score,
         updated_at: db.fn.now(),
       })
       .returning('*');
 
-    // Broadcast real-time score to everyone in the interview room (interviewers)
     try {
       const io = getIO();
       io.to(`interview_${id}`).emit('aptitude-score-updated', {
@@ -256,7 +298,6 @@ export class InterviewService {
     const { script, language, stdin, interviewId } = data;
     const result = await executeWithPiston({ language, code: script, stdin });
 
-    // If an interviewId was provided, run plagiarism check asynchronously
     if (interviewId && script) {
       this.runPlagiarismCheck(interviewId, script, language).catch(err =>
         logger.warn('Plagiarism check after code execution failed', { module: 'Interview', err: err?.message })
@@ -266,14 +307,10 @@ export class InterviewService {
     return result;
   }
 
-  /**
-   * Run plagiarism check and store results in the interview record.
-   */
   private async runPlagiarismCheck(interviewId: string, code: string, language: string) {
     try {
       const report = await codePlagiarismService.checkPlagiarism(interviewId, code, language);
 
-      // Store the plagiarism report in the interview metadata
       await db('interviews')
         .where({ id: interviewId })
         .update({
@@ -281,7 +318,6 @@ export class InterviewService {
           updated_at: db.fn.now(),
         });
 
-      // If flagged, broadcast a real-time warning to the interview room
       if (report.is_flagged) {
         try {
           const io = getIO();
@@ -302,9 +338,6 @@ export class InterviewService {
     }
   }
 
-  /**
-   * Get the plagiarism report for a specific interview.
-   */
   async getPlagiarismReport(interviewId: string) {
     const interview = await db('interviews')
       .select('id', 'plagiarism_report', 'code_snapshots')
@@ -315,11 +348,10 @@ export class InterviewService {
 
     const report = interview.plagiarism_report
       ? (typeof interview.plagiarism_report === 'string'
-          ? JSON.parse(interview.plagiarism_report)
-          : interview.plagiarism_report)
+        ? JSON.parse(interview.plagiarism_report)
+        : interview.plagiarism_report)
       : null;
 
-    // Also provide the code analysis metadata
     let codeAnalysis = null;
     if (interview.code_snapshots && Array.isArray(interview.code_snapshots) && interview.code_snapshots.length > 0) {
       const lastSnapshot = interview.code_snapshots[interview.code_snapshots.length - 1];
@@ -382,7 +414,6 @@ export class InterviewService {
 
     if (interviews.length === 0) return [];
 
-    // Single GROUP BY query instead of N individual COUNT queries
     const interviewIds = interviews.map((iv: any) => iv.id);
     const counts = await db('interview_transcripts')
       .whereIn('interview_id', interviewIds)
@@ -402,7 +433,6 @@ export class InterviewService {
 
   async requestReschedule(interviewId: string, candidateId: string, data: { reason: string, preferred_date: string }) {
     return await db.transaction(async (trx) => {
-      // Find the interview and verify candidate owns it
       const interview = await trx('interviews')
         .join('applications', 'interviews.application_id', 'applications.id')
         .where('interviews.id', interviewId)
@@ -418,7 +448,6 @@ export class InterviewService {
         throw new AppError('Only scheduled interviews can be rescheduled', 400);
       }
 
-      // Check if there is already a pending reschedule request
       const existing = await trx('reschedule_requests')
         .where({ interview_id: interviewId, status: 'pending' })
         .first();
@@ -426,7 +455,6 @@ export class InterviewService {
         throw new AppError('A reschedule request is already pending for this interview', 400);
       }
 
-      // Insert reschedule request
       const [request] = await trx('reschedule_requests')
         .insert({
           interview_id: interviewId,
@@ -437,7 +465,6 @@ export class InterviewService {
         })
         .returning('*');
 
-      // Update interview status
       await trx('interviews')
         .where({ id: interviewId })
         .update({ status: 'reschedule_requested', updated_at: db.fn.now() });
@@ -497,10 +524,8 @@ export class InterviewService {
         return { success: true, message: 'Reschedule request rejected' };
       }
 
-      // Approve flow:
       const scheduleTime = newTime ? new Date(newTime) : new Date(request.preferred_date);
 
-      // Check conflict for interviewer at new time
       const conflict = await interviewRepository.checkConflict(request.interviewer_id, scheduleTime, request.duration);
       if (conflict) {
         throw new AppError('Interviewer has a scheduling conflict at the new proposed time', 400);
@@ -524,3 +549,4 @@ export class InterviewService {
 }
 
 export const interviewService = new InterviewService();
+

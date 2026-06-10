@@ -12,12 +12,14 @@
     "migrate:rollback": "knex migrate:rollback --knexfile knexfile.ts",
     "migrate:make": "knex migrate:make --knexfile knexfile.ts",
     "seed:run": "knex seed:run --knexfile knexfile.ts",
-    "seed:make": "knex seed:make --knexfile knexfile.ts"
+    "seed:make": "knex seed:make --knexfile knexfile.ts",
+    "reset:test-data": "ts-node-dev --transpile-only scripts/reset_test_data.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/pdf-parse": "^1.1.5",
     "axios": "^1.15.2",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
@@ -28,10 +30,11 @@
     "google-auth-library": "^10.6.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "knex": "^3.2.9",
+    "knex": "^3.2.10",
     "morgan": "^1.10.1",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.7",
+    "pdf-parse": "^2.4.5",
     "pg": "^8.20.0",
     "socket.io": "^4.8.3",
     "winston": "^3.19.0",

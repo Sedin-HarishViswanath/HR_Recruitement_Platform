@@ -56,7 +56,7 @@ export class ApplicationService {
       await trx('stage_transitions').insert({
         application_id: application.id,
         to_stage: application.status,
-        changed_by: candidate.id, // In this case, the candidate themselves
+        changed_by: null, // Candidate-initiated transitions have no company user owner
         notes: `Initial application. AI Score: ${ai_score}%`
       });
 

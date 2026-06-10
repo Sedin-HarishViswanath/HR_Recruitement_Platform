@@ -19,6 +19,7 @@ router.get('/assigned', authenticate, authorize('Interviewer', 'Recruiter', 'Adm
 router.post('/:id/feedback', authenticate, authorize('Interviewer', 'Recruiter', 'Admin'), interviewController.submitFeedback.bind(interviewController));
 router.get('/:id/meeting-room', authenticate, interviewController.getMeetingRoom.bind(interviewController));
 router.post('/:id/aptitude-result', authenticate, authorize('Candidate'), interviewController.submitAptitudeResult.bind(interviewController));
+router.post('/:id/start-assessment', authenticate, authorize('Candidate'), interviewController.startAssessment.bind(interviewController));
 
 // Reschedule routes
 router.get('/reschedule-requests', authenticate, authorize('Admin', 'Recruiter'), interviewController.listRescheduleRequests.bind(interviewController));

@@ -26,7 +26,7 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().default('http://localhost:5173'),
 
   // Custom ML flags
-  USE_CUSTOM_ML: z.string().default('false').transform(v => v === 'true'),
+  USE_CUSTOM_ML: z.string().default('true').transform(v => v === 'true'),
   PLAGIARISM_THRESHOLD: z.string().default('70').transform(v => parseInt(v, 10)),
 });
 

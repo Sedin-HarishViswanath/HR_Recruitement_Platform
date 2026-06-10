@@ -38,19 +38,19 @@ const getStageLabel = (app: any) => {
 const getStageStyle = (status: string) => {
   const s = String(status || '').toLowerCase();
   if (['new', 'applied', 'screening', 'shortlisted'].includes(s))
-    return 'bg-blue-50 text-blue-700 border-blue-200';
+    return 'badge-premium badge-sky';
   if (s.startsWith('interview_') || s === 'interview')
-    return 'bg-violet-50 text-violet-700 border-violet-200';
-  if (s === 'hired') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-  if (s === 'rejected') return 'bg-red-50 text-red-600 border-red-200';
-  return 'bg-slate-100 text-slate-600 border-slate-200';
+    return 'badge-premium badge-violet';
+  if (s === 'hired') return 'badge-premium badge-emerald';
+  if (s === 'rejected') return 'badge-premium badge-red';
+  return 'badge-premium bg-slate-50 text-slate-500 border-slate-200';
 };
 
 const getAiScoreStyle = (score: number) => {
-  if (score >= 85) return { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', bar: 'bg-emerald-500' };
-  if (score >= 70) return { badge: 'bg-blue-50 text-blue-700 border-blue-200', bar: 'bg-blue-500' };
-  if (score >= 55) return { badge: 'bg-violet-50 text-violet-700 border-violet-200', bar: 'bg-violet-500' };
-  return { badge: 'bg-slate-100 text-slate-600 border-slate-200', bar: 'bg-slate-400' };
+  if (score >= 85) return { badge: 'badge-premium badge-emerald', bar: 'bg-emerald-500' };
+  if (score >= 70) return { badge: 'badge-premium badge-sky', bar: 'bg-blue-500' };
+  if (score >= 55) return { badge: 'badge-premium badge-violet', bar: 'bg-violet-500' };
+  return { badge: 'badge-premium bg-slate-50 text-slate-500 border-slate-200', bar: 'bg-slate-400' };
 };
 
 const getInitials = (name: string) => {
@@ -60,16 +60,16 @@ const getInitials = (name: string) => {
 };
 
 const GRADIENTS = [
-  'from-blue-500 to-cyan-500', 'from-violet-500 to-purple-500',
-  'from-amber-500 to-orange-500', 'from-emerald-500 to-teal-500',
-  'from-rose-500 to-pink-500', 'from-sky-500 to-indigo-500',
+  'from-blue-600 to-cyan-600', 'from-violet-600 to-indigo-600',
+  'from-amber-600 to-orange-600', 'from-emerald-600 to-teal-600',
+  'from-rose-600 to-pink-600', 'from-sky-600 to-indigo-600',
 ];
 
 const REC_STYLE: Record<string, string> = {
-  strong_hire: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  hire: 'bg-green-50 text-green-700 border-green-200',
-  no_hire: 'bg-orange-50 text-orange-700 border-orange-200',
-  strong_no_hire: 'bg-red-50 text-red-700 border-red-200',
+  strong_hire: 'badge-premium badge-emerald',
+  hire: 'badge-premium badge-emerald',
+  no_hire: 'badge-premium badge-amber',
+  strong_no_hire: 'badge-premium badge-red',
 };
 
 const REC_LABEL: Record<string, string> = {
@@ -79,7 +79,7 @@ const REC_LABEL: Record<string, string> = {
 
 // ── Skeleton ─────────────────────────────────────────────────────────────────
 const AppCardSkeleton = () => (
-  <div className="bg-white rounded-xl border border-slate-200/80 p-5 animate-pulse">
+  <div className="panel p-5 animate-pulse">
     <div className="flex items-center gap-4">
       <div className="w-10 h-10 rounded-xl bg-slate-200 shrink-0" />
       <div className="flex-1 space-y-2">
@@ -234,36 +234,34 @@ export const CompanyApplicationsPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-
       {/* ── Page header ── */}
       <div className="topbar-frost px-6 py-4 sticky top-0 z-40">
         <div>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
             Workspace &rsaquo; <span className="text-slate-600">Applications</span>
           </p>
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
               Applications
             </h1>
-            <span className="text-xs text-slate-400 font-medium">{applications.length} total</span>
+            <span className="chip-brand">{applications.length} Pipeline Entries</span>
           </div>
         </div>
       </div>
 
-      <main className="p-5 max-w-[1400px] w-full mx-auto space-y-5 flex-1">
-
+      <main className="p-6 max-w-[1400px] w-full mx-auto space-y-6 flex-1 animate-fade-in-up">
         {/* ── Toolbar ── */}
-        <div className="surface-raised !rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="panel p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
             {/* Search */}
             <div className="relative flex-1 min-w-[200px] max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={13} />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={13} />
               <input
                 type="text"
-                placeholder="Search candidates or jobs..."
+                placeholder="Search candidates or job posts..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 font-medium text-slate-700 placeholder:text-slate-400 transition-all"
+                className="input-premium pl-9 text-xs py-2 bg-slate-50/50"
               />
             </div>
 
@@ -273,7 +271,7 @@ export const CompanyApplicationsPage = () => {
               <select
                 value={selectedJob}
                 onChange={(e) => setSelectedJob(e.target.value)}
-                className="pl-8 pr-8 py-2 text-xs border border-slate-200 rounded-lg bg-slate-50 font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 cursor-pointer appearance-none min-w-[180px]"
+                className="input-premium pl-8 pr-8 py-2 text-xs bg-slate-50/50 font-bold text-slate-600 appearance-none min-w-[180px]"
               >
                 <option value="all">All Jobs</option>
                 {jobs.map((job) => (
@@ -284,44 +282,46 @@ export const CompanyApplicationsPage = () => {
             </div>
           </div>
 
-          {/* Compare button */}
-          {selectedIds.size >= 2 && (
-            <button
-              onClick={() => setCompareOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-sm"
-            >
-              <GitCompare size={13} />
-              Compare ({selectedIds.size})
-            </button>
-          )}
-          {selectedIds.size === 1 && (
-            <span className="text-[10px] text-slate-500 font-medium px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg">
-              Select 1 more to compare
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Compare actions */}
+            {selectedIds.size >= 2 && (
+              <button
+                onClick={() => setCompareOpen(true)}
+                className="btn-primary py-2 px-4 text-xs"
+              >
+                <GitCompare size={13} />
+                Compare ({selectedIds.size})
+              </button>
+            )}
+            {selectedIds.size === 1 && (
+              <span className="text-[10px] text-slate-500 font-bold px-3 py-2 bg-slate-50 border border-slate-200/60 rounded-xl">
+                Select 1 more to compare
+              </span>
+            )}
 
-          {/* Stage tabs */}
-          <div className="flex items-center bg-slate-50 border border-slate-200/60 rounded-lg p-0.5 gap-0.5">
-            {STAGE_FILTERS.map((stage) => {
-              const count = stageCounts[stage] || 0;
-              const isActive = activeStage === stage;
-              return (
-                <button
-                  key={stage}
-                  onClick={() => setActiveStage(stage)}
-                  className={`px-3 py-1.5 rounded-md text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                    isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-700'
-                  }`}
-                >
-                  {stage}
-                  {stage !== 'All' && count > 0 && (
-                    <span className={`text-[9px] font-bold px-1.5 rounded-full ${isActive ? 'bg-violet-100 text-violet-700' : 'bg-slate-200 text-slate-500'}`}>
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+            {/* Stage tabs */}
+            <div className="flex items-center bg-slate-100/80 border border-slate-200/50 rounded-xl p-0.5 gap-0.5">
+              {STAGE_FILTERS.map((stage) => {
+                const count = stageCounts[stage] || 0;
+                const isActive = activeStage === stage;
+                return (
+                  <button
+                    key={stage}
+                    onClick={() => setActiveStage(stage)}
+                    className={`px-3 py-1.5 rounded-lg text-[10.5px] font-bold transition-spring cursor-pointer flex items-center gap-1 ${
+                      isActive ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40' : 'text-slate-400 hover:text-slate-700'
+                    }`}
+                  >
+                    {stage}
+                    {stage !== 'All' && count > 0 && (
+                      <span className={`text-[9px] font-bold px-1.5 rounded-full ${isActive ? 'bg-violet-100 text-violet-700' : 'bg-slate-200/80 text-slate-500'}`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -331,13 +331,15 @@ export const CompanyApplicationsPage = () => {
             {[0, 1, 2, 3].map(i => <AppCardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center surface-raised !rounded-xl">
-            <Filter size={28} className="mx-auto text-slate-300 mb-3" />
-            <p className="text-sm font-bold text-slate-600">No applications found</p>
-            <p className="text-xs text-slate-400 mt-1">Try adjusting your search or filters.</p>
+          <div className="py-24 text-center panel">
+            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200/60 mx-auto flex items-center justify-center mb-4">
+              <Filter size={24} className="text-slate-400" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-700 mt-1" style={{ fontFamily: 'Sora' }}>No Applications Found</h3>
+            <p className="text-xs text-slate-400 font-medium mt-1.5 max-w-xs mx-auto">Try adjusting your filters or search terms.</p>
           </div>
         ) : (
-          <div className="panel divide-y divide-slate-100 overflow-hidden">
+          <div className="panel divide-y divide-slate-100 overflow-hidden list-slide-in">
             {filtered.map((app, i) => {
               const name = app.candidate_name || app.user_name || 'Unknown';
               const email = app.candidate_email || app.user_email || '';
@@ -359,77 +361,75 @@ export const CompanyApplicationsPage = () => {
               return (
                 <div
                   key={app.id || i}
-                  className="overflow-hidden transition-colors duration-200 hover:bg-slate-50/50"
+                  className="overflow-hidden transition-colors duration-200 hover:bg-slate-50/20"
                 >
                   {/* ── Main row ── */}
                   <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center gap-4">
-
                     {/* Select checkbox */}
                     <div
                       onClick={() => toggleSelect(app.id)}
                       className="shrink-0 cursor-pointer"
                     >
-                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
+                      <div className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center transition-spring ${
                         selectedIds.has(app.id)
-                          ? 'bg-violet-600 border-violet-600'
+                          ? 'bg-violet-600 border-violet-600 shadow-sm shadow-violet-200'
                           : 'bg-white border-slate-300 hover:border-violet-400'
                       }`}>
                         {selectedIds.has(app.id) && (
-                          <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                            <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg width="9" height="7" viewBox="0 0 8 6" fill="none">
+                            <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         )}
                       </div>
                     </div>
 
-                  {/* Avatar + info */}
+                    {/* Avatar + info */}
                     <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0 shadow-sm`}>
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0 shadow-sm border border-slate-700/5`}>
                         {initials}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-sm font-bold text-slate-900">{name}</p>
-                          <span className={`text-[10.5px] font-semibold px-2 py-0.5 rounded-md border ${getStageStyle(app.status)}`}>
+                          <p className="text-sm font-bold text-slate-900 leading-none">{name}</p>
+                          <span className={getStageStyle(app.status)}>
                             {getStageLabel(app)}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-[10.5px] text-slate-500 font-semibold flex-wrap mt-0.5">
-                          <span className="truncate max-w-[180px]">{app.job_title || '—'}</span>
-                          <span className="text-slate-300">·</span>
-                          <span className="truncate max-w-[160px]">{email}</span>
+                        <div className="flex items-center gap-1.5 text-[10.5px] text-slate-400 font-semibold flex-wrap mt-1">
+                          <span className="text-slate-700 truncate max-w-[180px]">{app.job_title || '—'}</span>
+                          <span className="text-slate-350">•</span>
+                          <span className="truncate max-w-[200px]">{email}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* AI score + date */}
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-4 shrink-0 justify-between md:justify-end">
                       {aiScore != null && scoreStyle && (
                         <div className="flex flex-col items-end gap-1">
-                          <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-lg border ${scoreStyle.badge}`}>
-                            <Sparkles size={11} className="opacity-70" />
+                          <span className={scoreStyle.badge}>
+                            <Sparkles size={10} />
                             {aiScore}% fit
                           </span>
-                          {/* Mini progress bar */}
                           <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full transition-all ${scoreStyle.bar}`} style={{ width: `${aiScore}%` }} />
+                            <div className={`h-full rounded-full transition-spring ${scoreStyle.bar}`} style={{ width: `${aiScore}%` }} />
                           </div>
                         </div>
                       )}
-                      <span className="text-[10px] text-slate-400 font-semibold whitespace-nowrap">{date}</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider whitespace-nowrap">{date}</span>
                     </div>
 
                     {/* Action buttons */}
                     <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                       <button
                         onClick={() => toggleFeedback(app.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer shadow-sm h-8 hover:border-slate-300"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-650 border border-slate-200 rounded-xl text-[10.5px] font-bold transition-spring shadow-sm h-8.5 hover:border-slate-300 cursor-pointer"
                       >
-                        <Eye size={12} className="text-slate-400" />
+                        <Eye size={12} className="text-slate-450" />
                         Feedback
                         {isExpanded
-                          ? <ChevronUp size={11} className="text-slate-400" />
-                          : <ChevronDown size={11} className="text-slate-400" />}
+                          ? <ChevronUp size={11} className="text-slate-450" />
+                          : <ChevronDown size={11} className="text-slate-450" />}
                       </button>
 
                       {/* Contextual action buttons */}
@@ -437,13 +437,13 @@ export const CompanyApplicationsPage = () => {
                         <>
                           <button
                             onClick={() => setScheduleModal({ isOpen: true, application: app })}
-                            className="h-8 px-3.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer shadow-sm"
+                            className="btn-primary py-1.5 px-3.5 text-[10.5px] h-8.5"
                           >
                             Schedule Interview
                           </button>
                           <button
                             onClick={() => setRejectModal({ isOpen: true, app })}
-                            className="h-8 px-3.5 bg-white border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer"
+                            className="btn-soft px-3.5 text-[10.5px] h-8.5 hover:bg-red-50 hover:text-red-655 hover:border-red-200"
                           >
                             Reject
                           </button>
@@ -454,23 +454,23 @@ export const CompanyApplicationsPage = () => {
                         if (latestStatus === 'scheduled' || latestStatus === 'reschedule_requested') {
                           return (
                             <>
-                              <span className="h-8 inline-flex items-center px-3 bg-violet-50 text-violet-700 border border-violet-100 rounded-lg text-[10.5px] font-bold">
+                              <span className="h-8.5 inline-flex items-center px-3 bg-violet-50 text-violet-700 border border-violet-100 rounded-xl text-[10.5px] font-bold">
                                 {latestStatus === 'reschedule_requested' ? 'Reschedule Pending' : 'Interview Scheduled'}
                               </span>
                               {isLastRound && (
                                 <button
                                   onClick={() => setHireConfirm({ isOpen: true, app, loading: false })}
-                                  className="h-8 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer shadow-sm"
+                                  className="h-8.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10.5px] font-bold transition-spring shadow-sm shadow-emerald-150 cursor-pointer"
                                 >
                                   Hire
                                 </button>
                               )}
                               <button
-                                onClick={() => setRejectModal({ isOpen: true, app })}
-                                className="h-8 px-3.5 bg-white border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer"
-                              >
-                                Reject
-                              </button>
+                                  onClick={() => setRejectModal({ isOpen: true, app })}
+                                  className="btn-soft px-3.5 text-[10.5px] h-8.5 hover:bg-red-50 hover:text-red-655 hover:border-red-200"
+                                >
+                                  Reject
+                                </button>
                             </>
                           );
                         }
@@ -480,13 +480,13 @@ export const CompanyApplicationsPage = () => {
                               <>
                                 <button
                                   onClick={() => setScheduleModal({ isOpen: true, application: app })}
-                                  className="h-8 px-3.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer shadow-sm"
+                                  className="btn-primary py-1.5 px-3.5 text-[10.5px] h-8.5"
                                 >
                                   Schedule Next Round
                                 </button>
                                 <button
                                   onClick={() => setRejectModal({ isOpen: true, app })}
-                                  className="h-8 px-3.5 bg-white border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer"
+                                  className="btn-soft px-3.5 text-[10.5px] h-8.5 hover:bg-red-50 hover:text-red-655 hover:border-red-200"
                                 >
                                   Reject
                                 </button>
@@ -497,13 +497,13 @@ export const CompanyApplicationsPage = () => {
                             <>
                               <button
                                 onClick={() => setHireConfirm({ isOpen: true, app, loading: false })}
-                                className="h-8 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer shadow-sm"
+                                className="h-8.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10.5px] font-bold transition-spring shadow-sm shadow-emerald-150 cursor-pointer"
                               >
-                                Hire
+                                Hire Candidate
                               </button>
                               <button
                                 onClick={() => setRejectModal({ isOpen: true, app })}
-                                className="h-8 px-3.5 bg-white border border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer"
+                                className="btn-soft px-3.5 text-[10.5px] h-8.5 hover:bg-red-50 hover:text-red-655 hover:border-red-200"
                               >
                                 Reject
                               </button>
@@ -517,8 +517,8 @@ export const CompanyApplicationsPage = () => {
 
                   {/* ── Feedback drawer ── */}
                   {isExpanded && (
-                    <div className="border-t border-slate-100 bg-slate-50/40 p-5 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-slate-400 tracking-wider">
+                    <div className="border-t border-slate-100 bg-slate-50/40 p-5 space-y-4 animate-fade-in-up">
+                      <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-slate-400 tracking-wider">
                         <MessageSquare size={12} className="text-violet-500" />
                         Interview Feedback · {name}
                       </div>
@@ -526,133 +526,135 @@ export const CompanyApplicationsPage = () => {
                       {loadingFeedback === app.id ? (
                         <div className="flex items-center gap-2 py-4">
                           <div className="w-4 h-4 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" />
-                          <span className="text-xs text-slate-400 font-medium">Loading feedback...</span>
+                          <span className="text-xs text-slate-450 font-bold">Retrieving scorecards...</span>
                         </div>
                       ) : appFeedback.length === 0 ? (
-                        <div className="py-6 text-center bg-white border border-slate-100 rounded-xl max-w-md mx-auto">
-                          <MessageSquare size={20} className="mx-auto text-slate-200 mb-2" />
-                          <p className="text-xs font-bold text-slate-500">No feedback yet</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">Available after interviewers complete their rounds.</p>
+                        <div className="py-8 text-center bg-white border border-slate-150 rounded-2xl max-w-md mx-auto shadow-sm">
+                          <MessageSquare size={20} className="mx-auto text-slate-300 mb-2" />
+                          <p className="text-xs font-bold text-slate-500">No scorecards submitted</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5">Feedback details will load after the interviews are completed.</p>
                         </div>
                       ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           {appFeedback.map((f: any, fi: number) => {
                             const hasFeedback = !!f.rating;
                             const isAptitude = (f.round_type || '').toLowerCase() === 'aptitude';
                             const aptitudePct = f.aptitude_score != null ? Math.round((f.aptitude_score / 20) * 100) : null;
                             return (
-                            <div key={f.interview_id || f.id || fi} className="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm space-y-3">
-                              {/* Round header */}
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
-                                    <Award size={14} className="text-violet-600" />
-                                  </div>
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <p className="text-xs font-bold text-slate-900 capitalize">
-                                        {f.round_type || 'Interview'} Round
-                                      </p>
-                                      {f.round_number && (
-                                        <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
-                                          #{f.round_number}
+                              <div key={f.interview_id || f.id || fi} className="outer-bezel">
+                                <div className="inner-core space-y-3">
+                                  {/* Round header */}
+                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
+                                        <Award size={14} className="text-violet-600" />
+                                      </div>
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <p className="text-xs font-extrabold text-slate-900 capitalize">
+                                            {f.round_type || 'Interview'} Round
+                                          </p>
+                                          {f.round_number && (
+                                            <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                              #{f.round_number}
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold mt-0.5 flex-wrap">
+                                          <User size={10} className="text-slate-400" />
+                                          {f.interviewer_name || 'Interviewer'}
+                                          {f.scheduled_at && (
+                                            <>
+                                              <span className="text-slate-300">·</span>
+                                              <Calendar size={10} className="text-slate-400" />
+                                              {new Date(f.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      {f.recommendation && (
+                                        <span className={REC_STYLE[f.recommendation] || 'badge-premium bg-slate-100 text-slate-650'}>
+                                          {REC_LABEL[f.recommendation] || f.recommendation}
+                                        </span>
+                                      )}
+                                      {!hasFeedback && (
+                                        <span className="badge-premium badge-amber">
+                                          {f.interview_status === 'completed' || isAptitude ? 'Completed' : 'Pending feedback'}
                                         </span>
                                       )}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold mt-0.5 flex-wrap">
-                                      <User size={10} />
-                                      {f.interviewer_name || 'Interviewer'}
-                                      {f.scheduled_at && (
-                                        <>
-                                          <span className="text-slate-300">·</span>
-                                          <Calendar size={10} />
-                                          {new Date(f.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                        </>
-                                      )}
-                                    </div>
                                   </div>
-                                </div>
-                                <div className="flex items-center gap-2 shrink-0">
-                                  {f.recommendation && (
-                                    <span className={`text-[9px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_STYLE[f.recommendation] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
-                                      {REC_LABEL[f.recommendation] || f.recommendation}
-                                    </span>
+
+                                  {/* Aptitude score block */}
+                                  {isAptitude && f.aptitude_score != null && (
+                                    <div className="flex items-center gap-4 p-3.5 rounded-xl bg-violet-50/70 border border-violet-100">
+                                      <div className="text-center shrink-0">
+                                        <p className="text-2xl font-black text-violet-750">{f.aptitude_score}<span className="text-sm font-bold text-violet-400">/20</span></p>
+                                        <p className="text-[9px] font-bold text-violet-500 uppercase tracking-wider">Aptitude Score</p>
+                                      </div>
+                                      <div className="flex-1">
+                                        <div className="w-full bg-violet-100/50 rounded-full h-1.5 mb-1.5">
+                                          <div
+                                            className={`h-1.5 rounded-full transition-spring ${aptitudePct != null && aptitudePct >= 70 ? 'bg-emerald-500' : 'bg-violet-500'}`}
+                                            style={{ width: `${aptitudePct ?? 0}%` }}
+                                          />
+                                        </div>
+                                        <p className={`text-[10px] font-bold ${aptitudePct != null && aptitudePct >= 70 ? 'text-emerald-600' : 'text-violet-650'}`}>
+                                          {aptitudePct}% &mdash; {aptitudePct != null && aptitudePct >= 70 ? 'Passed technical threshold' : 'Under target criteria'}
+                                        </p>
+                                      </div>
+                                    </div>
                                   )}
-                                  {!hasFeedback && (
-                                    <span className="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
-                                      {f.interview_status === 'completed' || isAptitude ? 'Completed' : 'Pending feedback'}
-                                    </span>
+
+                                  {/* Aptitude pending */}
+                                  {isAptitude && f.aptitude_score == null && (
+                                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                                      <p className="text-xs text-slate-400 font-medium">Aptitude assessment not yet completed</p>
+                                    </div>
+                                  )}
+
+                                  {/* Feedback details — only when feedback was submitted */}
+                                  {hasFeedback && (
+                                    <>
+                                      <div className="flex items-center gap-1">
+                                        {[1, 2, 3, 4, 5].map(s => (
+                                          <Star key={s} size={13} className={s <= (f.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'} />
+                                        ))}
+                                        <span className="ml-1.5 text-[10.5px] font-bold text-slate-500">
+                                          {f.rating}/5 &middot; {['', 'Poor', 'Below Avg', 'Average', 'Good', 'Excellent'][f.rating] || ''}
+                                        </span>
+                                      </div>
+
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div className="p-3.5 rounded-xl bg-emerald-50/30 border border-emerald-100/60">
+                                          <p className="text-[9px] font-black uppercase tracking-wider text-emerald-600 mb-1">Strengths</p>
+                                          <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.strengths || 'Not provided'}</p>
+                                        </div>
+                                        <div className="p-3.5 rounded-xl bg-rose-50/20 border border-rose-100/50">
+                                          <p className="text-[9px] font-black uppercase tracking-wider text-rose-600 mb-1">Areas for Improvement</p>
+                                          <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.weaknesses || 'Not provided'}</p>
+                                        </div>
+                                      </div>
+
+                                      {f.additional_comments && (
+                                        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                                          <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">Notes</p>
+                                          <p className="text-xs font-medium text-slate-655 leading-relaxed italic">&ldquo;{f.additional_comments}&rdquo;</p>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+
+                                  {/* Non-aptitude round with no feedback yet */}
+                                  {!hasFeedback && !isAptitude && (
+                                    <p className="text-xs text-slate-400 font-medium text-center py-2">
+                                      Interviewer feedback pending
+                                    </p>
                                   )}
                                 </div>
                               </div>
-
-                              {/* Aptitude score block */}
-                              {isAptitude && f.aptitude_score != null && (
-                                <div className="flex items-center gap-4 p-3 rounded-lg bg-violet-50 border border-violet-100">
-                                  <div className="text-center">
-                                    <p className="text-2xl font-black text-violet-700">{f.aptitude_score}<span className="text-sm font-bold text-violet-400">/20</span></p>
-                                    <p className="text-[9px] font-bold text-violet-500 uppercase tracking-wider">Aptitude Score</p>
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="w-full bg-violet-100 rounded-full h-2 mb-1">
-                                      <div
-                                        className={`h-2 rounded-full transition-all ${aptitudePct != null && aptitudePct >= 70 ? 'bg-emerald-500' : 'bg-violet-500'}`}
-                                        style={{ width: `${aptitudePct ?? 0}%` }}
-                                      />
-                                    </div>
-                                    <p className={`text-[10px] font-bold ${aptitudePct != null && aptitudePct >= 70 ? 'text-emerald-600' : 'text-violet-600'}`}>
-                                      {aptitudePct}% &mdash; {aptitudePct != null && aptitudePct >= 70 ? 'Above threshold' : 'Below threshold'}
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Aptitude pending */}
-                              {isAptitude && f.aptitude_score == null && (
-                                <div className="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
-                                  <p className="text-xs text-slate-400 font-medium">Aptitude test not yet completed</p>
-                                </div>
-                              )}
-
-                              {/* Feedback details — only when feedback was submitted */}
-                              {hasFeedback && (
-                                <>
-                                  <div className="flex items-center gap-1">
-                                    {[1, 2, 3, 4, 5].map(s => (
-                                      <Star key={s} size={13} className={s <= (f.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'} />
-                                    ))}
-                                    <span className="ml-1.5 text-[10.5px] font-bold text-slate-500">
-                                      {f.rating}/5 &middot; {['', 'Poor', 'Below Avg', 'Average', 'Good', 'Excellent'][f.rating] || ''}
-                                    </span>
-                                  </div>
-
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div className="p-3 rounded-lg bg-emerald-50/40 border border-emerald-100">
-                                      <p className="text-[9px] font-semibold uppercase tracking-wider text-emerald-600 mb-1">Strengths</p>
-                                      <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.strengths || 'Not provided'}</p>
-                                    </div>
-                                    <div className="p-3 rounded-lg bg-red-50/30 border border-red-100">
-                                      <p className="text-[9px] font-semibold uppercase tracking-wider text-red-600 mb-1">Areas for Improvement</p>
-                                      <p className="text-xs font-medium text-slate-700 leading-relaxed">{f.weaknesses || 'Not provided'}</p>
-                                    </div>
-                                  </div>
-
-                                  {f.additional_comments && (
-                                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
-                                      <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Notes</p>
-                                      <p className="text-xs font-medium text-slate-600 leading-relaxed italic">&ldquo;{f.additional_comments}&rdquo;</p>
-                                    </div>
-                                  )}
-                                </>
-                              )}
-
-                              {/* Non-aptitude round with no feedback yet */}
-                              {!hasFeedback && !isAptitude && (
-                                <p className="text-xs text-slate-400 font-medium text-center py-2">
-                                  Interviewer feedback pending
-                                </p>
-                              )}
-                            </div>
                             );
                           })}
                         </div>

@@ -5,7 +5,7 @@ import type { RootState } from '../../../app/store';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
 import {
-  Calendar, Clock, Video, Plus,
+  Calendar as CalendarIcon, Clock, Video, Plus,
   Brain, AlertCircle, CheckSquare, MessageSquare,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
@@ -134,9 +134,9 @@ export const CompanyInterviewsPage = () => {
       days.push(
         <div
           key={d}
-          className={`h-7 w-7 rounded-md flex flex-col items-center justify-center text-[10px] font-bold relative cursor-pointer hover:bg-slate-50 transition-colors ${
+          className={`h-7 w-7 rounded-md flex flex-col items-center justify-center text-[10px] font-bold relative cursor-pointer hover:bg-slate-100 transition-colors ${
             isToday
-              ? 'bg-violet-600 text-white hover:bg-violet-700'
+              ? 'bg-violet-650 text-white'
               : 'text-slate-700'
           }`}
         >
@@ -192,13 +192,13 @@ export const CompanyInterviewsPage = () => {
           <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span>
             <span>&rsaquo;</span>
-            <span className="text-slate-600 font-semibold">Interviews</span>
+            <span className="text-slate-655 font-semibold">Interviews</span>
           </div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
-              {isInterviewer ? 'My Interviews' : 'Interviews'}
+              {isInterviewer ? 'Assigned Interviews' : 'Interview Scheduler'}
             </h1>
-            <span className="text-xs text-slate-400 font-medium">{weekInterviews.length} this week &middot; {todayInterviews.length} today</span>
+            <span className="chip-brand">{weekInterviews.length} Booked Round{weekInterviews.length !== 1 ? 's' : ''}</span>
           </div>
         </div>
 
@@ -206,32 +206,30 @@ export const CompanyInterviewsPage = () => {
           {canSchedule && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="text-[12px] font-bold text-white bg-violet-600 hover:bg-violet-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-sm shadow-violet-500/10 hover:scale-[1.01]"
+              className="btn-primary"
             >
               <Plus size={13} />
-              Schedule
+              Schedule Round
             </button>
           )}
         </div>
       </div>
 
-      <main className="p-5 max-w-[1600px] w-full mx-auto space-y-6 flex-1 flex flex-col">
-
+      <main className="p-6 max-w-[1600px] w-full mx-auto space-y-6 flex-1 flex flex-col animate-fade-in-up">
         {/* Top metrics bar */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Today', value: String(todayInterviews.length), icon: Calendar, color: 'text-violet-600 bg-violet-50 border-violet-100' },
-            { label: 'This Week', value: String(weekInterviews.length), icon: Clock, color: 'text-sky-600 bg-sky-50 border-sky-100' },
-            { label: 'Avg Duration', value: `${avgDuration}m`, icon: Brain, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
-            { label: 'No-Shows', value: String(noShowInterviews.length), icon: AlertCircle, color: 'text-rose-600 bg-rose-50 border-rose-100' },
+            { label: 'Today', value: String(todayInterviews.length), icon: CalendarIcon, color: 'text-violet-600 bg-violet-500/10 border-violet-250/20' },
+            { label: 'This Week', value: String(weekInterviews.length), icon: Clock, color: 'text-sky-600 bg-sky-500/10 border-sky-250/20' },
+            { label: 'Avg Duration', value: `${avgDuration}m`, icon: Brain, color: 'text-emerald-600 bg-emerald-500/10 border-emerald-250/20' },
+            { label: 'No-Shows', value: String(noShowInterviews.length), icon: AlertCircle, color: 'text-rose-600 bg-rose-500/10 border-rose-250/20' },
           ].map((metric, i) => (
-            <div key={i} className="metric-card p-4 group">
-              <div className="metric-card-accent" />
+            <div key={i} className="stat-card p-4 group">
               <div className="flex items-start justify-between mb-3">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${metric.color}`}>
                   <metric.icon size={15} />
                 </div>
-                <p className="text-[9px] font-semibold uppercase text-slate-400 tracking-[0.12em] pt-0.5">{metric.label}</p>
+                <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.14em] pt-0.5">{metric.label}</p>
               </div>
               <p className="text-[28px] font-extrabold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {metric.value}
@@ -241,25 +239,24 @@ export const CompanyInterviewsPage = () => {
         </div>
 
         {/* Dynamic Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
-
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
           {/* Left panel: Timeline */}
-          <div className="surface-raised p-5 space-y-4">
+          <div className="panel p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
               <div>
                 <h3 className="font-bold text-slate-900 text-sm" style={{ fontFamily: 'Sora, sans-serif' }}>
                   Today &middot; {now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                 </h3>
-                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{todayScheduledCount} scheduled &middot; {todayInProgressCount} in progress</p>
+                <p className="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-wide">{todayScheduledCount} scheduled &middot; {todayInProgressCount} in progress</p>
               </div>
 
-              <div className="flex bg-slate-50 border border-slate-200/60 rounded-lg p-0.5">
+              <div className="flex bg-slate-100/80 border border-slate-200/50 rounded-xl p-0.5 gap-0.5">
                 {['Day', 'Week', 'Month'].map((tab) => (
                   <button
                     key={tab}
-                    className={`px-3 py-1 rounded text-[10px] font-bold transition-all ${
+                    className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-spring ${
                       tab === 'Day'
-                        ? 'bg-white text-slate-800 shadow-sm'
+                        ? 'bg-white text-slate-800 shadow-sm border border-slate-200/40'
                         : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
@@ -271,16 +268,16 @@ export const CompanyInterviewsPage = () => {
 
             {/* Interviewer notice */}
             {isInterviewer && (
-              <div className="bg-violet-50 border border-violet-100 rounded-xl px-4 py-2.5 text-xs text-violet-700 font-semibold">
-                Showing your assigned interviews only.
+              <div className="bg-violet-50/70 border border-violet-100 rounded-xl px-4 py-2.5 text-xs text-violet-750 font-bold">
+                Showing your assigned interview cards only.
               </div>
             )}
 
             {/* List of interviews */}
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-150/60 list-slide-in">
               {displayInterviews.length === 0 && (
-                <div className="py-8 text-center text-sm text-slate-400">
-                  {isInterviewer ? 'No interviews assigned to you yet.' : 'No interviews available'}
+                <div className="py-12 text-center text-xs text-slate-400 font-medium">
+                  {isInterviewer ? 'No interviews assigned to you yet.' : 'No interviews scheduled at the moment.'}
                 </div>
               )}
               {displayInterviews.map((item, idx) => {
@@ -293,35 +290,35 @@ export const CompanyInterviewsPage = () => {
                   <div
                     key={item.id}
                     onClick={() => handleActiveSelect(item)}
-                    className={`py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all ${
-                      isActive ? 'bg-slate-50/50 -mx-5 px-5 border-l-2 border-violet-600' : 'hover:bg-slate-50/30'
+                    className={`py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-spring ${
+                      isActive ? 'bg-violet-50/20 -mx-5 px-5 border-l-2 border-violet-600' : 'hover:bg-slate-50/30'
                     }`}
                   >
                     {/* Time & Candidate Info */}
                     <div className="flex items-start gap-4">
                       <div className="text-left min-w-[56px] leading-tight shrink-0 pt-0.5">
                         <p className="text-xs font-bold text-slate-900">{time}</p>
-                        <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{item.duration}min</p>
+                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">{item.duration}m</p>
                       </div>
 
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-9 h-9 rounded-full ${avatarBg} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0`}>
+                        <div className={`w-9 h-9 rounded-xl ${avatarBg} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0 border border-slate-700/5 shadow-sm`}>
                           {initials}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="font-bold text-xs text-slate-900 truncate">
                               {item.candidate_name}
                             </h4>
                             {item.isLive && (
-                              <span className="inline-flex items-center gap-1 text-[8px] font-black px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 animate-pulse uppercase tracking-wider">
-                                <span className="w-1 h-1 bg-emerald-500 rounded-full" />
-                                Live now
+                              <span className="inline-flex items-center gap-1 text-[8.5px] font-black px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 animate-pulse uppercase tracking-wider">
+                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                Live round
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-slate-500 font-medium mt-0.5">
-                            {item.job_title} &middot; <span className="text-violet-500 font-bold uppercase tracking-wider text-[8px]">{item.round_type}</span>
+                          <p className="text-[10px] text-slate-500 font-semibold mt-1">
+                            {item.job_title} &middot; <span className="text-violet-600 font-bold uppercase tracking-wider text-[9px]">{item.round_type}</span>
                           </p>
                         </div>
                       </div>
@@ -336,17 +333,16 @@ export const CompanyInterviewsPage = () => {
                           navigate(`/interview/${item.id}`);
                         }}
                         disabled={item.application_status === 'rejected' || item.application_status === 'withdrawn'}
-                        className={`text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all ${
+                        className={`text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-spring border cursor-pointer ${
                           (item.application_status === 'rejected' || item.application_status === 'withdrawn')
-                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
+                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
                             : item.isLive
-                            ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-sm shadow-violet-500/10'
-                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                            ? 'bg-violet-600 text-white hover:bg-violet-700 border-violet-550 shadow-sm shadow-violet-200'
+                            : 'bg-white border-slate-200 text-slate-750 hover:bg-slate-50'
                         }`}
                       >
                         <Video size={12} />
-                        {(item.application_status === 'rejected' || item.application_status === 'withdrawn') ? 'Application Closed' : (item.isLive ? 'Join' : 'Open')}
-                        {!(item.application_status === 'rejected' || item.application_status === 'withdrawn') && <>&rarr;</>}
+                        {(item.application_status === 'rejected' || item.application_status === 'withdrawn') ? 'Round Closed' : (item.isLive ? 'Join Room' : 'Open Workspace')}
                       </button>
 
                       {/* Interviewers can submit feedback directly */}
@@ -356,7 +352,7 @@ export const CompanyInterviewsPage = () => {
                             e.stopPropagation();
                             setFeedbackModal({ isOpen: true, interview: item });
                           }}
-                          className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                          className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-spring bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                         >
                           <MessageSquare size={12} />
                           Feedback
@@ -371,99 +367,108 @@ export const CompanyInterviewsPage = () => {
 
           {/* Right panel: Details & Calendar */}
           <div className="space-y-6">
-
             {/* Details Panel */}
             {activeInt ? (
-            <div className="surface-raised p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                  <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                    {activeInt.isLive ? 'Live Now' : 'Details View'} &middot; {new Date(activeInt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </h3>
-                </div>
-              </div>
+              <div className="outer-bezel">
+                <div className="inner-core space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${activeInt.isLive ? 'bg-red-500 animate-pulse' : 'bg-slate-400'}`} />
+                      <h3 className="font-bold text-slate-900 text-[10px] uppercase tracking-wider" style={{ fontFamily: 'Sora' }}>
+                        {activeInt.isLive ? 'Simulator Active' : 'Round details'}
+                      </h3>
+                    </div>
+                  </div>
 
-              {/* Video preview mockup */}
-              <div className="bg-[#111827] rounded-xl overflow-hidden aspect-[4/3] flex flex-col justify-between p-4 relative group">
-                <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center select-none pointer-events-none">
-                  <div className="w-16 h-16 rounded-full bg-violet-600/35 border-2 border-violet-500/50 flex items-center justify-center text-white font-black text-lg backdrop-blur-sm group-hover:scale-105 transition-transform duration-300">
-                    {getInitials(activeInt.candidate_name)}
+                  {/* Video preview mockup */}
+                  <div className="rounded-xl overflow-hidden aspect-[4/3] flex flex-col justify-between p-4 relative group shadow-inner border border-slate-950" style={{ background: 'radial-gradient(circle at center, #1f2937 0%, #111827 100%)' }}>
+                    {/* Simulated lens reflection */}
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none" />
+
+                    <div className="absolute inset-0 flex flex-col items-center justify-center select-none pointer-events-none z-0">
+                      <div className="w-16 h-16 rounded-2xl bg-slate-800/40 border border-slate-700/35 flex items-center justify-center text-white font-extrabold text-xl backdrop-blur-sm group-hover:scale-[1.03] transition-spring">
+                        {getInitials(activeInt.candidate_name)}
+                      </div>
+                      <span className="text-[10px] text-slate-550 font-bold mt-2 tracking-wide font-mono uppercase">FEED STATUS: ONLINE</span>
+                    </div>
+
+                    <div className="flex justify-between items-start relative z-10 w-full">
+                      <span className="bg-slate-950/80 text-white text-[9px] font-bold px-2 py-0.5 rounded-lg border border-slate-800/45 backdrop-blur-md">
+                        {activeInt.candidate_name}
+                      </span>
+                      <div className="flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-500 text-[8px] font-black px-2 py-0.5 rounded-full animate-pulse backdrop-blur-md">
+                        <span className="w-1 h-1 bg-red-500 rounded-full" />
+                        REC
+                      </div>
+                    </div>
+
+                    <div className="flex items-end justify-between relative z-10 w-full">
+                      <span className="bg-slate-950/80 text-slate-300 text-[9px] font-bold px-2 py-0.5 rounded-lg border border-slate-800/45 backdrop-blur-md">
+                        {new Date(activeInt.scheduled_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} &middot; {new Date(activeInt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className="bg-violet-600/90 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border border-violet-500/20 backdrop-blur-md">
+                        {activeInt.round_type}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Warning banner for rejected candidates */}
+                  {(activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') && (
+                    <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-2.5 text-xs text-rose-700 font-bold text-center leading-normal">
+                      The candidate is marked inactive. Round meeting room disabled.
+                    </div>
+                  )}
+
+                  {/* Action triggers */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
+                        navigate(`/interview/${activeInt.id}`);
+                      }}
+                      disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
+                      className={`flex-1 text-xs font-bold py-2 rounded-lg transition-spring flex items-center justify-center gap-1.5 shadow-sm ${
+                        (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
+                          ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                          : 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-200/50'
+                      }`}
+                    >
+                      <Video size={13} />
+                      Join Room
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
+                        setFeedbackModal({ isOpen: true, interview: activeInt });
+                      }}
+                      disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
+                      className={`flex-1 border text-xs font-bold py-2 rounded-lg transition-spring flex items-center justify-center gap-1.5 ${
+                        (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
+                          ? 'border-slate-100 bg-slate-50/50 text-slate-350 cursor-not-allowed'
+                          : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <CheckSquare size={13} className="text-slate-400" />
+                      Scorecard
+                    </button>
                   </div>
                 </div>
-
-                <div className="flex justify-between items-start relative z-10">
-                  <span className="bg-slate-950/80 text-white text-[9px] font-bold px-2 py-0.5 rounded backdrop-blur">
-                    {activeInt.candidate_name}
-                  </span>
-                  <span className="bg-violet-600 text-white text-[9px] font-bold px-2 py-0.5 rounded flex items-center gap-1 shadow-sm">
-                    {activeInt.round_type} Round
-                  </span>
-                </div>
-
-                <div className="flex items-end justify-between relative z-10">
-                  <span className="bg-slate-950/80 text-slate-300 text-[9px] font-medium px-2 py-0.5 rounded backdrop-blur">
-                    {new Date(activeInt.scheduled_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} &middot; {new Date(activeInt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
               </div>
-
-              {/* Warning banner for rejected candidates */}
-              {(activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') && (
-                <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-2 text-xs text-rose-700 font-semibold text-center leading-normal">
-                  Candidate was rejected. Interview meeting is disabled.
-                </div>
-              )}
-
-              {/* Action triggers */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
-                    navigate(`/interview/${activeInt.id}`);
-                  }}
-                  disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
-                  className={`flex-1 text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm ${
-                    (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
-                      ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                      : 'bg-violet-600 hover:bg-violet-700 text-white'
-                  }`}
-                >
-                  <Video size={13} />
-                  {(activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') ? 'Call Disabled' : 'Open call'}
-                </button>
-                <button
-                  onClick={() => {
-                    if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
-                    setFeedbackModal({ isOpen: true, interview: activeInt });
-                  }}
-                  disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
-                  className={`flex-1 border text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1 ${
-                    (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
-                      ? 'border-slate-100 bg-slate-50/50 text-slate-350 cursor-not-allowed'
-                      : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <CheckSquare size={13} className={(activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') ? 'text-slate-300' : 'text-slate-400'} />
-                  Scorecard
-                </button>
-              </div>
-            </div>
             ) : (
-              <div className="surface-raised p-5 flex items-center justify-center text-slate-400 h-64 text-sm font-medium">
-                No interviews scheduled
+              <div className="panel p-5 flex items-center justify-center text-slate-400 h-64 text-sm font-medium">
+                No active interview round details
               </div>
             )}
 
             {/* Calendar widget */}
-            <div className="surface-raised p-5 space-y-3">
+            <div className="panel p-5 space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                 <h4 className="font-bold text-slate-900 text-xs" style={{ fontFamily: 'Sora, sans-serif' }}>
                   {calendarMonth}
                 </h4>
                 <div className="flex items-center gap-1">
-                  <button className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-600"><ChevronLeft size={14} /></button>
-                  <button className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-600"><ChevronRight size={14} /></button>
+                  <button className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-600 cursor-pointer"><ChevronLeft size={14} /></button>
+                  <button className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-600 cursor-pointer"><ChevronRight size={14} /></button>
                 </div>
               </div>
 
@@ -481,11 +486,8 @@ export const CompanyInterviewsPage = () => {
                 {renderCalendarWidget()}
               </div>
             </div>
-
           </div>
-
         </div>
-
       </main>
 
       {canSchedule && (

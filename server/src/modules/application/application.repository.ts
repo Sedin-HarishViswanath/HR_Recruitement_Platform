@@ -86,7 +86,7 @@ export class ApplicationRepository {
   async getHistory(applicationId: string) {
     return db('stage_transitions')
       .select('stage_transitions.*', 'users.name as changed_by_name')
-      .join('users', 'stage_transitions.changed_by', 'users.id')
+      .leftJoin('users', 'stage_transitions.changed_by', 'users.id')
       .where('application_id', applicationId)
       .orderBy('changed_at', 'asc');
   }

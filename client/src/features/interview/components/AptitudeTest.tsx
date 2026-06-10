@@ -1,7 +1,7 @@
-﻿import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
-import { Clock, CheckCircle2, XCircle, AlertTriangle, ChevronRight, BookOpen } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, ChevronRight, BookOpen } from 'lucide-react';
 
 interface OTDBQuestion {
   id: number;
@@ -51,7 +51,6 @@ export const AptitudeTest = ({
 }: AptitudeTestProps) => {
   const [questions, setQuestions] = useState<OTDBQuestion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -61,51 +60,11 @@ export const AptitudeTest = ({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const handleSubmitRef = useRef<((autoSubmit?: boolean) => void) | null>(null);
 
-  // â”€â”€ Fetch questions from Open Trivia DB
-  const fetchQuestions = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Mix of categories: General Knowledge (9), Science (17), Math (19), Computers (18)
-      const categories = [9, 17, 19, 18];
-      const perCategory = Math.ceil(questionCount / categories.length);
-
-      const results = await Promise.all(
-        categories.map(cat =>
-          fetch(`https://opentdb.com/api.php?amount=${perCategory}&category=${cat}&type=multiple`)
-            .then(r => r.json())
-        )
-      );
-
-      const allRaw = results.flatMap(r => r.results || []);
-
-      if (allRaw.length === 0) {
-        throw new Error('No questions received from API');
-      }
-
-      const processed: OTDBQuestion[] = allRaw
-        .slice(0, questionCount)
-        .map((q: any, i: number) => ({
-          id: i + 1,
-          question: decodeHTML(q.question),
-          options: shuffle([q.correct_answer, ...q.incorrect_answers].map(decodeHTML)),
-          correct_answer: decodeHTML(q.correct_answer),
-          category: decodeHTML(q.category),
-          difficulty: q.difficulty,
-          type: q.type,
-        }));
-
-      setQuestions(processed);
-    } catch (err) {
-      setError('Failed to load questions. Using offline bank instead.');
-      // Fallback to a small offline set
-      setQuestions(OFFLINE_FALLBACK.slice(0, questionCount));
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    const picked = shuffle(QUESTION_BANK).slice(0, questionCount);
+    setQuestions(picked.map((q, i) => ({ ...q, id: i + 1 })));
+    setLoading(false);
   }, [questionCount]);
-
-  useEffect(() => { fetchQuestions(); }, [fetchQuestions]);
 
   useEffect(() => {
     if (loading || submitted || timeLimit === 0) return;
@@ -170,31 +129,13 @@ export const AptitudeTest = ({
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
-  // â”€â”€ Loading state
-  if (loading) {
+  if (loading || questions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 bg-[#f8fafc]">
         <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-6 animate-pulse">
           <BookOpen size={28} className="text-blue-600" />
         </div>
-        <p className="text-lg font-black text-slate-900 mb-1">Loading Assessment</p>
-        <p className="text-sm text-slate-400 font-medium">Fetching {questionCount} questions from question bank...</p>
-        <div className="mt-6 flex gap-1.5">
-          {[0,1,2].map(i => (
-            <div key={i} className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // â”€â”€ Error state
-  if (error && questions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full p-8 bg-[#f8fafc] text-center">
-        <AlertTriangle size={40} className="text-violet-500 mb-4" />
-        <p className="font-bold text-slate-900 mb-2">{error}</p>
-        <button onClick={fetchQuestions} className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl mt-4">Try Again</button>
+        <p className="text-sm text-slate-400 font-medium">Preparing assessment...</p>
       </div>
     );
   }
@@ -356,26 +297,72 @@ export const AptitudeTest = ({
   );
 };
 
-// â”€â”€ Offline fallback (used when Open Trivia DB is unavailable) â”€â”€
-const OFFLINE_FALLBACK: OTDBQuestion[] = [
-  { id: 1, question: "What is the time complexity of binary search?", options: ["O(n)", "O(log n)", "O(n log n)", "O(1)"], correct_answer: "O(log n)", category: "Computer Science", difficulty: "medium", type: "multiple" },
-  { id: 2, question: "What does RAM stand for?", options: ["Read Access Memory", "Random Access Memory", "Rapid Application Module", "Readable Assigned Memory"], correct_answer: "Random Access Memory", category: "Computers", difficulty: "easy", type: "multiple" },
-  { id: 3, question: "What is 15% of 200?", options: ["20", "25", "30", "35"], correct_answer: "30", category: "Mathematics", difficulty: "easy", type: "multiple" },
-  { id: 4, question: "Which data structure uses LIFO order?", options: ["Queue", "Stack", "Linked List", "Tree"], correct_answer: "Stack", category: "Computer Science", difficulty: "easy", type: "multiple" },
-  { id: 5, question: "What is the square root of 144?", options: ["10", "11", "12", "14"], correct_answer: "12", category: "Mathematics", difficulty: "easy", type: "multiple" },
-  { id: 6, question: "In SQL, which command retrieves data from a table?", options: ["GET", "SELECT", "FETCH", "READ"], correct_answer: "SELECT", category: "Computers", difficulty: "easy", type: "multiple" },
-  { id: 7, question: "What is 2 to the power of 10?", options: ["512", "1024", "2048", "256"], correct_answer: "1024", category: "Mathematics", difficulty: "medium", type: "multiple" },
-  { id: 8, question: "Which sorting algorithm has the best average-case complexity?", options: ["Bubble Sort", "Selection Sort", "Merge Sort", "Insertion Sort"], correct_answer: "Merge Sort", category: "Computer Science", difficulty: "hard", type: "multiple" },
-  { id: 9, question: "What is the chemical symbol for Gold?", options: ["Gd", "Go", "Au", "Ag"], correct_answer: "Au", category: "Science", difficulty: "easy", type: "multiple" },
-  { id: 10, question: "Solve: If 5x - 3 = 22, what is x?", options: ["4", "5", "6", "7"], correct_answer: "5", category: "Mathematics", difficulty: "medium", type: "multiple" },
-  { id: 11, question: "Which protocol is used to send emails?", options: ["HTTP", "FTP", "SMTP", "TCP"], correct_answer: "SMTP", category: "Computers", difficulty: "medium", type: "multiple" },
-  { id: 12, question: "What is the next prime after 23?", options: ["25", "27", "29", "31"], correct_answer: "29", category: "Mathematics", difficulty: "medium", type: "multiple" },
-  { id: 13, question: "What does HTML stand for?", options: ["Hyper Trainer Marking Language", "Hyper Text Markup Language", "High Text Machine Language", "Hyper Transfer Markup Language"], correct_answer: "Hyper Text Markup Language", category: "Computers", difficulty: "easy", type: "multiple" },
-  { id: 14, question: "Which planet is farthest from the Sun?", options: ["Saturn", "Uranus", "Jupiter", "Neptune"], correct_answer: "Neptune", category: "Science", difficulty: "easy", type: "multiple" },
-  { id: 15, question: "What is the area of a circle with radius 7?", options: ["49Ï€", "14Ï€", "21Ï€", "7Ï€"], correct_answer: "49Ï€", category: "Mathematics", difficulty: "medium", type: "multiple" },
-  { id: 16, question: "Which layer of the OSI model handles routing?", options: ["Transport", "Data Link", "Network", "Session"], correct_answer: "Network", category: "Computers", difficulty: "hard", type: "multiple" },
-  { id: 17, question: "What is 0.125 as a fraction?", options: ["1/4", "1/8", "1/6", "1/10"], correct_answer: "1/8", category: "Mathematics", difficulty: "medium", type: "multiple" },
-  { id: 18, question: "Who invented the World Wide Web?", options: ["Bill Gates", "Vint Cerf", "Tim Berners-Lee", "Steve Jobs"], correct_answer: "Tim Berners-Lee", category: "Computers", difficulty: "easy", type: "multiple" },
-  { id: 19, question: "What type of triangle has all sides equal?", options: ["Scalene", "Isosceles", "Equilateral", "Right"], correct_answer: "Equilateral", category: "Mathematics", difficulty: "easy", type: "multiple" },
-  { id: 20, question: "What does CPU stand for?", options: ["Central Program Unit", "Coded Processing Unit", "Central Processing Unit", "Core Processor Utility"], correct_answer: "Central Processing Unit", category: "Computers", difficulty: "easy", type: "multiple" },
+const QUESTION_BANK: OTDBQuestion[] = [
+  // ── Computer Science ───────────────────────────────────────────────────────
+  { id: 1,  question: "What is the time complexity of binary search?", options: ["O(n)", "O(log n)", "O(n log n)", "O(1)"], correct_answer: "O(log n)", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 2,  question: "What does RAM stand for?", options: ["Read Access Memory", "Random Access Memory", "Rapid Application Module", "Readable Assigned Memory"], correct_answer: "Random Access Memory", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 3,  question: "Which data structure uses LIFO order?", options: ["Queue", "Stack", "Linked List", "Tree"], correct_answer: "Stack", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 4,  question: "Which sorting algorithm has the best average-case time complexity?", options: ["Bubble Sort", "Selection Sort", "Merge Sort", "Insertion Sort"], correct_answer: "Merge Sort", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 5,  question: "What does CPU stand for?", options: ["Central Program Unit", "Coded Processing Unit", "Central Processing Unit", "Core Processor Utility"], correct_answer: "Central Processing Unit", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 6,  question: "Which layer of the OSI model handles routing?", options: ["Transport", "Data Link", "Network", "Session"], correct_answer: "Network", category: "Computer Science", difficulty: "hard", type: "multiple" },
+  { id: 7,  question: "What is the time complexity of inserting into a hash table (average case)?", options: ["O(n)", "O(log n)", "O(1)", "O(n²)"], correct_answer: "O(1)", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 8,  question: "Which data structure is used for Breadth-First Search (BFS)?", options: ["Stack", "Queue", "Heap", "Graph"], correct_answer: "Queue", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 9,  question: "What does HTTP stand for?", options: ["HyperText Transfer Protocol", "High Text Transfer Protocol", "HyperText Transport Procedure", "High Transfer Text Process"], correct_answer: "HyperText Transfer Protocol", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 10, question: "Which of the following is NOT a type of database index?", options: ["B-Tree", "Hash", "Bitmap", "Radix Heap"], correct_answer: "Radix Heap", category: "Computer Science", difficulty: "hard", type: "multiple" },
+  { id: 11, question: "What is the worst-case time complexity of QuickSort?", options: ["O(n log n)", "O(n)", "O(n²)", "O(log n)"], correct_answer: "O(n²)", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 12, question: "In object-oriented programming, which concept restricts access to certain components?", options: ["Inheritance", "Polymorphism", "Encapsulation", "Abstraction"], correct_answer: "Encapsulation", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 13, question: "What does DNS stand for?", options: ["Domain Name System", "Dynamic Network Service", "Data Name Server", "Distributed Node System"], correct_answer: "Domain Name System", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 14, question: "Which protocol is used to send emails?", options: ["HTTP", "FTP", "SMTP", "TCP"], correct_answer: "SMTP", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 15, question: "What does HTML stand for?", options: ["Hyper Trainer Markup Language", "HyperText Markup Language", "High Text Machine Language", "Hyper Transfer Markup Language"], correct_answer: "HyperText Markup Language", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 16, question: "Which of the following is a primary key constraint?", options: ["Can be NULL", "Must be unique", "Can duplicate", "Is optional"], correct_answer: "Must be unique", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 17, question: "In SQL, which command retrieves data from a table?", options: ["GET", "SELECT", "FETCH", "READ"], correct_answer: "SELECT", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 18, question: "Who invented the World Wide Web?", options: ["Bill Gates", "Vint Cerf", "Tim Berners-Lee", "Steve Jobs"], correct_answer: "Tim Berners-Lee", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 19, question: "What is a deadlock in operating systems?", options: ["A program crash", "Two processes waiting on each other indefinitely", "A memory overflow", "A CPU scheduling error"], correct_answer: "Two processes waiting on each other indefinitely", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 20, question: "Which HTTP status code means 'Not Found'?", options: ["200", "301", "404", "500"], correct_answer: "404", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 21, question: "What is the purpose of a compiler?", options: ["Execute machine code", "Translate source code to machine code", "Manage memory", "Schedule CPU processes"], correct_answer: "Translate source code to machine code", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 22, question: "Which data structure is best for implementing a priority queue?", options: ["Array", "Linked List", "Binary Heap", "Stack"], correct_answer: "Binary Heap", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 23, question: "What does REST stand for in web services?", options: ["Remote Execution State Transfer", "Representational State Transfer", "Request Endpoint Service Technology", "Remote State Transport"], correct_answer: "Representational State Transfer", category: "Computer Science", difficulty: "medium", type: "multiple" },
+  { id: 24, question: "In version control, what does 'git merge' do?", options: ["Deletes a branch", "Combines two branches into one", "Creates a new commit", "Reverts last commit"], correct_answer: "Combines two branches into one", category: "Computer Science", difficulty: "easy", type: "multiple" },
+  { id: 25, question: "What is Big-O notation used for?", options: ["Measuring RAM usage", "Describing algorithm complexity", "Counting lines of code", "Benchmarking CPUs"], correct_answer: "Describing algorithm complexity", category: "Computer Science", difficulty: "easy", type: "multiple" },
+
+  // ── Mathematics ─────────────────────────────────────────────────────────────
+  { id: 26, question: "What is 15% of 200?", options: ["20", "25", "30", "35"], correct_answer: "30", category: "Mathematics", difficulty: "easy", type: "multiple" },
+  { id: 27, question: "What is the square root of 144?", options: ["10", "11", "12", "14"], correct_answer: "12", category: "Mathematics", difficulty: "easy", type: "multiple" },
+  { id: 28, question: "What is 2 to the power of 10?", options: ["512", "1024", "2048", "256"], correct_answer: "1024", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 29, question: "Solve: If 5x - 3 = 22, what is x?", options: ["4", "5", "6", "7"], correct_answer: "5", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 30, question: "What is the next prime after 23?", options: ["25", "27", "29", "31"], correct_answer: "29", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 31, question: "What is 0.125 as a fraction?", options: ["1/4", "1/8", "1/6", "1/10"], correct_answer: "1/8", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 32, question: "What type of triangle has all sides equal?", options: ["Scalene", "Isosceles", "Equilateral", "Right"], correct_answer: "Equilateral", category: "Mathematics", difficulty: "easy", type: "multiple" },
+  { id: 33, question: "The area of a circle with radius 7 is approximately?", options: ["154", "144", "132", "168"], correct_answer: "154", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 34, question: "What is the LCM of 12 and 18?", options: ["6", "24", "36", "54"], correct_answer: "36", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 35, question: "A train travels 300 km in 5 hours. What is its average speed?", options: ["50 km/h", "60 km/h", "70 km/h", "80 km/h"], correct_answer: "60 km/h", category: "Mathematics", difficulty: "easy", type: "multiple" },
+  { id: 36, question: "What is the value of log₁₀(1000)?", options: ["2", "3", "4", "10"], correct_answer: "3", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 37, question: "If a shirt costs $80 and is discounted 25%, what is the final price?", options: ["$55", "$60", "$65", "$70"], correct_answer: "$60", category: "Mathematics", difficulty: "easy", type: "multiple" },
+  { id: 38, question: "What is the sum of interior angles of a pentagon?", options: ["360°", "450°", "540°", "720°"], correct_answer: "540°", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 39, question: "How many ways can 4 people be arranged in a line?", options: ["8", "16", "24", "32"], correct_answer: "24", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 40, question: "What is the probability of getting heads twice in a row when flipping a fair coin?", options: ["1/2", "1/4", "1/3", "1/8"], correct_answer: "1/4", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 41, question: "Simplify: (x² - 9) / (x - 3)", options: ["x + 3", "x - 3", "x² + 3", "x + 9"], correct_answer: "x + 3", category: "Mathematics", difficulty: "medium", type: "multiple" },
+  { id: 42, question: "What is the slope of the line y = 3x + 5?", options: ["5", "3", "8", "15"], correct_answer: "3", category: "Mathematics", difficulty: "easy", type: "multiple" },
+
+  // ── Logical Reasoning ────────────────────────────────────────────────────────
+  { id: 43, question: "If all roses are flowers and some flowers fade quickly, which conclusion is valid?", options: ["All roses fade quickly", "Some roses may fade quickly", "No roses fade quickly", "All flowers are roses"], correct_answer: "Some roses may fade quickly", category: "Logical Reasoning", difficulty: "medium", type: "multiple" },
+  { id: 44, question: "Find the next number: 2, 4, 8, 16, __", options: ["24", "28", "32", "30"], correct_answer: "32", category: "Logical Reasoning", difficulty: "easy", type: "multiple" },
+  { id: 45, question: "Which figure completes the pattern? ○ □ △ ○ □ __", options: ["○", "□", "△", "◇"], correct_answer: "△", category: "Logical Reasoning", difficulty: "easy", type: "multiple" },
+  { id: 46, question: "A is B's sister, B is C's brother. What is A to C?", options: ["Brother", "Sister", "Cousin", "Cannot be determined"], correct_answer: "Sister", category: "Logical Reasoning", difficulty: "medium", type: "multiple" },
+  { id: 47, question: "Find the odd one out: Dog, Cat, Parrot, Lion, Rabbit", options: ["Dog", "Cat", "Parrot", "Lion"], correct_answer: "Parrot", category: "Logical Reasoning", difficulty: "easy", type: "multiple" },
+  { id: 48, question: "If MANGO is coded as OCPIQ, how is APPLE coded?", options: ["CRNNG", "CQQNG", "CRRNG", "CRRNF"], correct_answer: "CRRNG", category: "Logical Reasoning", difficulty: "hard", type: "multiple" },
+  { id: 49, question: "Complete the series: 1, 1, 2, 3, 5, 8, __", options: ["11", "12", "13", "14"], correct_answer: "13", category: "Logical Reasoning", difficulty: "easy", type: "multiple" },
+  { id: 50, question: "If today is Wednesday, what day will it be 100 days from now?", options: ["Monday", "Tuesday", "Wednesday", "Friday"], correct_answer: "Friday", category: "Logical Reasoning", difficulty: "medium", type: "multiple" },
+
+  // ── General Science ──────────────────────────────────────────────────────────
+  { id: 51, question: "What is the chemical symbol for Gold?", options: ["Gd", "Go", "Au", "Ag"], correct_answer: "Au", category: "Science", difficulty: "easy", type: "multiple" },
+  { id: 52, question: "Which planet is farthest from the Sun?", options: ["Saturn", "Uranus", "Jupiter", "Neptune"], correct_answer: "Neptune", category: "Science", difficulty: "easy", type: "multiple" },
+  { id: 53, question: "What is the speed of light in a vacuum (approx)?", options: ["3×10⁶ m/s", "3×10⁸ m/s", "3×10¹⁰ m/s", "3×10⁴ m/s"], correct_answer: "3×10⁸ m/s", category: "Science", difficulty: "medium", type: "multiple" },
+  { id: 54, question: "What gas makes up the majority of Earth's atmosphere?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], correct_answer: "Nitrogen", category: "Science", difficulty: "easy", type: "multiple" },
+  { id: 55, question: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Golgi Apparatus"], correct_answer: "Mitochondria", category: "Science", difficulty: "easy", type: "multiple" },
+  { id: 56, question: "Which fundamental force is responsible for keeping electrons in orbit around a nucleus?", options: ["Gravity", "Strong nuclear", "Weak nuclear", "Electromagnetic"], correct_answer: "Electromagnetic", category: "Science", difficulty: "medium", type: "multiple" },
+  { id: 57, question: "What is the atomic number of Carbon?", options: ["4", "6", "8", "12"], correct_answer: "6", category: "Science", difficulty: "easy", type: "multiple" },
+  { id: 58, question: "What unit is used to measure frequency?", options: ["Watt", "Volt", "Hertz", "Joule"], correct_answer: "Hertz", category: "Science", difficulty: "easy", type: "multiple" },
+  { id: 59, question: "Which blood type is considered the universal donor?", options: ["A+", "B+", "AB+", "O-"], correct_answer: "O-", category: "Science", difficulty: "medium", type: "multiple" },
+  { id: 60, question: "How many bones are in the adult human body?", options: ["186", "196", "206", "216"], correct_answer: "206", category: "Science", difficulty: "easy", type: "multiple" },
 ];

@@ -8,12 +8,17 @@ import type { RootState } from '../../../app/store';
 import { toast } from 'sonner';
 import { CodeEditor } from '../components/CodeEditor';
 import { AptitudeTest } from '../components/AptitudeTest';
+import { TechnicalAssessment } from '../components/TechnicalAssessment';
 import { MeetingPanel } from '../components/MeetingPanel';
 import { SubmitFeedbackModal } from '../../company/components/SubmitFeedbackModal';
 import {
   ArrowLeft, Calendar, Clock, User, Briefcase, AlertCircle,
   CheckCircle2, Trophy, RefreshCw
 } from 'lucide-react';
+
+// An interview is "automated" when assessment_status is set (not null/undefined)
+const isAutomated = (interview: any) =>
+  interview.assessment_status !== null && interview.assessment_status !== undefined;
 
 export const InterviewWorkspace = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,7 +32,6 @@ export const InterviewWorkspace = () => {
   const [error, setError] = useState<string | null>(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
-  // Live aptitude score state for the interviewer view
   const [liveAptitudeScore, setLiveAptitudeScore] = useState<{ score: number; total: number } | null>(null);
   const [aptitudeCompleted, setAptitudeCompleted] = useState(false);
 
@@ -66,19 +70,19 @@ export const InterviewWorkspace = () => {
     socket.on('aptitude-score-updated', (data: { score: number; total: number }) => {
       setLiveAptitudeScore({ score: data.score, total: data.total });
       setAptitudeCompleted(true);
-      // Update local interview state so the UI reflects completion
       setInterview((prev: any) => prev ? { ...prev, status: 'completed', aptitude_score: data.score } : prev);
     });
 
     return () => { socket.disconnect(); };
   }, [id, accessToken]);
 
-  // ── Beforeunload guard during active interview ──────────────────────────────
+  // ── Beforeunload guard for live rounds ─────────────────────────────────────
   useEffect(() => {
     if (!interview) return;
     const roundType = (interview.round_type || '').toLowerCase();
-    const isActive = interview.status === 'scheduled' && (roundType === 'technical' || roundType === 'hr');
-    if (!isActive) return;
+    // Only guard live rounds (not automated assessments)
+    const isLive = !isAutomated(interview) && interview.status === 'scheduled';
+    if (!isLive) return;
 
     const handler = (e: BeforeUnloadEvent) => {
       e.preventDefault();
@@ -129,8 +133,9 @@ export const InterviewWorkspace = () => {
   }
 
   const roundType = (interview.round_type || '').toLowerCase();
+  const automated = isAutomated(interview);
 
-  // ── Shared header component ─────────────────────────────────────────────────
+  // ── Shared header ───────────────────────────────────────────────────────────
   const WorkspaceHeader = () => (
     <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-900 border-b border-slate-800 shrink-0">
       <button
@@ -170,36 +175,49 @@ export const InterviewWorkspace = () => {
     </div>
   );
 
-  // ── APTITUDE ROUND ──────────────────────────────────────────────────────────
-  if (roundType === 'aptitude') {
-    if (isCandidate) {
-      return (
-        <div className="flex flex-col h-screen w-full bg-[#f8fafc]">
-          <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-slate-200 shrink-0 shadow-sm/5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                <Briefcase size={15} />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-900">{interview.company_name} — Aptitude Assessment</p>
-                <p className="text-xs text-slate-500 font-medium">{interview.job_title}</p>
-              </div>
+  // ── AUTOMATED APTITUDE: candidate takes MCQ test ────────────────────────────
+  if (roundType === 'aptitude' && automated && isCandidate) {
+    return (
+      <div className="flex flex-col h-screen w-full bg-[#f8fafc]">
+        <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-slate-200 shrink-0 shadow-sm/5">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+              <Briefcase size={15} />
             </div>
-            <span className="text-xs font-bold text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
-              20 Questions · Do not close this tab
-            </span>
+            <div>
+              <p className="text-sm font-bold text-slate-900">{interview.company_name} — Aptitude Assessment</p>
+              <p className="text-xs text-slate-500 font-medium">{interview.job_title}</p>
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <AptitudeTest
-              interviewId={interview.id}
-              onComplete={() => toast.success('Test submitted! You may close this window.')}
-            />
-          </div>
+          <span className="text-xs font-bold text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
+            20 Questions · Do not close this tab
+          </span>
         </div>
-      );
-    }
+        <div className="flex-1 overflow-y-auto">
+          <AptitudeTest
+            interviewId={interview.id}
+            onComplete={() => toast.success('Test submitted! You may close this window.')}
+          />
+        </div>
+      </div>
+    );
+  }
 
-    // Interviewer view — real-time socket updates instead of manual reload
+  // ── AUTOMATED TECHNICAL: candidate takes HackerRank-style coding test ────────
+  if (roundType === 'technical' && automated && isCandidate) {
+    return (
+      <div className="flex flex-col h-screen w-full">
+        <TechnicalAssessment
+          interviewId={interview.id}
+          onComplete={() => toast.success('Assessment submitted! You may close this window.')}
+          timeLimitSeconds={(interview.duration || 90) * 60}
+        />
+      </div>
+    );
+  }
+
+  // ── RECRUITER/INTERVIEWER view for automated rounds (score monitor) ─────────
+  if (automated && !isCandidate) {
     const displayScore = liveAptitudeScore ?? (
       interview.aptitude_score != null
         ? { score: interview.aptitude_score, total: 20 }
@@ -218,7 +236,9 @@ export const InterviewWorkspace = () => {
               <Briefcase size={30} className="text-blue-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Sora' }}>Aptitude Round</h2>
+              <h2 className="text-xl font-bold text-white capitalize" style={{ fontFamily: 'Sora' }}>
+                {interview.round_type} Assessment
+              </h2>
               <p className="text-slate-400 text-sm font-medium mt-1">{interview.candidate_name}</p>
             </div>
 
@@ -249,7 +269,7 @@ export const InterviewWorkspace = () => {
                   <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
                   <div className="w-2 h-2 bg-violet-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
                 </div>
-                <p className="text-amber-300 font-semibold text-sm">Test in progress...</p>
+                <p className="text-amber-300 font-semibold text-sm">Assessment in progress...</p>
                 <p className="text-slate-400 text-xs font-medium leading-relaxed">
                   The candidate is taking the assessment. Score will appear here automatically when they submit.
                 </p>
@@ -265,37 +285,11 @@ export const InterviewWorkspace = () => {
     );
   }
 
-  // ── HR ROUND ────────────────────────────────────────────────────────────────
-  if (roundType === 'hr') {
-    return (
-      <div className="flex flex-col h-screen w-full bg-slate-900">
-        <WorkspaceHeader />
-        <div className="flex-1 min-h-0">
-          <MeetingPanel
-            interviewId={interview.id}
-            candidateName={interview.candidate_name}
-            jobTitle={interview.job_title}
-            participantRole={isCandidate ? 'candidate' : 'interviewer'}
-            onMeetingWindowClosed={promptForFeedback}
-          />
-        </div>
-        {!isCandidate && (
-          <SubmitFeedbackModal
-            isOpen={showFeedbackModal}
-            onClose={() => setShowFeedbackModal(false)}
-            onSuccess={() => navigate('/company/interviews')}
-            interview={interview}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // ── TECHNICAL ROUND — Code Editor + Meeting Panel ───────────────────────────
-  if (roundType === 'technical') {
+  // ── LIVE ROUNDS (Technical, HR, Final) — Code Editor + Meeting Panel ────────
+  if (!automated) {
+    const liveRoundLabel = `Live ${interview.round_type ? interview.round_type.toUpperCase() : 'Interview'}`;
     return (
       <div className="flex flex-col h-screen w-full bg-[#0d0f1a]">
-        {/* Technical header */}
         <div className="flex items-center gap-3 px-4 py-2.5 bg-[#1a1d2e] border-b border-[#252840] shrink-0">
           <button
             onClick={() => navigate(-1)}
@@ -309,7 +303,7 @@ export const InterviewWorkspace = () => {
             <span className="text-[11px] text-slate-500 truncate">{interview.job_title}</span>
           </div>
           <span className="text-[9px] font-semibold uppercase tracking-widest text-emerald-400 border border-emerald-800 bg-emerald-900/20 px-3 py-1 rounded-full shrink-0">
-            Technical
+            {liveRoundLabel}
           </span>
         </div>
 
@@ -344,27 +338,13 @@ export const InterviewWorkspace = () => {
     );
   }
 
-  // ── FALLBACK ────────────────────────────────────────────────────────────────
+  // ── FALLBACK ───
   return (
     <div className="flex flex-col h-screen w-full bg-slate-900">
       <WorkspaceHeader />
-      <div className="flex-1 min-h-0">
-        <MeetingPanel
-          interviewId={interview.id}
-          candidateName={interview.candidate_name}
-          jobTitle={interview.job_title}
-          participantRole={isCandidate ? 'candidate' : 'interviewer'}
-          onMeetingWindowClosed={promptForFeedback}
-        />
+      <div className="flex-1 flex items-center justify-center text-slate-400">
+        Workspace fallback — round state unsupported.
       </div>
-      {!isCandidate && (
-        <SubmitFeedbackModal
-          isOpen={showFeedbackModal}
-          onClose={() => setShowFeedbackModal(false)}
-          onSuccess={() => navigate('/company/interviews')}
-          interview={interview}
-        />
-      )}
     </div>
   );
 };

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { updateUser } from '../../auth/auth.slice';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -17,41 +19,53 @@ import {
 } from '../../../components/ui/select';
 import { toast } from 'sonner';
 
-const onboardingSchema = z.object({
-  name: z.string().min(2, 'Company name is required'),
-  domain: z.string().min(3, 'Domain is required'),
+const step1Schema = z.object({
+  name: z.string().min(2, 'Company name must be at least 2 characters'),
+  domain: z.string().min(3, 'Domain must be at least 3 characters'),
   company_size: z.string().min(1, 'Please select company size'),
   industry: z.string().min(1, 'Please select industry'),
-  bio: z.string().max(500, 'Bio must be less than 500 characters'),
-  website_url: z.string().url().or(z.literal('')),
+  bio: z.string().max(500, 'Bio must be less than 500 characters').optional().or(z.literal('')),
+  website_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+});
+
+const step2Schema = z.object({
   address_line1: z.string().min(1, 'Address is required'),
-  address_line2: z.string().optional(),
+  address_line2: z.string().optional().or(z.literal('')),
   city: z.string().min(1, 'City is required'),
   state: z.string().min(1, 'State is required'),
   country: z.string().min(1, 'Country is required'),
   postal_code: z.string().min(1, 'Postal code is required'),
-  contact_email: z.string().email(),
-  contact_phone: z.string().optional(),
+  contact_email: z.string().email('Valid email required'),
+  contact_phone: z.string().optional().or(z.literal('')),
 });
 
+const onboardingSchema = step1Schema.merge(step2Schema);
 type OnboardingValues = z.infer<typeof onboardingSchema>;
 
 export const OnboardingWizard = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [step1Errors, setStep1Errors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-  } = useForm<OnboardingValues>({
+  const { register, handleSubmit, setValue, watch } = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
+      name: '',
+      domain: '',
       company_size: '',
       industry: '',
+      bio: '',
+      website_url: '',
+      address_line1: '',
+      address_line2: '',
+      city: '',
+      state: '',
       country: '',
+      postal_code: '',
+      contact_email: '',
+      contact_phone: '',
     }
   });
 
@@ -61,13 +75,25 @@ export const OnboardingWizard = () => {
         const { data } = await api.get('/companies/me/profile');
         const profile = data.data;
         if (profile) {
-          Object.keys(profile).forEach((key) => {
-            if (key in onboardingSchema.shape) {
-               setValue(key as keyof OnboardingValues, profile[key] || '');
-            }
-          });
-          // Simple logic to determine step: if Step 1 fields are filled, go to Step 2
-          if (profile.company_size && profile.industry) {
+          if (profile.name) setValue('name', profile.name);
+          if (profile.domain) setValue('domain', profile.domain);
+          // Only set enum/select fields if they have a valid non-empty value
+          if (profile.company_size) setValue('company_size', profile.company_size);
+          if (profile.industry) setValue('industry', profile.industry);
+          if (profile.country) setValue('country', profile.country);
+          // Text fields: set to empty string when null to avoid uncontrolled inputs
+          setValue('bio', profile.bio || '');
+          setValue('website_url', profile.website_url || '');
+          setValue('address_line1', profile.address_line1 || '');
+          setValue('address_line2', profile.address_line2 || '');
+          setValue('city', profile.city || '');
+          setValue('state', profile.state || '');
+          setValue('postal_code', profile.postal_code || '');
+          setValue('contact_email', profile.contact_email || '');
+          setValue('contact_phone', profile.contact_phone || '');
+
+          // Advance to step 2 if step 1 was already saved
+          if (profile.company_size && profile.industry && profile.domain) {
             setStep(2);
           }
         }
@@ -80,51 +106,91 @@ export const OnboardingWizard = () => {
     fetchProfile();
   }, [setValue]);
 
+  const validateStep1 = () => {
+    const { name, domain, company_size, industry } = watch();
+    const errs: Record<string, string> = {};
+    if (!name || name.trim().length < 2) errs.name = 'Company name must be at least 2 characters';
+    if (!domain || domain.trim().length < 3) errs.domain = 'Domain must be at least 3 characters';
+    if (!company_size) errs.company_size = 'Please select company size';
+    if (!industry) errs.industry = 'Please select industry';
+    setStep1Errors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const onNext = async () => {
-    // Basic validation for Step 1
-    const step1Data = watch();
-    if (!step1Data.name || !step1Data.domain || !step1Data.company_size || !step1Data.industry) {
-      toast.error('Please fill all required fields in Step 1');
-      return;
-    }
-    
+    if (!validateStep1()) return;
+
+    const { name, domain, company_size, industry, bio, website_url } = watch();
+
     try {
-      await api.patch('/companies/me/profile', watch());
+      await api.patch('/companies/me/profile', {
+        name: name.trim(),
+        domain: domain.trim(),
+        company_size,
+        industry: industry.trim(),
+        bio: bio?.trim() || '',
+        website_url: website_url?.trim() || '',
+      });
+      setStep1Errors({});
       setStep(2);
-    } catch (err) {
-      toast.error('Failed to save progress');
+    } catch (err: any) {
+      const msg = err.response?.data?.errors
+        ? JSON.stringify(err.response.data.errors)
+        : err.response?.data?.message || 'Failed to save progress';
+      toast.error(msg);
     }
   };
 
   const onSubmit = async (data: OnboardingValues) => {
     try {
-      await api.patch('/companies/me/profile', data);
-      toast.success('Onboarding complete!');
-      navigate('/company/dashboard');
-    } catch (err) {
-      toast.error('Failed to complete onboarding');
+      await api.patch('/companies/me/profile', {
+        name: data.name.trim(),
+        domain: data.domain.trim(),
+        company_size: data.company_size,
+        industry: data.industry.trim(),
+        bio: data.bio?.trim() || '',
+        website_url: data.website_url?.trim() || '',
+        address_line1: data.address_line1.trim(),
+        address_line2: data.address_line2?.trim() || '',
+        city: data.city.trim(),
+        state: data.state.trim(),
+        country: data.country,
+        postal_code: data.postal_code.trim(),
+        contact_email: data.contact_email.trim(),
+        contact_phone: data.contact_phone?.trim() || '',
+      });
+      dispatch(updateUser({ onboardingCompleted: true, companyStatus: 'pending' }));
+      toast.success('Onboarding complete! Your company is pending approval.');
+      navigate('/pending-approval');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Failed to complete onboarding';
+      toast.error(msg);
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm border p-8">
-        
+
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
               Step {step} of 2
             </span>
-            <span className="text-sm font-medium text-blue-600">
+            <span className="text-sm font-medium text-violet-600">
               {step === 1 ? 'Company Profile' : 'Location & Contact'}
             </span>
           </div>
           <div className="h-2 bg-slate-100 rounded-full">
-            <div 
-              className="h-full bg-blue-600 rounded-full transition-all duration-300" 
+            <div
+              className="h-full bg-violet-600 rounded-full transition-all duration-300"
               style={{ width: `${(step / 2) * 100}%` }}
             />
           </div>
@@ -135,20 +201,25 @@ export const OnboardingWizard = () => {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Company Name</Label>
+                  <Label>Company Name <span className="text-red-500">*</span></Label>
                   <Input {...register('name')} placeholder="Acme Inc" />
+                  {step1Errors.name && <p className="text-red-500 text-xs">{step1Errors.name}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label>Domain</Label>
+                  <Label>Domain <span className="text-red-500">*</span></Label>
                   <Input {...register('domain')} placeholder="acme.com" />
+                  {step1Errors.domain && <p className="text-red-500 text-xs">{step1Errors.domain}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Company Size</Label>
-                  <Select onValueChange={(v) => setValue('company_size', v)} value={watch('company_size')}>
-                    <SelectTrigger>
+                  <Label>Company Size <span className="text-red-500">*</span></Label>
+                  <Select
+                    onValueChange={(v) => { setValue('company_size', v); setStep1Errors(e => ({ ...e, company_size: '' })); }}
+                    value={watch('company_size') || undefined}
+                  >
+                    <SelectTrigger className={step1Errors.company_size ? 'border-red-400' : ''}>
                       <SelectValue placeholder="Select size" />
                     </SelectTrigger>
                     <SelectContent>
@@ -157,11 +228,15 @@ export const OnboardingWizard = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {step1Errors.company_size && <p className="text-red-500 text-xs">{step1Errors.company_size}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label>Industry</Label>
-                  <Select onValueChange={(v) => setValue('industry', v)} value={watch('industry')}>
-                    <SelectTrigger>
+                  <Label>Industry <span className="text-red-500">*</span></Label>
+                  <Select
+                    onValueChange={(v) => { setValue('industry', v); setStep1Errors(e => ({ ...e, industry: '' })); }}
+                    value={watch('industry') || undefined}
+                  >
+                    <SelectTrigger className={step1Errors.industry ? 'border-red-400' : ''}>
                       <SelectValue placeholder="Select industry" />
                     </SelectTrigger>
                     <SelectContent>
@@ -170,6 +245,7 @@ export const OnboardingWizard = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {step1Errors.industry && <p className="text-red-500 text-xs">{step1Errors.industry}</p>}
                 </div>
               </div>
 
@@ -180,10 +256,10 @@ export const OnboardingWizard = () => {
 
               <div className="space-y-2">
                 <Label>Bio</Label>
-                <Textarea {...register('bio')} placeholder="Tell us about your company..." className="h-32" />
+                <Textarea {...register('bio')} placeholder="Tell us about your company..." className="h-28 resize-none" />
               </div>
 
-              <Button type="button" onClick={onNext} className="w-full">
+              <Button type="button" onClick={onNext} className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold">
                 Save & Continue
               </Button>
             </div>
@@ -192,49 +268,57 @@ export const OnboardingWizard = () => {
           {step === 2 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="space-y-2">
-                <Label>Address Line 1</Label>
+                <Label>Address Line 1 <span className="text-red-500">*</span></Label>
                 <Input {...register('address_line1')} placeholder="123 Main St" />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Address Line 2</Label>
+                <Input {...register('address_line2')} placeholder="Suite 100 (optional)" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>City</Label>
+                  <Label>City <span className="text-red-500">*</span></Label>
                   <Input {...register('city')} placeholder="San Francisco" />
                 </div>
                 <div className="space-y-2">
-                  <Label>State</Label>
+                  <Label>State <span className="text-red-500">*</span></Label>
                   <Input {...register('state')} placeholder="CA" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Country</Label>
-                  <Select onValueChange={(v) => setValue('country', v)} value={watch('country')}>
+                  <Label>Country <span className="text-red-500">*</span></Label>
+                  <Select
+                    onValueChange={(v) => setValue('country', v)}
+                    value={watch('country') || undefined}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select country" />
                     </SelectTrigger>
                     <SelectContent>
-                      {['United States', 'India', 'United Kingdom', 'Canada', 'Germany'].map((c) => (
+                      {['United States', 'India', 'United Kingdom', 'Canada', 'Germany', 'Australia', 'Singapore'].map((c) => (
                         <SelectItem key={c} value={c}>{c}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Postal Code</Label>
+                  <Label>Postal Code <span className="text-red-500">*</span></Label>
                   <Input {...register('postal_code')} placeholder="94103" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Contact Email</Label>
-                  <Input {...register('contact_email')} type="email" />
+                  <Label>Contact Email <span className="text-red-500">*</span></Label>
+                  <Input {...register('contact_email')} type="email" placeholder="hr@acme.com" />
                 </div>
                 <div className="space-y-2">
                   <Label>Contact Phone</Label>
-                  <Input {...register('contact_phone')} />
+                  <Input {...register('contact_phone')} placeholder="+1 555 000 0000" />
                 </div>
               </div>
 
@@ -242,7 +326,7 @@ export const OnboardingWizard = () => {
                 <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1">
                   Back
                 </Button>
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold">
                   Complete Setup
                 </Button>
               </div>

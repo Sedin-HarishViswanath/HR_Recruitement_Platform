@@ -32,35 +32,32 @@ const MODE_CONFIG = {
   behavioral: {
     label: 'Behavioral',
     icon: MessageSquare,
-    description: 'STAR method — leadership, conflict, teamwork',
+    description: 'STAR method framework targeting leadership, conflict resolution, and teamwork scenario modeling.',
     accent: 'amber',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
+    bg: 'bg-amber-500/10 border-amber-500/25',
     text: 'text-amber-600',
-    btnBg: 'bg-amber-500 hover:bg-amber-600',
-    ring: 'ring-amber-200',
+    badgeClass: 'badge-premium badge-amber',
+    btnClass: 'bg-amber-600 hover:bg-amber-700 text-white shadow-sm shadow-amber-200',
   },
   technical: {
     label: 'Technical',
     icon: Code2,
-    description: 'Algorithms & data structures with live code review',
+    description: 'Algorithmic logic and data structures training complete with real-time AI code analysis.',
     accent: 'emerald',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
+    bg: 'bg-emerald-500/10 border-emerald-500/25',
     text: 'text-emerald-600',
-    btnBg: 'bg-emerald-500 hover:bg-emerald-600',
-    ring: 'ring-emerald-200',
+    badgeClass: 'badge-premium badge-emerald',
+    btnClass: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-200',
   },
   system_design: {
     label: 'System Design',
     icon: BrainCircuit,
-    description: 'Architect scalable systems end-to-end',
+    description: 'Scalable system blueprint assessments, microservices architecture, and API design patterns.',
     accent: 'blue',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
+    bg: 'bg-blue-500/10 border-blue-500/25',
     text: 'text-blue-600',
-    btnBg: 'bg-blue-500 hover:bg-blue-600',
-    ring: 'ring-blue-200',
+    badgeClass: 'badge-premium badge-sky',
+    btnClass: 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-200',
   },
 } as const;
 
@@ -93,7 +90,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
       if (codeMatch) {
         if (codeMatch[1]) parts.push(<Fragment key={k++}>{codeMatch[1]}</Fragment>);
         parts.push(
-          <code key={k++} className="bg-slate-100 text-violet-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-slate-200">
+          <code key={k++} className="bg-slate-100 text-violet-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-slate-200/60">
             {codeMatch[2]}
           </code>
         );
@@ -119,9 +116,9 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
         i++;
       }
       elements.push(
-        <div key={nextKey()} className="my-2 rounded-xl overflow-hidden border border-slate-700 text-[11px]">
+        <div key={nextKey()} className="my-2.5 rounded-xl overflow-hidden border border-slate-700/80 text-[11px] shadow-sm">
           {lang && (
-            <div className="bg-[#1a1d2e] px-3 py-1.5 text-[9px] text-slate-500 font-mono font-bold uppercase tracking-wider border-b border-slate-700">
+            <div className="bg-[#1e2238] px-3 py-1.5 text-[9px] text-slate-400 font-mono font-bold uppercase tracking-wider border-b border-slate-700">
               {lang}
             </div>
           )}
@@ -139,7 +136,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
       const level = line.match(/^(#{1,3})\s/)?.[1]?.length || 1;
       const content = line.replace(/^#{1,3}\s/, '').trim();
       elements.push(
-        <p key={nextKey()} className={`font-bold text-slate-900 mt-3 mb-1 ${level === 1 ? 'text-sm' : level === 2 ? 'text-xs' : 'text-[11px]'}`}>
+        <p key={nextKey()} className={`font-bold text-slate-900 mt-3.5 mb-1.5 ${level === 1 ? 'text-sm' : level === 2 ? 'text-xs' : 'text-[11px]'}`} style={{ fontFamily: 'Sora' }}>
           {renderInline(content)}
         </p>
       );
@@ -151,7 +148,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
     const numMatch = line.trim().match(/^(\d+)\.\s+(.*)/);
     if (numMatch) {
       elements.push(
-        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed">
+        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed my-0.5">
           <span className="text-violet-500 font-bold shrink-0 min-w-[16px]">{numMatch[1]}.</span>
           <span>{renderInline(numMatch[2])}</span>
         </div>
@@ -164,7 +161,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
     if (/^[-•*]\s/.test(line.trim())) {
       const content = line.trim().replace(/^[-•*]\s/, '');
       elements.push(
-        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed">
+        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed my-0.5">
           <span className="text-violet-400 font-bold shrink-0 mt-0.5">•</span>
           <span>{renderInline(content)}</span>
         </div>
@@ -175,7 +172,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
 
     // Blank line
     if (line.trim() === '') {
-      elements.push(<div key={nextKey()} className="h-1.5" />);
+      elements.push(<div key={nextKey()} className="h-2" />);
       i++;
       continue;
     }
@@ -309,26 +306,25 @@ export const PracticeRoom = () => {
 
   return (
     <div className="flex flex-col h-screen bg-[#f8f9fb]" style={{ fontFamily: "'Inter', sans-serif" }}>
-
       {/* ── Top bar ── */}
-      <div className="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between shrink-0 z-20 shadow-sm/5">
+      <div className="topbar-frost px-4 py-2.5 flex items-center justify-between shrink-0 z-20">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/candidate/interviews')}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-all cursor-pointer"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-spring cursor-pointer"
           >
             <ArrowLeft size={16} />
           </button>
           <div className="w-px h-5 bg-slate-200" />
           <div className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-lg ${cfg.bg} ${cfg.border} border flex items-center justify-center`}>
-              <ModeIcon size={13} className={cfg.text} />
+            <div className={`w-8 h-8 rounded-xl ${cfg.bg} border border-slate-200/20 flex items-center justify-center`}>
+              <ModeIcon size={14} className={cfg.text} />
             </div>
             <div>
               <h1 className="text-[13px] font-bold text-slate-900 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
-                AI Practice Room
+                Practice Room
               </h1>
-              <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">{cfg.label} Mode</p>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{cfg.label} Interview</p>
             </div>
           </div>
         </div>
@@ -336,15 +332,16 @@ export const PracticeRoom = () => {
         <div className="flex items-center gap-2">
           {/* Mode selector — only when session not started */}
           {!sessionStarted && (
-            <div className="flex bg-slate-100 border border-slate-200/60 p-0.5 rounded-lg gap-0.5">
+            <div className="flex bg-slate-100 border border-slate-200/50 p-0.5 rounded-xl gap-0.5">
               {(Object.entries(MODE_CONFIG) as [InterviewMode, typeof cfg][]).map(([key, c]) => {
                 const Icon = c.icon;
+                const isSelected = mode === key;
                 return (
                   <button
                     key={key}
                     onClick={() => setMode(key)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                      mode === key ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-spring cursor-pointer ${
+                      isSelected ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40' : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
                     <Icon size={11} />
@@ -358,10 +355,10 @@ export const PracticeRoom = () => {
           {isTechnical && (
             <button
               onClick={() => setShowEditor(e => !e)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-spring border cursor-pointer ${
                 showEditor
-                  ? 'bg-slate-800 text-white border-slate-700'
-                  : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                  ? 'bg-slate-800 text-white border-slate-700 shadow-sm'
+                  : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 shadow-sm'
               }`}
             >
               <Code2 size={11} />
@@ -372,10 +369,10 @@ export const PracticeRoom = () => {
           {sessionStarted && (
             <button
               onClick={resetSession}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 transition-spring cursor-pointer shadow-sm"
             >
               <RotateCcw size={11} />
-              New Session
+              Reset Session
             </button>
           )}
         </div>
@@ -383,107 +380,108 @@ export const PracticeRoom = () => {
 
       {/* ── Main ── */}
       <div className="flex-1 flex min-h-0">
-
         {/* ── Chat panel ── */}
-        <div className={`flex flex-col ${showCodePanel ? 'w-[45%]' : 'w-full max-w-3xl mx-auto'} bg-white border-r border-slate-200/60`}>
-
+        <div className={`flex flex-col ${showCodePanel ? 'w-[45%]' : 'w-full max-w-3xl mx-auto'} bg-white border-r border-slate-200/50`}>
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 scroll-smooth">
-
+          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scroll-smooth bg-slate-50/40">
             {/* Welcome screen */}
             {!sessionStarted && messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                <div className={`w-16 h-16 rounded-2xl ${cfg.bg} ${cfg.border} border-2 flex items-center justify-center mb-5 shadow-sm`}>
-                  <Sparkles size={28} className={cfg.text} />
+              <div className="flex flex-col items-center justify-center h-full text-center px-4 animate-fade-in">
+                <div className="outer-bezel mb-6">
+                  <div className={`w-14 h-14 rounded-[calc(24px-6px)] ${cfg.bg} flex items-center justify-center`}>
+                    <Sparkles size={24} className={cfg.text} />
+                  </div>
                 </div>
-                <h2 className="text-lg font-bold text-slate-900 mb-1.5" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  {cfg.label} Practice
+                <h2 className="text-base font-extrabold text-slate-900 mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  Mock {cfg.label} Interview
                 </h2>
-                <p className="text-[12px] text-slate-500 font-medium mb-1 max-w-sm leading-relaxed">
+                <p className="text-[12px] text-slate-500 font-medium mb-8 max-w-xs leading-relaxed">
                   {cfg.description}
                 </p>
 
+                {/* Mode selector grid */}
+                <div className="grid grid-cols-3 gap-3 w-full max-w-sm mb-8">
+                  {(Object.entries(MODE_CONFIG) as [InterviewMode, typeof cfg][]).map(([key, c]) => {
+                    const Icon = c.icon;
+                    const isSelected = mode === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => { setMode(key); }}
+                        className={`flex flex-col items-center gap-2 p-3.5 rounded-xl border transition-spring cursor-pointer text-center ${
+                          isSelected
+                            ? 'bg-white border-violet-500 text-violet-600 shadow-md shadow-violet-100/50 scale-[1.02]'
+                            : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600'
+                        }`}
+                      >
+                        <Icon size={16} />
+                        <span className="text-[10px] font-bold">{c.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <button
                   onClick={startSession}
-                  className={`mt-6 flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold text-white transition-all shadow-lg hover:shadow-xl active:scale-[0.97] cursor-pointer ${cfg.btnBg}`}
+                  className={`flex items-center gap-2 px-8 py-3.5 rounded-xl text-[13px] font-bold text-white transition-spring cursor-pointer shadow-md ${cfg.btnClass}`}
                 >
                   <Trophy size={14} />
-                  Start Practice Session
+                  Begin Simulator
                 </button>
 
-                {/* Mode cards */}
-                {!sessionStarted && (
-                  <div className="mt-8 grid grid-cols-3 gap-3 w-full max-w-sm">
-                    {(Object.entries(MODE_CONFIG) as [InterviewMode, typeof cfg][]).map(([key, c]) => {
-                      const Icon = c.icon;
-                      return (
-                        <button
-                          key={key}
-                          onClick={() => { setMode(key); }}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all cursor-pointer text-center ${
-                            mode === key
-                              ? `${c.bg} ${c.border} ${c.text}`
-                              : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 hover:text-slate-600'
-                          }`}
-                        >
-                          <Icon size={16} />
-                          <span className="text-[9.5px] font-bold">{c.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                <div className="mt-6 flex gap-4 text-[10px] text-slate-400 font-medium">
-                  <span className="flex items-center gap-1"><Zap size={10} className="text-violet-400" /> Powered by Gemini</span>
-                  <span className="flex items-center gap-1"><Code2 size={10} className="text-emerald-400" /> Live code review</span>
+                <div className="mt-8 flex gap-4 text-[10px] text-slate-400 font-bold">
+                  <span className="flex items-center gap-1"><Zap size={11} className="text-violet-400" /> AI Sandbox</span>
+                  <span className="flex items-center gap-1"><Code2 size={11} className="text-emerald-400" /> Interactive Review</span>
                 </div>
               </div>
             )}
 
             {/* Messages */}
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                {msg.role === 'model' && (
-                  <div className={`w-7 h-7 rounded-lg ${cfg.bg} ${cfg.border} border flex items-center justify-center shrink-0 mt-0.5`}>
-                    <Bot size={13} className={cfg.text} />
+            {messages.map((msg, idx) => {
+              const isModel = msg.role === 'model';
+              return (
+                <div
+                  key={idx}
+                  className={`flex gap-3 ${!isModel ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
+                >
+                  {isModel && (
+                    <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0 shadow-sm">
+                      <Bot size={14} className="text-violet-600" />
+                    </div>
+                  )}
+                  <div className={`max-w-[85%] rounded-2xl p-4 ${
+                    !isModel
+                      ? 'bg-slate-900 text-white rounded-tr-none shadow-sm border border-slate-800'
+                      : 'bg-white border border-slate-200/80 text-slate-700 rounded-tl-none shadow-sm'
+                  }`}>
+                    {isModel
+                      ? renderSafeMarkdown(msg.text)
+                      : <p className="text-[12px] font-medium leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                    }
+                    <p className={`text-[9px] mt-2 font-bold uppercase tracking-wider ${!isModel ? 'text-slate-400' : 'text-slate-400'}`}>
+                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
                   </div>
-                )}
-                <div className={`max-w-[86%] rounded-2xl px-4 py-3 ${
-                  msg.role === 'user'
-                    ? 'bg-slate-800 text-white rounded-br-sm'
-                    : 'bg-white border border-slate-200/80 text-slate-700 rounded-bl-sm shadow-sm'
-                }`}>
-                  {msg.role === 'model'
-                    ? renderSafeMarkdown(msg.text)
-                    : <p className="text-[12px] font-medium leading-relaxed">{msg.text}</p>
-                  }
-                  <p className={`text-[9px] mt-2 ${msg.role === 'user' ? 'text-slate-500' : 'text-slate-400'}`}>
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
+                  {!isModel && (
+                    <div className="w-8 h-8 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-sm border border-slate-700">
+                      <User size={13} />
+                    </div>
+                  )}
                 </div>
-                {msg.role === 'user' && (
-                  <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
-                    <User size={13} className="text-slate-500" />
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
 
             {/* Typing indicator */}
             {loading && (
-              <div className="flex gap-2.5 items-start">
-                <div className={`w-7 h-7 rounded-lg ${cfg.bg} ${cfg.border} border flex items-center justify-center shrink-0`}>
-                  <Bot size={13} className={cfg.text} />
+              <div className="flex gap-3 items-start animate-fade-in">
+                <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0 shadow-sm">
+                  <Bot size={14} className="text-violet-600" />
                 </div>
-                <div className="bg-white border border-slate-200/80 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-1.5 py-1">
+                    <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -494,15 +492,15 @@ export const PracticeRoom = () => {
 
           {/* ── Input bar ── */}
           {sessionStarted && (
-            <div className="border-t border-slate-200/80 bg-white p-3 shrink-0">
+            <div className="border-t border-slate-200/80 bg-white p-4 shrink-0">
               <div className="flex items-end gap-2">
                 {showCodePanel && (
                   <button
                     onClick={shareCodeWithAI}
-                    className="flex items-center gap-1 px-3 py-2 rounded-lg text-[10px] font-bold text-violet-600 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all shrink-0 cursor-pointer"
+                    className="flex items-center gap-1 px-3 py-2.5 rounded-xl text-[10px] font-bold text-violet-700 bg-violet-50 border border-violet-150 hover:bg-violet-100/70 transition-spring shrink-0 cursor-pointer shadow-sm"
                   >
                     <Sparkles size={11} />
-                    Share Code
+                    Submit Code
                   </button>
                 )}
                 <div className="flex-1 relative">
@@ -512,13 +510,13 @@ export const PracticeRoom = () => {
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder={
-                      mode === 'behavioral' ? 'Share your answer...' :
-                      mode === 'system_design' ? 'Describe your approach...' :
-                      'Ask a question or describe your logic...'
+                      mode === 'behavioral' ? 'Type your behavioral description...' :
+                      mode === 'system_design' ? 'Describe your architectural layout...' :
+                      'Discuss your logic or ask a question...'
                     }
-                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[12px] text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 transition-all"
+                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[12px] text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/10 focus:border-violet-400 transition-spring"
                     rows={1}
-                    style={{ minHeight: '40px', maxHeight: '120px' }}
+                    style={{ minHeight: '42px', maxHeight: '120px' }}
                     onInput={e => {
                       const t = e.currentTarget;
                       t.style.height = 'auto';
@@ -529,17 +527,17 @@ export const PracticeRoom = () => {
                 <button
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || loading}
-                  className={`p-2.5 rounded-xl text-white transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shrink-0 active:scale-95 ${
-                    mode === 'behavioral' ? 'bg-amber-500 hover:bg-amber-600' :
-                    mode === 'system_design' ? 'bg-blue-500 hover:bg-blue-600' :
-                    'bg-violet-600 hover:bg-violet-700'
+                  className={`p-3 rounded-xl text-white transition-spring cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shrink-0 active:scale-95 ${
+                    mode === 'behavioral' ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-200/50' :
+                    mode === 'system_design' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-200/50' :
+                    'bg-violet-600 hover:bg-violet-700 shadow-violet-200/50'
                   }`}
                 >
                   {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 </button>
               </div>
-              <p className="text-[9px] text-slate-400 mt-1.5 px-1">
-                Enter to send · Shift+Enter for new line
+              <p className="text-[9px] text-slate-400 mt-2 px-1">
+                Press <b>Enter</b> to send · <b>Shift+Enter</b> for newline
               </p>
             </div>
           )}
@@ -548,7 +546,6 @@ export const PracticeRoom = () => {
         {/* ── Code editor panel ── */}
         {showCodePanel && (
           <div className="flex-1 flex flex-col bg-[#0f111a] text-white min-w-0">
-
             {/* Editor toolbar */}
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#252840] bg-[#1a1d2e] shrink-0">
               <div className="flex items-center gap-3">
@@ -569,7 +566,7 @@ export const PracticeRoom = () => {
                   </select>
                   <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
                 </div>
-                <span className="text-[9px] text-slate-600 font-bold uppercase tracking-wider">Practice Sandbox</span>
+                <span className="text-[9px] text-[#8185af] font-black uppercase tracking-wider">Practice Sandbox</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -578,7 +575,7 @@ export const PracticeRoom = () => {
                   className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg font-bold transition-colors bg-violet-600/15 text-violet-400 border border-violet-500/20 hover:bg-violet-600/25 cursor-pointer"
                 >
                   <Sparkles size={11} />
-                  AI Review
+                  AI Feedback
                 </button>
                 <button
                   onClick={handleRunCode}
@@ -623,7 +620,7 @@ export const PracticeRoom = () => {
               <div className="flex items-center justify-between px-4 py-1.5 border-b border-[#1e2035] shrink-0">
                 <div className="flex items-center gap-2">
                   <Terminal size={11} className="text-slate-600" />
-                  <span className="text-[9px] text-slate-600 uppercase tracking-widest font-bold">Output</span>
+                  <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Terminal Output</span>
                   {executionResult && (
                     executionResult.code === 0
                       ? <CheckCircle2 size={11} className="text-emerald-500" />
@@ -631,7 +628,7 @@ export const PracticeRoom = () => {
                   )}
                 </div>
                 {running && (
-                  <div className="flex items-center gap-1 text-[9px] text-slate-600">
+                  <div className="flex items-center gap-1 text-[9px] text-slate-500">
                     <Clock size={10} className="animate-spin" />
                     Executing...
                   </div>
@@ -641,11 +638,11 @@ export const PracticeRoom = () => {
                 running ? 'text-slate-600 animate-pulse' :
                 executionResult?.code === 0 ? 'text-emerald-300' :
                 executionResult ? 'text-red-400' :
-                'text-slate-600'
+                'text-slate-500'
               }`}>
                 {running
                   ? '⟳  Executing...'
-                  : executionResult?.output || '// Press Run ▶  to execute, or use AI Review for code feedback'}
+                  : executionResult?.output || '// Press Run ▶ to execute local code execution, or use AI Feedback for full diagnostics.'}
               </pre>
             </div>
           </div>

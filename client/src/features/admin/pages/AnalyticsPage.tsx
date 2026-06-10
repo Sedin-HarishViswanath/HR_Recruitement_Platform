@@ -47,39 +47,39 @@ export const SuperAdminAnalyticsPage = () => {
         title="Platform Analytics" 
         subtitle="Global metrics and performance tracking" 
       />
-      <main className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in">
-        
+      <main className="p-4 sm:p-5 lg:p-6 space-y-5 animate-fade-in">
+        <div className="max-w-[1400px] mx-auto space-y-5">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {statMeta.map((s, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 flex items-center justify-between shadow-sm">
+            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 flex items-center justify-between shadow-sm">
               <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
-                <p className="text-3xl font-black text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{s.value}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
+                <p className="text-[22px] font-black text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{s.value}</p>
               </div>
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center text-white shadow-sm`}>
-                <s.icon size={20} />
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center text-white shadow-sm`}>
+                <s.icon size={18} />
               </div>
             </div>
           ))}
         </div>
 
         {/* Charts and Tables */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
           {/* Companies By Status */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                <Activity size={16} />
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <Activity size={14} />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-[15px]" style={{ fontFamily: 'Sora, sans-serif' }}>Companies by Status</h3>
-                <p className="text-xs text-slate-400 font-medium">Distribution of registered companies</p>
+                <h3 className="font-bold text-slate-900 text-[13px]" style={{ fontFamily: 'Sora, sans-serif' }}>Companies by Status</h3>
+                <p className="text-[10px] text-slate-400 font-medium">Distribution of registered companies</p>
               </div>
             </div>
-            
-            <div className="h-[280px] w-full">
+
+            <div className="h-[220px] w-full">
               {data.companiesByStatus && data.companiesByStatus.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.companiesByStatus}>
@@ -97,33 +97,32 @@ export const SuperAdminAnalyticsPage = () => {
           </div>
 
           {/* Top Companies */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-            <div className="mb-6">
-              <h3 className="font-bold text-slate-900 text-[15px]" style={{ fontFamily: 'Sora, sans-serif' }}>Top Companies by Jobs</h3>
-              <p className="text-xs text-slate-400 font-medium mt-1">Companies with the most active job postings</p>
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+            <div className="mb-4">
+              <h3 className="font-bold text-slate-900 text-[13px]" style={{ fontFamily: 'Sora, sans-serif' }}>Top Companies by Jobs</h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Companies with the most active job postings</p>
             </div>
-            
-            <div className="space-y-4">
+            <div className="space-y-2.5">
               {data.topCompanies && data.topCompanies.length > 0 ? data.topCompanies.map((company: any, i: number) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold">
+                <div key={i} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold">
                       #{i + 1}
                     </div>
-                    <span className="font-semibold text-slate-800">{company.name}</span>
+                    <span className="font-semibold text-slate-800 text-[12px]">{company.name}</span>
                   </div>
-                  <span className="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+                  <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
                     {company.jobs_count} jobs
                   </span>
                 </div>
               )) : (
-                <div className="py-8 text-center text-sm font-medium text-slate-400">No top companies found</div>
+                <div className="py-8 text-center text-[12px] font-medium text-slate-400">No top companies found</div>
               )}
             </div>
           </div>
 
         </div>
-
+        </div>
       </main>
     </div>
   );

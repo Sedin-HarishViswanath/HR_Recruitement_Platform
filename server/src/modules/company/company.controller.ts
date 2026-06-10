@@ -24,7 +24,10 @@ export class CompanyController {
       if (!companyId) throw new AppError('No company associated with this user', 400);
 
       const parsed = companyProfileSchema.safeParse(req.body);
-      if (!parsed.success) return res.status(400).json({ success: false, errors: parsed.error.flatten() });
+      if (!parsed.success) {
+        console.error('Company profile validation failed:', JSON.stringify(parsed.error.flatten()), 'Request Body:', JSON.stringify(req.body));
+        return res.status(400).json({ success: false, errors: parsed.error.flatten() });
+      }
 
       const updated = await companyService.updateCompanyProfile(companyId, parsed.data);
       return sendResponse(res, 200, true, 'Company profile updated', updated);

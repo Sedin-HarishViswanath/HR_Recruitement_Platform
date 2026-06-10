@@ -29,17 +29,22 @@ export const RoleGuard = ({ allowedRoles, children }: RoleGuardProps) => {
   if (isCandidate) {
     // Candidate role checks, onboarding is optional/skippable
   } else if (isAdmin) {
-    if (user.companyStatus?.toLowerCase() === 'pending' || user.companyStatus?.toLowerCase() === 'revoked') {
-      if (window.location.pathname !== '/pending-approval') {
-        console.log('RoleGuard: Redirecting pending/revoked company to approval page');
+    // Force onboarding completion before pending-approval
+    if (user.onboardingCompleted === false && !window.location.pathname.startsWith('/company/onboarding')) {
+      console.log('RoleGuard: Redirecting to onboarding (not completed)');
+      return <Navigate to="/company/onboarding" replace />;
+    }
+    if (['pending', 'revoked', 'rejected'].includes(user.companyStatus?.toLowerCase() || '')) {
+      if (window.location.pathname !== '/pending-approval' && !window.location.pathname.startsWith('/company/onboarding')) {
+        console.log('RoleGuard: Redirecting pending/revoked/rejected company to approval page');
         return <Navigate to="/pending-approval" replace />;
       }
     }
   } else {
     // Other company roles (Recruiter, Interviewer)
-    if (user.companyStatus?.toLowerCase() === 'pending' || user.companyStatus?.toLowerCase() === 'revoked') {
+    if (['pending', 'revoked', 'rejected'].includes(user.companyStatus?.toLowerCase() || '')) {
       if (window.location.pathname !== '/pending-approval') {
-        console.log('RoleGuard: Redirecting pending/revoked company staff to approval page');
+        console.log('RoleGuard: Redirecting pending/revoked/rejected company staff to approval page');
         return <Navigate to="/pending-approval" replace />;
       }
     }

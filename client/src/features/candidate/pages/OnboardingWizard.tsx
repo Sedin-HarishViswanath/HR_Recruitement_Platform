@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { updateUser } from '../../auth/auth.slice';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
@@ -47,6 +49,7 @@ export const CandidateOnboardingWizard = () => {
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { register: reg1, handleSubmit: handle1, setValue: set1, formState: { errors: err1 } } = useForm({ resolver: zodResolver(step1Schema) });
   const { register: reg2, handleSubmit: handle2, setValue: set2, formState: { errors: err2 } } = useForm({ resolver: zodResolver(step2Schema) });
@@ -139,6 +142,7 @@ export const CandidateOnboardingWizard = () => {
         salary_max: data.salary_max ? Number(data.salary_max) : undefined,
       };
       await api.patch('/candidate/profile/step/4', payload);
+      dispatch(updateUser({ onboardingCompleted: true }));
       toast.success('Profile completed!');
       navigate('/candidate/dashboard');
     } catch (err) { toast.error('Failed to complete profile'); }

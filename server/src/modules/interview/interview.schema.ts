@@ -1,12 +1,24 @@
 import { z } from 'zod';
 
+export const AUTOMATED_ROUND_TYPES = ['aptitude', 'technical'] as const;
+export const isAutomatedRound = (r: string) => (AUTOMATED_ROUND_TYPES as readonly string[]).includes(r);
+
 export const scheduleInterviewSchema = z.object({
   application_id: z.string(),
-  round_type: z.enum(['phone', 'screening', 'aptitude', 'technical', 'behavioral', 'hr', 'final']),
-  interviewer_id: z.string(),
-  scheduled_at: z.string().datetime(), // ISO string
+  round_type: z.enum(['aptitude', 'technical', 'hr', 'final']),
+  interviewer_id: z.string().optional(),
+  scheduled_at: z.string().datetime().optional(),
   duration: z.number().int().min(15).max(180).default(60),
   meeting_link: z.string().optional().or(z.literal('')),
+}).superRefine((data, ctx) => {
+  if (!isAutomatedRound(data.round_type)) {
+    if (!data.interviewer_id) {
+      ctx.addIssue({ code: 'custom', path: ['interviewer_id'], message: 'Interviewer is required for live interview rounds' });
+    }
+    if (!data.scheduled_at) {
+      ctx.addIssue({ code: 'custom', path: ['scheduled_at'], message: 'Scheduled time is required for live interview rounds' });
+    }
+  }
 });
 
 export const rescheduleInterviewSchema = z.object({
@@ -39,4 +51,3 @@ export const handleRescheduleRequestSchema = z.object({
 
 export type CandidateRescheduleRequestInput = z.infer<typeof candidateRescheduleRequestSchema>;
 export type HandleRescheduleRequestInput = z.infer<typeof handleRescheduleRequestSchema>;
-

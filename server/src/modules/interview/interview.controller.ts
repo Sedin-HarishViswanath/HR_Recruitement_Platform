@@ -142,6 +142,18 @@ export class InterviewController {
     }
   }
 
+  async startAssessment(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const candidateId = req.user.candidateId || req.user.userId;
+      const result = await interviewService.startAssessment(id as string, candidateId);
+      return sendResponse(res, 200, true, 'Assessment started', result);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to start assessment');
+    }
+  }
+
   // ── Transcript endpoints ──
 
   async saveTranscript(req: Request, res: Response) {

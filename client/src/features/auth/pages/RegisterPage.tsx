@@ -12,98 +12,103 @@ export const RegisterPage = () => {
   );
 
   return (
-    <div className="min-h-screen font-sans text-slate-900 flex flex-col">
-      {/* Navbar */}
+    <div className="min-h-screen font-sans text-slate-900 bg-background flex flex-col">
+      {/* Navbar - dark themed for high contrast layout */}
       <nav className="w-full bg-[#0c0e14] px-8 py-3.5 flex items-center justify-between sticky top-0 z-50 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center text-white shadow-lg shadow-violet-900/40 relative">
+          <div className="w-8 h-8 rounded-xl bg-violet-650 flex items-center justify-center text-white shadow-lg shadow-violet-900/40 relative">
             <Sparkles size={14} />
             <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
           </div>
           <div>
             <h1 className="text-white text-[14px] font-extrabold tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>RecruitAI</h1>
-            <p className="text-[8.5px] uppercase tracking-[0.15em] font-bold mt-0.5" style={{ color: 'rgba(139,92,246,0.8)' }}>Enterprise ATS</p>
+            <p className="text-[8px] uppercase tracking-[0.16em] font-black mt-0.5 text-violet-400">ATS Engine</p>
           </div>
         </Link>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/login?role=candidate')}
-            className="px-4 py-2 rounded-lg text-white/60 hover:text-white text-[12px] font-semibold transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-lg text-white/60 hover:text-white text-[12px] font-bold transition-colors cursor-pointer"
           >
-            Candidate Login
+            Candidate Portal
           </button>
           <button
             onClick={() => navigate('/login')}
-            className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-[12px] font-bold transition-all shadow-sm cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-750 text-white text-[12px] font-bold transition-spring shadow-sm cursor-pointer shadow-violet-500/10"
           >
-            Internal Login
+            Internal Team Sign In
           </button>
         </div>
       </nav>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center py-10 px-4">
-        <div className="w-full max-w-[760px]">
-
+      <div className="flex-1 flex flex-col items-center py-10 px-4 animate-fade-in-up">
+        <div className="w-full max-w-[760px] space-y-6">
           {/* Page heading */}
-          <div className="text-center mb-7">
-            <h2 className="text-[22px] font-extrabold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora' }}>
+          <div className="text-center">
+            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora' }}>
               Create your account
             </h2>
-            <p className="text-[13px] text-slate-500 font-normal mt-1">
-              Already have one?{' '}
-              <Link to="/login" className="text-violet-600 font-semibold hover:text-violet-700 cursor-pointer">Sign in →</Link>
+            <p className="text-xs text-slate-400 font-semibold mt-1.5">
+              Already registered?{' '}
+              <Link to="/login" className="text-violet-600 font-bold hover:text-violet-800 cursor-pointer">Sign in to workspace →</Link>
             </p>
           </div>
 
           {/* Role Switcher */}
-          <div className="flex gap-3 mb-6 justify-center">
+          <div className="flex gap-3 justify-center">
             {[
-              { key: 'internal', label: 'Company Registration', icon: Building2, desc: 'Manage jobs, hiring & teams' },
-              { key: 'candidate', label: 'Candidate Account', icon: User, desc: 'Discover and apply to great roles' },
-            ].map((t) => (
-              <button
-                key={t.key}
-                onClick={() => setRole(t.key as any)}
-                className={`flex items-center gap-3 px-5 py-3.5 rounded-xl border text-left transition-all flex-1 max-w-[280px] cursor-pointer ${
-                  role === t.key
-                    ? 'bg-white border-violet-400 shadow-md shadow-violet-100'
-                    : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'
-                }`}
-              >
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                  role === t.key ? 'bg-violet-600 text-white shadow-sm shadow-violet-200' : 'bg-slate-100 text-slate-500'
-                }`}>
-                  <t.icon size={15} />
-                </div>
-                <div>
-                  <p className={`text-[12px] font-bold leading-tight ${role === t.key ? 'text-violet-700' : 'text-slate-700'}`}>{t.label}</p>
-                  <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">{t.desc}</p>
-                </div>
-              </button>
-            ))}
+              { key: 'internal', label: 'Recruiter Workspace', icon: Building2, desc: 'Manage job posts, teams & simulation pipelines' },
+              { key: 'candidate', label: 'Candidate Account', icon: User, desc: 'Practice mock rounds & review matching metrics' },
+            ].map((t) => {
+              const isSelected = role === t.key;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setRole(t.key as any)}
+                  className={`flex items-center gap-3.5 px-5 py-4 rounded-xl border text-left transition-spring flex-1 max-w-[340px] cursor-pointer bg-white ${
+                    isSelected
+                      ? 'border-violet-500 shadow-md shadow-violet-100/50 scale-[1.01]'
+                      : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-spring ${
+                    isSelected ? 'bg-violet-600 text-white shadow-sm shadow-violet-200' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    <t.icon size={16} />
+                  </div>
+                  <div>
+                    <p className={`text-[12px] font-bold leading-tight ${isSelected ? 'text-violet-750' : 'text-slate-700'}`}>{t.label}</p>
+                    <p className="text-[10px] text-slate-400 font-semibold leading-tight mt-1">{t.desc}</p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)' }}>
-            <div className="px-8 pt-7 pb-5 border-b border-slate-100">
-              <h2 className="text-[18px] font-extrabold tracking-tight text-slate-900" style={{ fontFamily: 'Sora' }}>
-                {role === 'internal' ? 'Register your Company' : 'Create your Account'}
-              </h2>
-              <p className="text-[12px] text-slate-500 font-medium mt-1">
-                {role === 'internal'
-                  ? 'Set up your organization to start managing jobs and candidates.'
-                  : 'Join to discover and apply to amazing opportunities.'}
-              </p>
-            </div>
-            <div className="p-8">
-              <SignupForm role={role} onToggleMode={() => navigate('/')} />
+          <div className="outer-bezel">
+            <div className="inner-core !p-0 overflow-hidden">
+              <div className="px-8 pt-7 pb-5 border-b border-slate-100 bg-slate-50/30">
+                <h2 className="text-base font-extrabold tracking-tight text-slate-900" style={{ fontFamily: 'Sora' }}>
+                  {role === 'internal' ? 'Deploy Recruiter Workspace' : 'Configure Candidate Profile'}
+                </h2>
+                <p className="text-[12px] text-slate-450 font-bold mt-1">
+                  {role === 'internal'
+                    ? 'Register your company organization below to coordinate multi-tenant team members.'
+                    : 'Configure your profile to start testing code sandbox mock rounds.'}
+                </p>
+              </div>
+              <div className="p-8">
+                <SignupForm role={role} onToggleMode={() => navigate('/')} />
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
   );
 };
+
+export default RegisterPage;
