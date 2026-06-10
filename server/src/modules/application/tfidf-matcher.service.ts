@@ -131,7 +131,7 @@ function computeTf(tokens: string[]): Map<string, number> {
 
 /**
  * Compute inverse document frequency across a corpus of documents.
- * IDF(t) = log(N / (1 + df(t)))  where df = number of docs containing t
+ * IDF(t) = log((1 + N) / (1 + df(t))) + 1  where df = number of docs containing t (smoothed IDF)
  */
 function computeIdf(documents: string[][]): Map<string, number> {
   const N = documents.length;
@@ -146,7 +146,7 @@ function computeIdf(documents: string[][]): Map<string, number> {
 
   const idf = new Map<string, number>();
   for (const [term, df] of docFreq) {
-    idf.set(term, Math.log(N / (1 + df)));
+    idf.set(term, Math.log((1 + N) / (1 + df)) + 1);
   }
   return idf;
 }

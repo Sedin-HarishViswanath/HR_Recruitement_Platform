@@ -326,24 +326,30 @@ export const CompanyInterviewsPage = () => {
 
                     {/* Action buttons */}
                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (item.application_status === 'rejected' || item.application_status === 'withdrawn') return;
-                          navigate(`/interview/${item.id}`);
-                        }}
-                        disabled={item.application_status === 'rejected' || item.application_status === 'withdrawn'}
-                        className={`text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-spring border cursor-pointer ${
-                          (item.application_status === 'rejected' || item.application_status === 'withdrawn')
-                            ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
-                            : item.isLive
-                            ? 'bg-violet-600 text-white hover:bg-violet-700 border-violet-550 shadow-sm shadow-violet-200'
-                            : 'bg-white border-slate-200 text-slate-750 hover:bg-slate-50'
-                        }`}
-                      >
-                        <Video size={12} />
-                        {(item.application_status === 'rejected' || item.application_status === 'withdrawn') ? 'Round Closed' : (item.isLive ? 'Join Room' : 'Open Workspace')}
-                      </button>
+                      {item.status === 'completed' ? (
+                        <span className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 select-none">
+                          Completed
+                        </span>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (item.application_status === 'rejected' || item.application_status === 'withdrawn') return;
+                            navigate(`/interview/${item.id}`);
+                          }}
+                          disabled={item.application_status === 'rejected' || item.application_status === 'withdrawn'}
+                          className={`text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-spring border cursor-pointer ${
+                            (item.application_status === 'rejected' || item.application_status === 'withdrawn')
+                              ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
+                              : item.isLive
+                              ? 'bg-violet-600 text-white hover:bg-violet-700 border-violet-550 shadow-sm shadow-violet-200'
+                              : 'bg-white border-slate-200 text-slate-750 hover:bg-slate-50'
+                          }`}
+                        >
+                          <Video size={12} />
+                          {(item.application_status === 'rejected' || item.application_status === 'withdrawn') ? 'Round Closed' : (item.isLive ? 'Join Room' : 'Open Workspace')}
+                        </button>
+                      )}
 
                       {/* Interviewers can submit feedback directly */}
                       {isInterviewer && item.status !== 'completed' && (
@@ -421,21 +427,27 @@ export const CompanyInterviewsPage = () => {
 
                   {/* Action triggers */}
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
-                        navigate(`/interview/${activeInt.id}`);
-                      }}
-                      disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
-                      className={`flex-1 text-xs font-bold py-2 rounded-lg transition-spring flex items-center justify-center gap-1.5 shadow-sm ${
-                        (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
-                          ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                          : 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-200/50'
-                      }`}
-                    >
-                      <Video size={13} />
-                      Join Room
-                    </button>
+                    {activeInt.status === 'completed' ? (
+                      <div className="flex-1 text-center bg-emerald-50 text-emerald-700 border border-emerald-250 text-xs font-bold py-2 rounded-lg leading-normal select-none">
+                        Completed
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
+                          navigate(`/interview/${activeInt.id}`);
+                        }}
+                        disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
+                        className={`flex-1 text-xs font-bold py-2 rounded-lg transition-spring flex items-center justify-center gap-1.5 shadow-sm ${
+                          (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                            : 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-200/50'
+                        }`}
+                      >
+                        <Video size={13} />
+                        Join Room
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         if (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn') return;
