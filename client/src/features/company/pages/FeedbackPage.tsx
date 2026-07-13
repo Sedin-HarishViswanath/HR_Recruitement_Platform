@@ -17,7 +17,7 @@ const REC_CONFIG: Record<string, { label: string; badgeClass: string }> = {
 };
 
 const getRec = (recommendation: string) =>
-  REC_CONFIG[recommendation] ?? { label: recommendation || 'Evaluated', badgeClass: 'badge-premium bg-slate-50 text-slate-500 border-slate-200' };
+  REC_CONFIG[recommendation] ?? { label: recommendation || 'Evaluated', badgeClass: 'badge-premium bg-stone-50 text-stone-500 border-stone-200' };
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 const FeedbackCardSkeleton = () => (
@@ -25,18 +25,18 @@ const FeedbackCardSkeleton = () => (
     <div className="inner-core space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-200 rounded-xl" />
+          <div className="w-10 h-10 bg-stone-200 rounded-xl" />
           <div className="space-y-1.5">
-            <div className="h-3.5 bg-slate-200 rounded w-32" />
-            <div className="h-2.5 bg-slate-100 rounded w-48" />
+            <div className="h-3.5 bg-stone-200 rounded w-32" />
+            <div className="h-2.5 bg-stone-100 rounded w-48" />
           </div>
         </div>
-        <div className="h-6 w-20 bg-slate-100 rounded-full" />
+        <div className="h-6 w-20 bg-stone-100 rounded-full" />
       </div>
-      <div className="h-8 bg-slate-50 rounded-lg w-36" />
+      <div className="h-8 bg-stone-50 rounded-lg w-36" />
       <div className="grid grid-cols-2 gap-3">
-        <div className="h-20 bg-slate-50 rounded-lg" />
-        <div className="h-20 bg-slate-50 rounded-lg" />
+        <div className="h-20 bg-stone-50 rounded-lg" />
+        <div className="h-20 bg-stone-50 rounded-lg" />
       </div>
     </div>
   </div>
@@ -83,11 +83,11 @@ export const FeedbackPage = () => {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="topbar-frost px-6 py-4 sticky top-0 z-40">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
-          Workspace &rsaquo; <span className="text-slate-600">Feedback</span>
+        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
+          Workspace &rsaquo; <span className="text-stone-600">Feedback</span>
         </p>
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+          <h1 className="text-xl font-bold text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
             Interview Feedback
           </h1>
           <span className="chip-brand">{feedback.length} Evaluations</span>
@@ -97,7 +97,7 @@ export const FeedbackPage = () => {
       <main className="p-6 max-w-[1400px] w-full mx-auto space-y-6 flex-1 animate-fade-in-up">
         {/* Filter bar */}
         <div className="panel p-3.5 flex items-center gap-3 flex-wrap">
-          <div className="flex items-center bg-slate-100/80 border border-slate-200/50 rounded-xl p-0.5 gap-0.5">
+          <div className="flex items-center bg-stone-100/80 border border-stone-200/50 rounded-xl p-0.5 gap-0.5">
             {[
               { key: 'all', label: 'All' },
               { key: 'strong_hire', label: 'Strong Hire' },
@@ -109,12 +109,12 @@ export const FeedbackPage = () => {
                 key={key}
                 onClick={() => setFilter(key)}
                 className={`px-3 py-1.5 rounded-lg text-[10.5px] font-bold transition-spring cursor-pointer flex items-center gap-1 ${
-                  filter === key ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40' : 'text-slate-400 hover:text-slate-700'
+                  filter === key ? 'bg-white text-stone-900 shadow-sm border border-stone-200/40' : 'text-stone-400 hover:text-stone-700'
                 }`}
               >
                 {label}
                 {counts[key] > 0 && (
-                  <span className={`text-[9px] px-1.5 rounded-full ${filter === key ? 'bg-violet-100 text-violet-700' : 'bg-slate-200/80 text-slate-500'}`}>
+                  <span className={`text-[9px] px-1.5 rounded-full ${filter === key ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-200/80 text-stone-500'}`}>
                     {counts[key]}
                   </span>
                 )}
@@ -130,11 +130,11 @@ export const FeedbackPage = () => {
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-24 text-center panel">
-            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200/60 mx-auto flex items-center justify-center mb-4">
-              <CheckCircle2 size={24} className="text-slate-400" />
+            <div className="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-200/60 mx-auto flex items-center justify-center mb-4">
+              <CheckCircle2 size={24} className="text-stone-400" />
             </div>
-            <h3 className="text-sm font-bold text-slate-700" style={{ fontFamily: 'Sora' }}>No Feedback Scorecards</h3>
-            <p className="text-xs text-slate-400 font-medium mt-1.5 max-w-xs mx-auto">
+            <h3 className="text-sm font-bold text-stone-700" style={{ fontFamily: 'Plus Jakarta Sans' }}>No Feedback Scorecards</h3>
+            <p className="text-xs text-stone-400 font-medium mt-1.5 max-w-xs mx-auto">
               Interviewer scorecards matching this filter will appear here once submitted.
             </p>
           </div>
@@ -154,17 +154,17 @@ export const FeedbackPage = () => {
                       {/* Header */}
                       <div className="flex items-start justify-between gap-3 mb-4 relative z-10">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center text-white font-extrabold text-[11px] shadow-sm border border-slate-750/30">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-800 to-stone-950 flex items-center justify-center text-white font-extrabold text-[11px] shadow-sm border border-stone-750/30">
                             {(f.candidate_name || 'C').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <h4 className="font-bold text-sm text-slate-900" style={{ fontFamily: 'Sora' }}>
+                            <h4 className="font-bold text-sm text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                               {f.candidate_name || 'Unknown Candidate'}
                             </h4>
-                            <div className="flex items-center gap-2 mt-0.5 text-[10.5px] font-semibold text-slate-400 flex-wrap">
-                              <span className="flex items-center gap-1 text-slate-700 font-semibold"><Briefcase size={10} className="text-slate-400" /> {f.job_title || 'Position'}</span>
-                              <span className="text-slate-300">·</span>
-                              <span className="flex items-center gap-1"><User size={10} className="text-slate-400" /> {f.interviewer_name || 'Interviewer'}</span>
+                            <div className="flex items-center gap-2 mt-0.5 text-[10.5px] font-semibold text-stone-400 flex-wrap">
+                              <span className="flex items-center gap-1 text-stone-700 font-semibold"><Briefcase size={10} className="text-stone-400" /> {f.job_title || 'Position'}</span>
+                              <span className="text-stone-300">·</span>
+                              <span className="flex items-center gap-1"><User size={10} className="text-stone-400" /> {f.interviewer_name || 'Interviewer'}</span>
                             </div>
                           </div>
                         </div>
@@ -175,15 +175,15 @@ export const FeedbackPage = () => {
                       </div>
 
                       {/* Rating stars */}
-                      <div className="flex items-center gap-2 mb-4 w-fit bg-slate-50/50 border border-slate-100 px-3 py-1.5 rounded-xl">
+                      <div className="flex items-center gap-2 mb-4 w-fit bg-stone-50/50 border border-stone-100 px-3 py-1.5 rounded-xl">
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map(s => (
-                            <Star key={s} size={13} className={s <= (f.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'} />
+                            <Star key={s} size={13} className={s <= (f.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-stone-200'} />
                           ))}
                         </div>
-                        <div className="w-px h-3 bg-slate-200" />
-                        <span className="text-[11px] font-extrabold text-slate-700">
-                          {(f.rating || 0).toFixed(1)} <span className="text-slate-400 font-medium">/ 5</span>
+                        <div className="w-px h-3 bg-stone-200" />
+                        <span className="text-[11px] font-extrabold text-stone-700">
+                          {(f.rating || 0).toFixed(1)} <span className="text-stone-400 font-medium">/ 5</span>
                         </span>
                       </div>
 
@@ -193,9 +193,9 @@ export const FeedbackPage = () => {
                           <div className="absolute top-0 left-0 w-0.5 h-full bg-emerald-500" />
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <CheckCircle2 size={11} className="text-emerald-500" />
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Strengths</p>
+                            <p className="text-[9px] font-black text-stone-400 uppercase tracking-wider">Strengths</p>
                           </div>
-                          <p className="text-[11.5px] text-slate-600 leading-relaxed font-medium line-clamp-3">
+                          <p className="text-[11.5px] text-stone-600 leading-relaxed font-medium line-clamp-3">
                             {f.strengths || 'Not provided'}
                           </p>
                         </div>
@@ -204,9 +204,9 @@ export const FeedbackPage = () => {
                           <div className="absolute top-0 left-0 w-0.5 h-full bg-red-400" />
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <XCircle size={11} className="text-red-400" />
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Improvements</p>
+                            <p className="text-[9px] font-black text-stone-400 uppercase tracking-wider">Improvements</p>
                           </div>
-                          <p className="text-[11.5px] text-slate-600 leading-relaxed font-medium line-clamp-3">
+                          <p className="text-[11.5px] text-stone-600 leading-relaxed font-medium line-clamp-3">
                             {f.weaknesses || 'Not provided'}
                           </p>
                         </div>
@@ -214,16 +214,16 @@ export const FeedbackPage = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between relative z-10 mt-3">
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
-                        <Calendar size={11} className="text-slate-400" />
+                    <div className="pt-3 border-t border-stone-100 flex items-center justify-between relative z-10 mt-3">
+                      <div className="flex items-center gap-1.5 text-[10px] text-stone-400 font-semibold">
+                        <Calendar size={11} className="text-stone-400" />
                         {f.created_at
                           ? new Date(f.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                           : '—'}
                         {f.round_type && (
                           <>
-                            <span className="text-slate-300">·</span>
-                            <span className="capitalize font-bold text-slate-500">{f.round_type} Round</span>
+                            <span className="text-stone-300">·</span>
+                            <span className="capitalize font-bold text-stone-500">{f.round_type} Round</span>
                           </>
                         )}
                       </div>
@@ -231,7 +231,7 @@ export const FeedbackPage = () => {
                       {f.interview_id && (
                         <button
                           onClick={() => setDebriefModal({ isOpen: true, feedback: f })}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-violet-700 bg-violet-50 hover:bg-violet-100/80 border border-violet-150 text-[10px] font-bold transition-spring cursor-pointer shadow-sm"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-150 text-[10px] font-bold transition-spring cursor-pointer shadow-sm"
                         >
                           <Brain size={11} />
                           AI Debrief

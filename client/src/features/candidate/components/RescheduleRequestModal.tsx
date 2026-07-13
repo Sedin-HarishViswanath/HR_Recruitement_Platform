@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import { Label } from '../../../components/ui/label';
@@ -70,36 +70,36 @@ export const RescheduleRequestModal = ({
     }}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle style={{ fontFamily: 'Sora, sans-serif' }} className="text-lg font-black text-slate-900">
+          <DialogTitle style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }} className="text-lg font-black text-stone-900">
             Request Interview Reschedule
           </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500">
+          <DialogDescription className="text-xs text-stone-500">
             Please suggest a preferred date and time for your {interviewType || 'technical'} interview with {companyName || 'the company'}.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-4">
           <div className="space-y-2">
-            <Label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Preferred Date & Time *</Label>
+            <Label className="text-[11px] font-bold text-stone-700 uppercase tracking-wider">Preferred Date & Time *</Label>
             <Input
               type="datetime-local"
               required
               value={preferredDate}
               onChange={(e) => setPreferredDate(e.target.value)}
-              className="w-full text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+              className="w-full text-stone-700 bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Reason for Rescheduling *</Label>
+            <Label className="text-[11px] font-bold text-stone-700 uppercase tracking-wider">Reason for Rescheduling *</Label>
             <Textarea
               required
               placeholder="e.g. I have a conflict with my current university exam or work shift at this time."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full min-h-[100px] text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+              className="w-full min-h-[100px] text-stone-700 bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
             />
-            <p className="text-[10px] text-slate-400">At least 5 characters. The hiring manager will review and approve or reject this request.</p>
+            <p className="text-[10px] text-stone-400">At least 5 characters. The hiring manager will review and approve or reject this request.</p>
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
@@ -107,14 +107,14 @@ export const RescheduleRequestModal = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="rounded-xl border border-slate-200 text-xs font-bold px-4 py-2 hover:bg-slate-50 text-slate-600"
+              className="rounded-xl border border-stone-200 text-xs font-bold px-4 py-2 hover:bg-stone-50 text-stone-600"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl font-bold text-xs bg-gradient-to-r from-violet-600 to-violet-700 text-white hover:from-violet-700 hover:to-violet-800 shadow-sm transition-all btn-premium px-4 py-2"
+              className="rounded-xl font-bold text-xs bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800 shadow-sm transition-all btn-premium px-4 py-2"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Request'}
             </Button>

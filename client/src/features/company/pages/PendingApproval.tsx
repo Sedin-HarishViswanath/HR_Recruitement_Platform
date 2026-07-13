@@ -61,18 +61,18 @@ export const PendingApproval = () => {
   }, [pollStatus, isRevoked, isRejected]);
 
   const statusColor = isNegative ? 'bg-rose-400' : 'bg-blue-400';
-  const iconBg = isNegative ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-violet-50 border-violet-100 text-violet-600 animate-pulse';
+  const iconBg = isNegative ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-emerald-50 border-emerald-100 text-emerald-600 animate-pulse';
 
   const statusTitle = isRejected
-    ? <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
+    ? <h2 className="text-2xl font-black text-stone-900 tracking-tight leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
         Application <span className="text-rose-600">Rejected</span>
       </h2>
     : isRevoked
-    ? <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
+    ? <h2 className="text-2xl font-black text-stone-900 tracking-tight leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
         Account Access <span className="text-rose-600">Revoked</span>
       </h2>
-    : <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
-        Account Pending <span className="text-violet-600">Verification</span>
+    : <h2 className="text-2xl font-black text-stone-900 tracking-tight leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
+        Account Pending <span className="text-emerald-600">Verification</span>
       </h2>;
 
   const statusDesc = isRejected
@@ -96,20 +96,20 @@ export const PendingApproval = () => {
   ];
 
   return (
-    <div className="min-h-screen font-sans text-slate-900 flex flex-col">
+    <div className="min-h-screen font-sans text-stone-900 flex flex-col">
       <nav className="w-full bg-[#0b0f19] px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-white shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-md">
             <Building2 size={18} />
           </div>
           <div>
             <h1 className="text-white text-sm font-bold tracking-tight leading-none">RecruitAI</h1>
-            <p className="text-[9px] text-slate-500 mt-1 uppercase tracking-widest font-black">Company Portal</p>
+            <p className="text-[9px] text-stone-500 mt-1 uppercase tracking-widest font-black">Company Portal</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {!isNegative && (
-            <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
+            <div className="flex items-center gap-1.5 text-[10px] text-stone-400 font-semibold">
               <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               Checking status...
             </div>
@@ -130,7 +130,7 @@ export const PendingApproval = () => {
           <div className="lg:col-span-2 space-y-6">
 
             {/* Status Card */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm relative overflow-hidden">
+            <div className="bg-white rounded-2xl border border-stone-200/80 p-8 shadow-sm relative overflow-hidden">
               <div className={`absolute top-0 right-0 w-48 h-48 rounded-full -mr-24 -mt-24 transition-all duration-700 opacity-20 ${statusColor}`} />
               <div className="relative z-10 space-y-6">
                 <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center shadow-inner ${iconBg}`}>
@@ -138,28 +138,28 @@ export const PendingApproval = () => {
                 </div>
                 <div className="space-y-2">
                   {statusTitle}
-                  <p className="text-xs text-slate-500 font-semibold leading-relaxed max-w-md">{statusDesc}</p>
+                  <p className="text-xs text-stone-500 font-semibold leading-relaxed max-w-md">{statusDesc}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-                  <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm ${isNegative ? 'text-rose-600' : 'text-violet-600'}`}>
+                  <div className="flex items-center gap-3 p-3.5 rounded-xl bg-stone-50 border border-stone-100">
+                    <div className={`w-8 h-8 rounded-lg bg-white border border-stone-100 flex items-center justify-center shadow-sm ${isNegative ? 'text-rose-600' : 'text-emerald-600'}`}>
                       <ShieldCheck size={16} />
                     </div>
                     <div>
-                      <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest">Status</p>
-                      <p className="text-xs font-bold text-slate-800">
+                      <p className="text-[8px] text-stone-400 font-semibold uppercase tracking-widest">Status</p>
+                      <p className="text-xs font-bold text-stone-800">
                         {isRejected ? 'Rejected' : isRevoked ? 'Revoked' : 'Under Review'}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <div className={`w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm ${isNegative ? 'text-rose-600' : 'text-violet-600'}`}>
+                  <div className="flex items-center gap-3 p-3.5 rounded-xl bg-stone-50 border border-stone-100">
+                    <div className={`w-8 h-8 rounded-lg bg-white border border-stone-100 flex items-center justify-center shadow-sm ${isNegative ? 'text-rose-600' : 'text-emerald-600'}`}>
                       <AlertCircle size={16} />
                     </div>
                     <div>
-                      <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest">Action Required</p>
-                      <p className="text-xs font-bold text-slate-800">
+                      <p className="text-[8px] text-stone-400 font-semibold uppercase tracking-widest">Action Required</p>
+                      <p className="text-xs font-bold text-stone-800">
                         {isNegative ? 'Contact Support' : 'Wait for Approval'}
                       </p>
                     </div>
@@ -169,26 +169,26 @@ export const PendingApproval = () => {
             </div>
 
             {/* Journey Timeline */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
-              <h3 className="text-[14px] font-black text-slate-900 tracking-tight mb-6" style={{ fontFamily: 'Sora' }}>Verification Journey</h3>
+            <div className="bg-white rounded-2xl border border-stone-200/80 p-6 sm:p-8 shadow-sm">
+              <h3 className="text-[14px] font-black text-stone-900 tracking-tight mb-6" style={{ fontFamily: 'Plus Jakarta Sans' }}>Verification Journey</h3>
               <div className="space-y-6">
                 {steps.map((s, i) => (
                   <div key={i} className="flex gap-4 relative">
-                    {i !== steps.length - 1 && <div className="absolute left-4 top-8 w-0.5 h-10 bg-slate-100" />}
+                    {i !== steps.length - 1 && <div className="absolute left-4 top-8 w-0.5 h-10 bg-stone-100" />}
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm transition-all border ${
                       (s as any).error
                         ? 'bg-rose-50 border-rose-200 text-rose-600'
                         : (s as any).completed
-                          ? 'bg-violet-50 border-violet-200 text-violet-600'
+                          ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
                           : (s as any).current
-                            ? 'bg-violet-100 border-violet-300 text-violet-600 ring-2 ring-violet-50'
-                            : 'bg-slate-50 border-slate-200 text-slate-400'
+                            ? 'bg-emerald-100 border-emerald-300 text-emerald-600 ring-2 ring-emerald-50'
+                            : 'bg-stone-50 border-stone-200 text-stone-400'
                     }`}>
                       {(s as any).completed ? <CheckCircle2 size={15} /> : (s as any).error ? <XCircle size={15} /> : <span className="font-bold text-xs">{s.step}</span>}
                     </div>
                     <div className="pt-0.5">
-                      <h4 className={`font-bold text-xs ${(s as any).pending ? 'text-slate-400' : 'text-slate-900'}`}>{s.title}</h4>
-                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">{s.desc}</p>
+                      <h4 className={`font-bold text-xs ${(s as any).pending ? 'text-stone-400' : 'text-stone-900'}`}>{s.title}</h4>
+                      <p className="text-[11px] text-stone-500 font-medium mt-0.5">{s.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -198,44 +198,44 @@ export const PendingApproval = () => {
 
           {/* Right Panel */}
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-l-2 border-violet-600 pl-3">Company Details</h3>
+            <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-sm">
+              <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-4 border-l-2 border-emerald-600 pl-3">Company Details</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 border border-stone-100 shrink-0">
                     <Building2 size={16} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest leading-none mb-1">Company</p>
-                    <p className="text-xs font-bold text-slate-800 truncate">{user?.name ? `${user.name}'s Company` : 'Your Company'}</p>
+                    <p className="text-[8px] text-stone-400 font-semibold uppercase tracking-widest leading-none mb-1">Company</p>
+                    <p className="text-xs font-bold text-stone-800 truncate">{user?.name ? `${user.name}'s Company` : 'Your Company'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 border border-stone-100 shrink-0">
                     <ShieldCheck size={16} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[8px] text-slate-400 font-semibold uppercase tracking-widest leading-none mb-1">Admin</p>
-                    <p className="text-xs font-bold text-slate-800 truncate">{user?.name || 'Admin'}</p>
-                    <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">{user?.email}</p>
+                    <p className="text-[8px] text-stone-400 font-semibold uppercase tracking-widest leading-none mb-1">Admin</p>
+                    <p className="text-xs font-bold text-stone-800 truncate">{user?.name || 'Admin'}</p>
+                    <p className="text-[10px] text-stone-500 font-medium truncate mt-0.5">{user?.email}</p>
                   </div>
                 </div>
-                <div className="pt-3.5 border-t border-slate-50">
-                  <div className="flex items-center gap-1.5 text-violet-600 font-black text-[9px] uppercase tracking-wider">
+                <div className="pt-3.5 border-t border-stone-50">
+                  <div className="flex items-center gap-1.5 text-emerald-600 font-black text-[9px] uppercase tracking-wider">
                     <AlertCircle size={12} /> Need to update details?
                   </div>
-                  <p className="text-[10.5px] text-slate-400 mt-1 font-medium italic">Contact support@recruitai.com</p>
+                  <p className="text-[10.5px] text-stone-400 mt-1 font-medium italic">Contact support@recruitai.com</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-[#0b0f19] rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-              <div className="absolute bottom-0 right-0 w-24 h-24 bg-violet-600/10 rounded-full -mr-12 -mb-12" />
-              <h4 className="font-bold text-[14px] mb-2 relative z-10" style={{ fontFamily: 'Sora' }}>Have Questions?</h4>
-              <p className="text-[11.5px] text-slate-400 font-medium mb-5 relative z-10 leading-relaxed">
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-emerald-600/10 rounded-full -mr-12 -mb-12" />
+              <h4 className="font-bold text-[14px] mb-2 relative z-10" style={{ fontFamily: 'Plus Jakarta Sans' }}>Have Questions?</h4>
+              <p className="text-[11.5px] text-stone-400 font-medium mb-5 relative z-10 leading-relaxed">
                 Our team is here to help you get started with the platform.
               </p>
-              <Button className="w-full h-8 bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs rounded-lg relative z-10 transition-colors">
+              <Button className="w-full h-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg relative z-10 transition-colors">
                 Read Documentation
               </Button>
             </div>
@@ -244,12 +244,12 @@ export const PendingApproval = () => {
         </div>
       </main>
 
-      <footer className="w-full border-t border-slate-150 bg-white py-6 mt-auto">
+      <footer className="w-full border-t border-stone-150 bg-white py-6 mt-auto">
         <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2026 RecruitAI. All rights reserved.</p>
+          <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">© 2026 RecruitAI. All rights reserved.</p>
           <div className="flex gap-4">
-            <a href="#" className="text-[10px] text-slate-400 hover:text-violet-600 font-bold transition-colors uppercase tracking-widest">Privacy</a>
-            <a href="#" className="text-[10px] text-slate-400 hover:text-violet-600 font-bold transition-colors uppercase tracking-widest">Terms</a>
+            <a href="#" className="text-[10px] text-stone-400 hover:text-emerald-600 font-bold transition-colors uppercase tracking-widest">Privacy</a>
+            <a href="#" className="text-[10px] text-stone-400 hover:text-emerald-600 font-bold transition-colors uppercase tracking-widest">Terms</a>
           </div>
         </div>
       </footer>

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { api } from '../../../shared/lib/api';
 import { toast } from 'sonner';
@@ -235,8 +235,8 @@ export const CodeEditor = ({ interviewId, isReadOnly = false, accessToken }: Cod
           </div>
 
           {isReadOnly && (
-            <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-violet-400 bg-violet-50 px-2 py-1 rounded border border-violet-200 animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
+            <span className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-emerald-400 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
               Live View
             </span>
           )}
@@ -244,11 +244,11 @@ export const CodeEditor = ({ interviewId, isReadOnly = false, accessToken }: Cod
 
         <div className="flex items-center gap-2">
           {/* Socket connection indicator */}
-          <div className={`flex items-center gap-1 text-[10px] ${socketConnected ? 'text-emerald-500' : 'text-slate-600'}`} title={socketConnected ? 'Live sync active' : 'Sync disconnected'}>
+          <div className={`flex items-center gap-1 text-[10px] ${socketConnected ? 'text-emerald-500' : 'text-stone-600'}`} title={socketConnected ? 'Live sync active' : 'Sync disconnected'}>
             {socketConnected ? (
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             ) : (
-              <WifiOff size={10} className="text-slate-600" />
+              <WifiOff size={10} className="text-stone-600" />
             )}
           </div>
 

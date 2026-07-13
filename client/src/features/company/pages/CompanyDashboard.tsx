@@ -14,11 +14,11 @@ const BarChart = ({ data }: { data: { label: string; value: number }[] }) => {
           <div className="relative w-full">
             <div
               className="w-full rounded-t-md transition-all duration-700 ease-out cursor-pointer group-hover:brightness-110"
-              style={{ height: `${(d.value / max) * 140}px`, minHeight: d.value > 0 ? '6px' : '0', animationDelay: `${i * 80}ms`, background: 'linear-gradient(180deg, #a78bfa 0%, #7c3aed 100%)' }}
+              style={{ height: `${(d.value / max) * 140}px`, minHeight: d.value > 0 ? '6px' : '0', animationDelay: `${i * 80}ms`, background: 'linear-gradient(180deg, #8fbaa5 0%, #2e5a46 100%)' }}
             />
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{d.value}</div>
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{d.value}</div>
           </div>
-          <span className="text-[9px] text-slate-400 font-medium text-center leading-tight">{d.label}</span>
+          <span className="text-[9px] text-stone-400 font-medium text-center leading-tight">{d.label}</span>
         </div>
       ))}
     </div>
@@ -44,8 +44,8 @@ const DonutChart = ({ segments }: { segments: { label: string; value: number; co
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-xl font-bold text-slate-900">{total}</p>
-            <p className="text-[9px] text-slate-400 font-medium uppercase">Total</p>
+            <p className="text-xl font-bold text-stone-900">{total}</p>
+            <p className="text-[9px] text-stone-400 font-medium uppercase">Total</p>
           </div>
         </div>
       </div>
@@ -86,7 +86,7 @@ export const CompanyDashboard = () => {
   if (loading) return (
     <div className="flex flex-col min-h-screen">
       <DashboardHeader title="Dashboard" subtitle="Loading..." />
-      <div className="flex-1 flex items-center justify-center"><div className="w-7 h-7 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" /></div>
+      <div className="flex-1 flex items-center justify-center"><div className="w-7 h-7 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
     </div>
   );
   if (!data) return <div className="p-8 text-center font-medium text-red-500">Failed to load dashboard.</div>;
@@ -99,13 +99,13 @@ export const CompanyDashboard = () => {
     if (s === 'hired') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     if (s === 'rejected') return 'bg-red-50 text-red-600 border-red-200';
     if (s === 'offer') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    if (s?.includes('interview')) return 'bg-violet-50 text-violet-700 border-violet-200';
+    if (s?.includes('interview')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     if (s === 'shortlisted') return 'bg-blue-50 text-blue-700 border-blue-200';
     if (s === 'screening') return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-    return 'bg-slate-50 text-slate-600 border-slate-200';
+    return 'bg-stone-50 text-stone-600 border-stone-200';
   };
   const getInitials = (name: string) => { if (!name) return 'U'; const p = name.trim().split(' '); return (p[0]?.[0] || '') + (p[1]?.[0] || ''); };
-  const avatarGradients = ['from-violet-500 to-purple-500', 'from-teal-500 to-emerald-500', 'from-rose-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-orange-500 to-amber-500'];
+  const avatarGradients = ['from-emerald-500 to-emerald-500', 'from-teal-500 to-emerald-500', 'from-rose-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-orange-500 to-amber-500'];
 
   return (
     <div className="flex flex-col min-h-screen font-sans">
@@ -116,17 +116,17 @@ export const CompanyDashboard = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {statMeta.map((card, i) => {
             const Icon = card.icon;
-            const bgs = ['bg-blue-50', 'bg-violet-50', 'bg-emerald-50', 'bg-sky-50'];
-            const colors = ['text-blue-600', 'text-violet-600', 'text-emerald-600', 'text-sky-600'];
+            const bgs = ['bg-blue-50', 'bg-emerald-50', 'bg-emerald-50', 'bg-sky-50'];
+            const colors = ['text-blue-600', 'text-emerald-600', 'text-emerald-600', 'text-sky-600'];
             return (
               <div key={i} className="stat-card bg-white p-5 sm:p-6 group cursor-default">
-                <div className="flex items-center gap-2 text-slate-400 mb-3">
+                <div className="flex items-center gap-2 text-stone-400 mb-3">
                   <div className={`w-7 h-7 rounded-lg ${bgs[i % 4]} flex items-center justify-center shrink-0`}>
                     <Icon size={13} className={colors[i % 4]} strokeWidth={2.25} />
                   </div>
-                  <span className="text-[11px] font-semibold text-slate-500">{card.title}</span>
+                  <span className="text-[11px] font-semibold text-stone-500">{card.title}</span>
                 </div>
-                <p className="data-number text-[32px] sm:text-[36px] leading-none font-black text-slate-900" style={{ fontFamily: 'Sora' }}>
+                <p className="data-number text-[32px] sm:text-[36px] leading-none font-black text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                   {statValues[i].toLocaleString()}
                 </p>
               </div>
@@ -139,8 +139,8 @@ export const CompanyDashboard = () => {
           <div className="lg:col-span-2 panel">
             <div className="panel-header">
               <div>
-                <h2 className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora' }}>Pipeline overview</h2>
-                <p className="text-[12px] text-slate-500 font-medium mt-0.5">Stage-by-stage conversion</p>
+                <h2 className="text-[15px] font-bold text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>Pipeline overview</h2>
+                <p className="text-[12px] text-stone-500 font-medium mt-0.5">Stage-by-stage conversion</p>
               </div>
               <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
@@ -151,18 +151,18 @@ export const CompanyDashboard = () => {
 
           <div className="panel">
             <div className="panel-header">
-              <h2 className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora' }}>By department</h2>
+              <h2 className="text-[15px] font-bold text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>By department</h2>
             </div>
             <div className="p-5">
             <DonutChart segments={jobSegments} />
             <div className="mt-4 space-y-1">
               {jobSegments.map((seg: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-[11px] group hover:bg-slate-50 rounded-lg px-2 py-1.5 -mx-1 transition-colors cursor-pointer">
+                <div key={i} className="flex items-center justify-between text-[11px] group hover:bg-stone-50 rounded-lg px-2 py-1.5 -mx-1 transition-colors cursor-pointer">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full shrink-0" style={{ background: seg.color }} />
-                    <span className="text-slate-600 font-semibold">{seg.label}</span>
+                    <span className="text-stone-600 font-semibold">{seg.label}</span>
                   </div>
-                  <span className="font-bold text-slate-900">{seg.value}</span>
+                  <span className="font-bold text-stone-900">{seg.value}</span>
                 </div>
               ))}
             </div>
@@ -173,37 +173,37 @@ export const CompanyDashboard = () => {
         {/* ── Recent Applications ── */}
         <div className="panel overflow-hidden">
           <div className="panel-header">
-            <h2 className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora' }}>Recent applications</h2>
-            <button className="text-[12px] font-semibold text-violet-700 hover:text-violet-800 flex items-center gap-0.5 transition-colors active:scale-[0.98] cursor-pointer">
+            <h2 className="text-[15px] font-bold text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>Recent applications</h2>
+            <button className="text-[12px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 transition-colors active:scale-[0.98] cursor-pointer">
               View all <ChevronRight size={13} />
             </button>
           </div>
-          <div className="divide-y divide-slate-50 list-slide-in">
+          <div className="divide-y divide-stone-50 list-slide-in">
             {recentApplications.length > 0 ? recentApplications.map((app: any, i: number) => {
               const name = app.candidate_name || app.user_name || 'Candidate';
               return (
-                <div key={app.id || i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/60 transition-all group cursor-pointer">
+                <div key={app.id || i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-stone-50/60 transition-all group cursor-pointer">
                   <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradients[i % avatarGradients.length]} flex items-center justify-center text-white font-bold text-[10px] uppercase shrink-0 shadow-sm`}>
                     {getInitials(name)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-slate-800 leading-tight group-hover:text-violet-600 transition-colors">{name}</p>
-                    <p className="text-[11px] text-slate-400 font-semibold leading-tight truncate mt-0.5">{app.job_title || 'Position'}</p>
+                    <p className="text-[13px] font-bold text-stone-800 leading-tight group-hover:text-emerald-600 transition-colors">{name}</p>
+                    <p className="text-[11px] text-stone-400 font-semibold leading-tight truncate mt-0.5">{app.job_title || 'Position'}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     {app.ai_score && (
-                      <span className="text-[10px] font-extrabold text-violet-700 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-lg">
+                      <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-lg">
                         {app.ai_score}% fit
                       </span>
                     )}
                     <span className={`tag-pill ${getStatusStyle(app.status)}`}>{app.status || 'Applied'}</span>
-                    <span className="text-[10px] text-slate-400 font-medium hidden sm:block">{app.created_at ? new Date(app.created_at).toLocaleDateString('en-CA') : '—'}</span>
+                    <span className="text-[10px] text-stone-400 font-medium hidden sm:block">{app.created_at ? new Date(app.created_at).toLocaleDateString('en-CA') : '—'}</span>
                   </div>
                 </div>
               );
             }) : (
               <div className="py-14 text-center">
-                <p className="text-[12px] font-semibold text-slate-400">No recent applications found.</p>
+                <p className="text-[12px] font-semibold text-stone-400">No recent applications found.</p>
               </div>
             )}
           </div>

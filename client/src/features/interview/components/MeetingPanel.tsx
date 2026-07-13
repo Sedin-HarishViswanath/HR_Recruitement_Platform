@@ -394,13 +394,13 @@ export const MeetingPanel = ({
       {/* Header */}
       <div className="px-4 pt-4 pb-0 shrink-0">
         <div className="flex items-center gap-2 mb-1">
-          <div className={`w-2 h-2 rounded-full ${meetingJoined && !meetingEnded ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
-          <span className={`text-[10px] font-semibold uppercase tracking-widest ${meetingJoined && !meetingEnded ? 'text-emerald-400' : 'text-slate-500'}`}>
+          <div className={`w-2 h-2 rounded-full ${meetingJoined && !meetingEnded ? 'bg-emerald-400 animate-pulse' : 'bg-stone-600'}`} />
+          <span className={`text-[10px] font-semibold uppercase tracking-widest ${meetingJoined && !meetingEnded ? 'text-emerald-400' : 'text-stone-500'}`}>
             {meetingJoined && !meetingEnded ? 'Live Session' : meetingEnded ? 'Session Ended' : 'Ready'}
           </span>
         </div>
         <p className="text-sm font-bold text-white truncate">{candidateName}</p>
-        <p className="text-[11px] text-slate-500 truncate">{jobTitle}</p>
+        <p className="text-[11px] text-stone-500 truncate">{jobTitle}</p>
 
         {/* Tab bar */}
         <div className="flex mt-3 border-b border-[#1e2130]">
@@ -410,13 +410,13 @@ export const MeetingPanel = ({
               onClick={() => setTab(t.key)}
               className={`pb-2 px-3 text-[11px] font-bold transition-colors relative ${
                 tab === t.key
-                  ? 'text-violet-400'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'text-emerald-400'
+                  : 'text-stone-500 hover:text-stone-300'
               }`}
             >
               {t.label}
               {tab === t.key && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-500 rounded-full" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
               )}
             </button>
           ))}
@@ -434,17 +434,17 @@ export const MeetingPanel = ({
               {/* Preview area */}
               <div className="aspect-video bg-gradient-to-br from-[#1a1d2e] to-[#0d0f1a] flex flex-col items-center justify-center relative">
                 <div className="w-14 h-14 rounded-2xl bg-[#252840] border border-[#3a3d5e] flex items-center justify-center mb-3">
-                  <Video size={24} className="text-slate-400" />
+                  <Video size={24} className="text-stone-400" />
                 </div>
                 {meetingEnded ? (
                   <>
                     <p className="text-xs font-bold text-emerald-400">Session Ended</p>
-                    <p className="text-[10px] text-slate-600 mt-1">Feedback form has been triggered</p>
+                    <p className="text-[10px] text-stone-600 mt-1">Feedback form has been triggered</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-xs font-bold text-slate-400">Video call opens in a separate window</p>
-                    <p className="text-[10px] text-slate-600 mt-1">
+                    <p className="text-xs font-bold text-stone-400">Video call opens in a separate window</p>
+                    <p className="text-[10px] text-stone-600 mt-1">
                       {meetingJoined ? 'Meeting is active — return to this tab anytime' : 'Click Join to open the video room'}
                     </p>
                   </>
@@ -452,7 +452,7 @@ export const MeetingPanel = ({
 
                 {loadingRoom && (
                   <div className="absolute inset-0 bg-[#0d0f1a]/80 flex items-center justify-center">
-                    <Loader2 size={24} className="text-violet-400 animate-spin" />
+                    <Loader2 size={24} className="text-emerald-400 animate-spin" />
                   </div>
                 )}
               </div>
@@ -463,7 +463,7 @@ export const MeetingPanel = ({
                   <button
                     onClick={handleJoin}
                     disabled={!joinUrl || loadingRoom}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-40 text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-blue-900/40 active:scale-[0.98]"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 disabled:opacity-40 text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-blue-900/40 active:scale-[0.98]"
                   >
                     <ExternalLink size={14} />
                     Join Video Call
@@ -474,7 +474,7 @@ export const MeetingPanel = ({
                       <button
                         onClick={handleJoin}
                         disabled={!joinUrl || loadingRoom}
-                        className="w-full flex items-center justify-center gap-2 py-2 bg-[#252840] hover:bg-[#2a2d50] text-slate-300 font-bold text-xs rounded-xl transition-all border border-[#3a3d5e]"
+                        className="w-full flex items-center justify-center gap-2 py-2 bg-[#252840] hover:bg-[#2a2d50] text-stone-300 font-bold text-xs rounded-xl transition-all border border-[#3a3d5e]"
                       >
                         <ExternalLink size={12} />
                         Rejoin / Return to Call
@@ -499,12 +499,12 @@ export const MeetingPanel = ({
 
                 {/* Copy link */}
                 <div className="flex items-center gap-2 bg-[#0d0f1a] rounded-lg px-3 py-2 border border-[#2a2d3e]">
-                  <span className="flex-1 text-[10px] text-slate-500 truncate font-mono">
+                  <span className="flex-1 text-[10px] text-stone-500 truncate font-mono">
                     {loadingRoom ? 'Loading room...' : (roomUrl || 'No room')}
                   </span>
                   <button
                     onClick={handleCopy}
-                    className="shrink-0 text-slate-400 hover:text-white transition-colors"
+                    className="shrink-0 text-stone-400 hover:text-white transition-colors"
                     title="Copy meeting link"
                   >
                     {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
@@ -519,7 +519,7 @@ export const MeetingPanel = ({
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-xs font-black text-white">Live Transcription</p>
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-[10px] text-stone-500">
                       {speechSupported ? 'Auto-recording · Browser Speech API (Free)' : 'Not supported in this browser'}
                     </p>
                   </div>
@@ -537,7 +537,7 @@ export const MeetingPanel = ({
                 )}
 
                 {!speechSupported && (
-                  <div className="flex items-center gap-2 text-[10px] text-violet-400 bg-amber-900/20 px-3 py-2 rounded-lg border border-amber-900/30">
+                  <div className="flex items-center gap-2 text-[10px] text-emerald-400 bg-amber-900/20 px-3 py-2 rounded-lg border border-amber-900/30">
                     <MicOff size={12} />
                     <span>Speech recognition is not supported. Use Chrome or Edge for transcription.</span>
                   </div>
@@ -551,7 +551,7 @@ export const MeetingPanel = ({
                 )}
 
                 {!transcribing && !micError && speechSupported && (
-                  <p className="text-[10px] text-slate-600">
+                  <p className="text-[10px] text-stone-600">
                     {meetingJoined ? 'Transcription will auto-start momentarily...' : 'Transcription auto-starts when you join the call.'}
                   </p>
                 )}
@@ -569,14 +569,14 @@ export const MeetingPanel = ({
                     </div>
                   )}
                 </div>
-                <p className="text-[10px] text-slate-500 mb-3">
+                <p className="text-[10px] text-stone-500 mb-3">
                   Optionally record the meeting after joining. Select the meeting tab when prompted.
                 </p>
                 {!recordingVideo ? (
                   <button
                     onClick={handleStartRecording}
                     disabled={!meetingJoined || meetingEnded}
-                    className="w-full flex items-center justify-center gap-2 py-1.5 bg-[#252840] hover:bg-[#2a2d50] disabled:opacity-40 text-slate-300 font-bold text-xs rounded-xl transition-all border border-[#3a3d5e]"
+                    className="w-full flex items-center justify-center gap-2 py-1.5 bg-[#252840] hover:bg-[#2a2d50] disabled:opacity-40 text-stone-300 font-bold text-xs rounded-xl transition-all border border-[#3a3d5e]"
                   >
                     Start Recording
                   </button>
@@ -589,7 +589,7 @@ export const MeetingPanel = ({
                   </button>
                 )}
                 {videoUploadStatus === 'uploading' && (
-                  <div className="flex items-center gap-2 text-[10px] text-violet-400 mt-2">
+                  <div className="flex items-center gap-2 text-[10px] text-emerald-400 mt-2">
                     <Loader2 size={12} className="animate-spin" /> Uploading recording to server...
                   </div>
                 )}
@@ -613,10 +613,10 @@ export const MeetingPanel = ({
           <div className="flex flex-col h-full">
             {transcript.length > 0 && (
               <div className="flex items-center justify-between px-4 py-2 border-b border-[#1e2130] shrink-0">
-                <span className="text-[10px] text-slate-500 font-medium">{transcript.length} entries</span>
+                <span className="text-[10px] text-stone-500 font-medium">{transcript.length} entries</span>
                 <button
                   onClick={handleSaveTranscriptToNotes}
-                  className="flex items-center gap-1.5 text-[10px] font-bold text-violet-400 hover:text-violet-300 transition-colors border border-amber-600/30 bg-amber-600/10 hover:bg-violet-700/20 px-2.5 py-1 rounded-lg"
+                  className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 hover:text-emerald-300 transition-colors border border-amber-600/30 bg-amber-600/10 hover:bg-emerald-700/20 px-2.5 py-1 rounded-lg"
                 >
                   <FileText size={10} />
                   Save to Notes
@@ -627,9 +627,9 @@ export const MeetingPanel = ({
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
               {transcript.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Mic size={28} className="text-slate-700 mb-3" />
-                  <p className="text-xs font-bold text-slate-500">No transcript yet</p>
-                  <p className="text-[10px] text-slate-600 mt-1">
+                  <Mic size={28} className="text-stone-700 mb-3" />
+                  <p className="text-xs font-bold text-stone-500">No transcript yet</p>
+                  <p className="text-[10px] text-stone-600 mt-1">
                     {meetingJoined ? 'Transcription is active — speak into your microphone' : 'Join the meeting to begin transcription'}
                   </p>
                 </div>
@@ -650,12 +650,12 @@ export const MeetingPanel = ({
                       <div className={`flex-1 ${entry.speaker === 'interviewer' ? 'items-end' : ''}`}>
                         <div className={`inline-block px-3 py-2 rounded-xl text-[11px] font-medium leading-relaxed ${
                           entry.speaker === 'candidate'
-                            ? 'bg-[#1a2040] text-slate-300 rounded-tl-sm'
+                            ? 'bg-[#1a2040] text-stone-300 rounded-tl-sm'
                             : 'bg-[#2a1d10] text-amber-100 rounded-tr-sm'
                         }`}>
                           {entry.text}
                         </div>
-                        <p className="text-[9px] text-slate-700 mt-0.5 px-1">{entry.timestamp}</p>
+                        <p className="text-[9px] text-stone-700 mt-0.5 px-1">{entry.timestamp}</p>
                       </div>
                     </div>
                   ))}
@@ -670,7 +670,7 @@ export const MeetingPanel = ({
         {tab === 'notes' && (
           <div className="p-4 h-full">
             <textarea
-              className="w-full h-full min-h-[200px] bg-[#1a1d2e] border border-[#2a2d3e] rounded-2xl p-4 text-sm text-slate-300 font-mono placeholder-slate-700 resize-none outline-none focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 transition-all leading-relaxed"
+              className="w-full h-full min-h-[200px] bg-[#1a1d2e] border border-[#2a2d3e] rounded-2xl p-4 text-sm text-stone-300 font-mono placeholder-stone-700 resize-none outline-none focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 transition-all leading-relaxed"
               placeholder={`Interviewer notes for ${candidateName}...\n\n• Technical skills:\n• Communication:\n• Problem solving:\n• Overall impression:`}
               value={notes}
               onChange={e => setNotes(e.target.value)}
@@ -686,12 +686,12 @@ export const MeetingPanel = ({
           {transcribing ? (
             <>
               <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-              <span className="text-[10px] text-slate-500 font-medium">Recording transcription</span>
+              <span className="text-[10px] text-stone-500 font-medium">Recording transcription</span>
             </>
           ) : (
             <>
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-700" />
-              <span className="text-[10px] text-slate-600 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-stone-700" />
+              <span className="text-[10px] text-stone-600 font-medium">
                 {transcript.length > 0 ? `${transcript.length} transcript entries` : 'Transcription off'}
               </span>
             </>

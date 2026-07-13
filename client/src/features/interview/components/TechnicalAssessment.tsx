@@ -1134,22 +1134,22 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
     const pct = Math.round((totalPassing / Math.max(totalCases, 1)) * 100);
     return (
       <div className="flex flex-col items-center justify-center h-full bg-[#0d0f1a] p-8">
-        <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${pct >= 60 ? 'bg-emerald-900/40' : 'bg-violet-900/40'}`}>
+        <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${pct >= 60 ? 'bg-emerald-900/40' : 'bg-emerald-900/40'}`}>
           {pct >= 60
             ? <CheckCircle2 size={44} className="text-emerald-400" />
-            : <XCircle size={44} className="text-violet-400" />}
+            : <XCircle size={44} className="text-emerald-400" />}
         </div>
-        <h2 className="text-3xl font-black text-white mb-1" style={{ fontFamily: 'Sora' }}>{pct}%</h2>
-        <p className={`text-lg font-bold mb-2 ${pct >= 60 ? 'text-emerald-400' : 'text-violet-400'}`}>
+        <h2 className="text-3xl font-black text-white mb-1" style={{ fontFamily: 'Plus Jakarta Sans' }}>{pct}%</h2>
+        <p className={`text-lg font-bold mb-2 ${pct >= 60 ? 'text-emerald-400' : 'text-emerald-400'}`}>
           {pct >= 60 ? 'Assessment Complete — Great Work!' : 'Assessment Submitted'}
         </p>
-        <p className="text-slate-400 font-medium text-sm">
+        <p className="text-stone-400 font-medium text-sm">
           {totalPassing} of {totalCases} test cases passed across {problems.length} problems.
         </p>
         {tabViolations > 0 && (
           <p className="text-amber-400 text-xs font-medium mt-2">{tabViolations} tab-switch violation{tabViolations > 1 ? 's' : ''} recorded.</p>
         )}
-        <p className="text-slate-600 text-xs mt-4">Results submitted to your recruiter.</p>
+        <p className="text-stone-600 text-xs mt-4">Results submitted to your recruiter.</p>
       </div>
     );
   }
@@ -1159,7 +1159,7 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
   const timeWarning = timeLeft <= 300;
 
   return (
-    <div className="flex flex-col h-full bg-[#0d0f1a] text-slate-200 font-sans">
+    <div className="flex flex-col h-full bg-[#0d0f1a] text-stone-200 font-sans">
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#1a1d2e] border-b border-[#252840] shrink-0 gap-3">
         {/* Problem tabs */}
@@ -1173,7 +1173,7 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
                 className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                   currentProblem === idx
                     ? 'bg-[#252840] text-white'
-                    : 'text-slate-500 hover:text-slate-300 hover:bg-[#1e2132]'
+                    : 'text-stone-500 hover:text-stone-300 hover:bg-[#1e2132]'
                 }`}
               >
                 {idx + 1}. {p.title.split(' ')[0]}
@@ -1196,7 +1196,7 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
             <span className="text-[10px] text-amber-500 font-semibold">{tabViolations} violation{tabViolations > 1 ? 's' : ''}</span>
           )}
           <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-black text-sm ${
-            timeWarning ? 'bg-red-900/30 text-red-400 border border-red-700 animate-pulse' : 'bg-[#252840] text-slate-300'
+            timeWarning ? 'bg-red-900/30 text-red-400 border border-red-700 animate-pulse' : 'bg-[#252840] text-stone-300'
           }`}>
             <Clock size={13} />
             {formatTime(timeLeft)}
@@ -1221,15 +1221,15 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
             {/* Title + diff */}
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <h2 className="text-base font-black text-white" style={{ fontFamily: 'Sora' }}>{prob.title}</h2>
+                <h2 className="text-base font-black text-white" style={{ fontFamily: 'Plus Jakarta Sans' }}>{prob.title}</h2>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${DIFF_COLOR[prob.difficulty]}`}>{prob.difficulty}</span>
-                <span className="text-[10px] font-semibold text-slate-500 bg-[#252840] px-2 py-0.5 rounded">{prob.category}</span>
+                <span className="text-[10px] font-semibold text-stone-500 bg-[#252840] px-2 py-0.5 rounded">{prob.category}</span>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">{prob.title} — Problem {currentProblem + 1} of {problems.length}</p>
+              <p className="text-[11px] text-stone-500 font-medium">{prob.title} — Problem {currentProblem + 1} of {problems.length}</p>
             </div>
 
             {/* Description (render markdown-ish bold/code) */}
-            <div className="text-[13px] text-slate-300 leading-relaxed whitespace-pre-line">
+            <div className="text-[13px] text-stone-300 leading-relaxed whitespace-pre-line">
               {prob.description.split(/(`[^`]+`)|\*\*([^*]+)\*\*/g).map((part, i) => {
                 if (!part) return null;
                 if (part.startsWith('`') && part.endsWith('`')) {
@@ -1241,23 +1241,23 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
 
             {/* Examples */}
             <div className="space-y-3">
-              <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Examples</h4>
+              <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Examples</h4>
               {prob.examples.map((ex, i) => (
                 <div key={i} className="bg-[#1a1d2e] rounded-xl p-4 border border-[#252840] space-y-2 font-mono text-[12px]">
-                  <div><span className="text-slate-500 font-semibold">Input: </span><span className="text-slate-300">{ex.input}</span></div>
-                  <div><span className="text-slate-500 font-semibold">Output: </span><span className="text-emerald-400">{ex.output}</span></div>
-                  {ex.explanation && <div className="text-slate-500 text-[11px] pt-1">{ex.explanation}</div>}
+                  <div><span className="text-stone-500 font-semibold">Input: </span><span className="text-stone-300">{ex.input}</span></div>
+                  <div><span className="text-stone-500 font-semibold">Output: </span><span className="text-emerald-400">{ex.output}</span></div>
+                  {ex.explanation && <div className="text-stone-500 text-[11px] pt-1">{ex.explanation}</div>}
                 </div>
               ))}
             </div>
 
             {/* Constraints */}
             <div className="space-y-2">
-              <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Constraints</h4>
+              <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Constraints</h4>
               <ul className="space-y-1">
                 {prob.constraints.map((c, i) => (
-                  <li key={i} className="text-[12px] text-slate-400 flex items-start gap-2">
-                    <span className="text-slate-600 mt-0.5">•</span> {c}
+                  <li key={i} className="text-[12px] text-stone-400 flex items-start gap-2">
+                    <span className="text-stone-600 mt-0.5">•</span> {c}
                   </li>
                 ))}
               </ul>
@@ -1266,7 +1266,7 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
             {/* Test case results */}
             {probResult && (
               <div className="space-y-2">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
                   <Terminal size={11} />
                   Test Results — {probResult.passing}/{probResult.total} passed
                 </h4>
@@ -1282,9 +1282,9 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
                     </div>
                     {!tc.hidden && (
                       <>
-                        <div className="text-slate-500">Input: <span className="text-slate-300">{tc.input.replace(/\n/g, ', ')}</span></div>
-                        <div className="text-slate-500">Expected: <span className="text-emerald-400">{tc.expected}</span></div>
-                        <div className="text-slate-500">Got: <span className={tc.passed ? 'text-emerald-400' : 'text-red-400'}>{tc.actual}</span></div>
+                        <div className="text-stone-500">Input: <span className="text-stone-300">{tc.input.replace(/\n/g, ', ')}</span></div>
+                        <div className="text-stone-500">Expected: <span className="text-emerald-400">{tc.expected}</span></div>
+                        <div className="text-stone-500">Got: <span className={tc.passed ? 'text-emerald-400' : 'text-red-400'}>{tc.actual}</span></div>
                       </>
                     )}
                   </div>
@@ -1298,15 +1298,15 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
             <button
               onClick={() => setCurrentProblem(c => Math.max(0, c - 1))}
               disabled={currentProblem === 0}
-              className="flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-200 disabled:opacity-30 transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-[11px] text-stone-500 hover:text-stone-200 disabled:opacity-30 transition-colors cursor-pointer"
             >
               <ChevronLeft size={14} /> Prev
             </button>
-            <span className="text-[10px] text-slate-600 font-semibold">{currentProblem + 1} / {problems.length}</span>
+            <span className="text-[10px] text-stone-600 font-semibold">{currentProblem + 1} / {problems.length}</span>
             <button
               onClick={() => setCurrentProblem(c => Math.min(problems.length - 1, c + 1))}
               disabled={currentProblem === problems.length - 1}
-              className="flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-200 disabled:opacity-30 transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-[11px] text-stone-500 hover:text-stone-200 disabled:opacity-30 transition-colors cursor-pointer"
             >
               Next <ChevronRight size={14} />
             </button>
@@ -1323,7 +1323,7 @@ export const TechnicalAssessment = ({ interviewId, onComplete, timeLimitSeconds 
                   key={l.pistonId}
                   onClick={() => handleLangChange(i)}
                   className={`px-2.5 py-1 rounded text-[10px] font-bold transition-colors cursor-pointer ${
-                    selectedLang === i ? 'bg-[#252840] text-white' : 'text-slate-500 hover:text-slate-300'
+                    selectedLang === i ? 'bg-[#252840] text-white' : 'text-stone-500 hover:text-stone-300'
                   }`}
                 >
                   {l.label}

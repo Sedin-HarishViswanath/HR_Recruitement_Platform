@@ -2,13 +2,15 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 
 export default (app: Application) => {
   app.use(helmet());
-  
+  app.use(compression());
+
   app.use(
     cors({
       origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -20,9 +22,15 @@ export default (app: Application) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
-  app.use(morgan('dev'));
+  app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-  app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+  app.use(
+    '/uploads',
+    express.static(path.join(__dirname, '../../uploads'), {
+      maxAge: '7d',
+      immutable: true,
+    })
+  );
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

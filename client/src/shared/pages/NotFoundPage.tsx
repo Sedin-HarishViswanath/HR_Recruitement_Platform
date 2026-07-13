@@ -1,23 +1,28 @@
 import { useNavigate } from 'react-router-dom';
-import { ShieldAlert, ArrowLeft, Home } from 'lucide-react';
+import { Compass, ArrowLeft, Home } from 'lucide-react';
 
-export const UnauthorizedPage = () => {
+export const NotFoundPage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-[28px] border border-stone-200/60 p-10 text-center animate-scale-in" style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)' }}>
-
-        <div className="w-16 h-16 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-center text-red-500 mx-auto mb-7 shadow-inner">
-          <ShieldAlert size={30} />
+      <div
+        className="max-w-md w-full bg-white rounded-[28px] border border-stone-200/60 p-10 text-center animate-scale-in"
+        style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)' }}
+      >
+        <div className="w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 mx-auto mb-7 shadow-inner">
+          <Compass size={30} />
         </div>
 
-        <h1 className="text-[28px] font-extrabold text-stone-900 tracking-tight mb-3" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
-          Access Denied
+        <h1
+          className="text-[28px] font-extrabold text-stone-900 tracking-tight mb-3"
+          style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}
+        >
+          Page Not Found
         </h1>
 
         <p className="text-[14px] text-stone-500 font-normal mb-8 leading-relaxed max-w-[300px] mx-auto">
-          You don't have permission to view this page. Contact your administrator if you think this is a mistake.
+          The page you're looking for doesn't exist or may have been moved. Check the URL or head back to safety.
         </p>
 
         <div className="space-y-3">
@@ -38,7 +43,7 @@ export const UnauthorizedPage = () => {
 
         <div className="mt-8 pt-6 border-t border-stone-100">
           <p className="text-[10px] text-stone-400 font-bold uppercase tracking-[0.16em]">
-            RBAC Enforcement Active
+            Error 404
           </p>
         </div>
       </div>

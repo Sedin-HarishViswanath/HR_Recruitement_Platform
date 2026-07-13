@@ -73,22 +73,22 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
       {/* ── Logo ── */}
       <div className="px-5 pt-5 pb-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center text-white shadow-lg shadow-violet-900/40 shrink-0 relative">
+          <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-900/40 shrink-0 relative">
             <Sparkles size={14} />
             <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
           </div>
           <div>
-            <h2 className="text-white text-[14px] font-extrabold tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>
+            <h2 className="text-white text-[14px] font-extrabold tracking-tight leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
               RecruitAI
             </h2>
-            <p className="text-[8.5px] mt-0.5 uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(139,92,246,0.8)' }}>
+            <p className="text-[8.5px] mt-0.5 uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(46, 90, 70,0.8)' }}>
               Company
             </p>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="lg:hidden p-1.5 rounded-lg transition-colors text-slate-500 hover:text-slate-300 cursor-pointer"
+          className="lg:hidden p-1.5 rounded-lg transition-colors text-stone-500 hover:text-stone-300 cursor-pointer"
         >
           <X size={16} />
         </button>
@@ -125,12 +125,12 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
                       size={16}
                       className={cn(
                         'shrink-0 transition-colors',
-                        active ? 'text-violet-400' : 'text-slate-500 group-hover:text-slate-300',
+                        active ? 'text-emerald-400' : 'text-stone-500 group-hover:text-stone-300',
                       )}
                     />
                     <span>{item.label}</span>
                     {active && (
-                      <ChevronRight size={12} className="ml-auto text-violet-500/60" />
+                      <ChevronRight size={12} className="ml-auto text-emerald-500/60" />
                     )}
                   </Link>
                 );
@@ -158,7 +158,7 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
                       size={16}
                       className={cn(
                         'shrink-0',
-                        active ? 'text-violet-400' : 'text-slate-500 group-hover:text-slate-300',
+                        active ? 'text-emerald-400' : 'text-stone-500 group-hover:text-stone-300',
                       )}
                     />
                     <span>{item.label}</span>
@@ -183,7 +183,7 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
           >
             <Settings
               size={15}
-              className="text-slate-500 group-hover:text-slate-300 transition-all group-hover:rotate-45 duration-500 shrink-0"
+              className="text-stone-500 group-hover:text-stone-300 transition-all group-hover:rotate-45 duration-500 shrink-0"
             />
             <span>Settings</span>
           </Link>
@@ -194,18 +194,18 @@ export const CompanySidebar = ({ isOpen, onClose }: CompanySidebarProps) => {
           className="flex items-center gap-2.5 px-3 py-2.5 mt-1.5 rounded-xl"
           style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}
         >
-          <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-md shadow-violet-900/30">
+          <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-md shadow-emerald-900/30">
             {user?.name?.[0]?.toUpperCase() || 'A'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] font-semibold text-slate-200 truncate leading-tight">{user?.name || 'Admin'}</p>
-            <p className="text-[9px] uppercase font-bold tracking-wider leading-tight truncate" style={{ color: 'rgba(139,92,246,0.7)' }}>
+            <p className="text-[12px] font-semibold text-stone-200 truncate leading-tight">{user?.name || 'Admin'}</p>
+            <p className="text-[9px] uppercase font-bold tracking-wider leading-tight truncate" style={{ color: 'rgba(46, 90, 70,0.7)' }}>
               {user?.role || 'Admin'}
             </p>
           </div>
           <button
             onClick={() => dispatch(logout())}
-            className="p-1.5 rounded-lg transition-colors text-slate-500 hover:text-red-400 hover:bg-red-500/10 shrink-0"
+            className="p-1.5 rounded-lg transition-colors text-stone-500 hover:text-red-400 hover:bg-red-500/10 shrink-0"
             title="Sign out"
           >
             <LogOut size={13} />

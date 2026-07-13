@@ -31,7 +31,7 @@ const getInitials = (name: string) => {
 
 const avatarColors = [
   'bg-sky-500', 'bg-emerald-500', 'bg-orange-500', 'bg-pink-500',
-  'bg-purple-500', 'bg-teal-500', 'bg-red-500', 'bg-blue-500',
+  'bg-emerald-500', 'bg-teal-500', 'bg-red-500', 'bg-blue-500',
 ];
 
 export const CompanyInterviewsPage = () => {
@@ -134,15 +134,15 @@ export const CompanyInterviewsPage = () => {
       days.push(
         <div
           key={d}
-          className={`h-7 w-7 rounded-md flex flex-col items-center justify-center text-[10px] font-bold relative cursor-pointer hover:bg-slate-100 transition-colors ${
+          className={`h-7 w-7 rounded-md flex flex-col items-center justify-center text-[10px] font-bold relative cursor-pointer hover:bg-stone-100 transition-colors ${
             isToday
-              ? 'bg-violet-650 text-white'
-              : 'text-slate-700'
+              ? 'bg-emerald-650 text-white'
+              : 'text-stone-700'
           }`}
         >
           <span>{d}</span>
           {hasInterview && !isToday && (
-            <span className="absolute bottom-0.5 w-1 h-1 bg-violet-400 rounded-full" />
+            <span className="absolute bottom-0.5 w-1 h-1 bg-emerald-400 rounded-full" />
           )}
           {isToday && hasInterview && (
             <span className="absolute bottom-0.5 w-1 h-1 bg-white rounded-full" />
@@ -189,13 +189,13 @@ export const CompanyInterviewsPage = () => {
       {/* Workspace Header Bar */}
       <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
-          <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
+          <div className="text-xs text-stone-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span>
             <span>&rsaquo;</span>
-            <span className="text-slate-655 font-semibold">Interviews</span>
+            <span className="text-stone-655 font-semibold">Interviews</span>
           </div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+            <h1 className="text-xl font-bold text-stone-900 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
               {isInterviewer ? 'Assigned Interviews' : 'Interview Scheduler'}
             </h1>
             <span className="chip-brand">{weekInterviews.length} Booked Round{weekInterviews.length !== 1 ? 's' : ''}</span>
@@ -219,7 +219,7 @@ export const CompanyInterviewsPage = () => {
         {/* Top metrics bar */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Today', value: String(todayInterviews.length), icon: CalendarIcon, color: 'text-violet-600 bg-violet-500/10 border-violet-250/20' },
+            { label: 'Today', value: String(todayInterviews.length), icon: CalendarIcon, color: 'text-emerald-600 bg-emerald-500/10 border-emerald-250/20' },
             { label: 'This Week', value: String(weekInterviews.length), icon: Clock, color: 'text-sky-600 bg-sky-500/10 border-sky-250/20' },
             { label: 'Avg Duration', value: `${avgDuration}m`, icon: Brain, color: 'text-emerald-600 bg-emerald-500/10 border-emerald-250/20' },
             { label: 'No-Shows', value: String(noShowInterviews.length), icon: AlertCircle, color: 'text-rose-600 bg-rose-500/10 border-rose-250/20' },
@@ -229,9 +229,9 @@ export const CompanyInterviewsPage = () => {
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${metric.color}`}>
                   <metric.icon size={15} />
                 </div>
-                <p className="text-[9px] font-black uppercase text-slate-400 tracking-[0.14em] pt-0.5">{metric.label}</p>
+                <p className="text-[9px] font-black uppercase text-stone-400 tracking-[0.14em] pt-0.5">{metric.label}</p>
               </div>
-              <p className="text-[28px] font-extrabold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <p className="text-[28px] font-extrabold text-stone-900 tracking-tight leading-none" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
                 {metric.value}
               </p>
             </div>
@@ -242,22 +242,22 @@ export const CompanyInterviewsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
           {/* Left panel: Timeline */}
           <div className="panel p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3 flex-wrap gap-2">
               <div>
-                <h3 className="font-bold text-slate-900 text-sm" style={{ fontFamily: 'Sora, sans-serif' }}>
+                <h3 className="font-bold text-stone-900 text-sm" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
                   Today &middot; {now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                 </h3>
-                <p className="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-wide">{todayScheduledCount} scheduled &middot; {todayInProgressCount} in progress</p>
+                <p className="text-[10px] text-stone-400 font-bold mt-0.5 uppercase tracking-wide">{todayScheduledCount} scheduled &middot; {todayInProgressCount} in progress</p>
               </div>
 
-              <div className="flex bg-slate-100/80 border border-slate-200/50 rounded-xl p-0.5 gap-0.5">
+              <div className="flex bg-stone-100/80 border border-stone-200/50 rounded-xl p-0.5 gap-0.5">
                 {['Day', 'Week', 'Month'].map((tab) => (
                   <button
                     key={tab}
                     className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-spring ${
                       tab === 'Day'
-                        ? 'bg-white text-slate-800 shadow-sm border border-slate-200/40'
-                        : 'text-slate-400 hover:text-slate-600'
+                        ? 'bg-white text-stone-800 shadow-sm border border-stone-200/40'
+                        : 'text-stone-400 hover:text-stone-600'
                     }`}
                   >
                     {tab}
@@ -268,15 +268,15 @@ export const CompanyInterviewsPage = () => {
 
             {/* Interviewer notice */}
             {isInterviewer && (
-              <div className="bg-violet-50/70 border border-violet-100 rounded-xl px-4 py-2.5 text-xs text-violet-750 font-bold">
+              <div className="bg-emerald-50/70 border border-emerald-100 rounded-xl px-4 py-2.5 text-xs text-emerald-750 font-bold">
                 Showing your assigned interview cards only.
               </div>
             )}
 
             {/* List of interviews */}
-            <div className="divide-y divide-slate-150/60 list-slide-in">
+            <div className="divide-y divide-stone-150/60 list-slide-in">
               {displayInterviews.length === 0 && (
-                <div className="py-12 text-center text-xs text-slate-400 font-medium">
+                <div className="py-12 text-center text-xs text-stone-400 font-medium">
                   {isInterviewer ? 'No interviews assigned to you yet.' : 'No interviews scheduled at the moment.'}
                 </div>
               )}
@@ -291,23 +291,23 @@ export const CompanyInterviewsPage = () => {
                     key={item.id}
                     onClick={() => handleActiveSelect(item)}
                     className={`py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-spring ${
-                      isActive ? 'bg-violet-50/20 -mx-5 px-5 border-l-2 border-violet-600' : 'hover:bg-slate-50/30'
+                      isActive ? 'bg-emerald-50/20 -mx-5 px-5 border-l-2 border-emerald-600' : 'hover:bg-stone-50/30'
                     }`}
                   >
                     {/* Time & Candidate Info */}
                     <div className="flex items-start gap-4">
                       <div className="text-left min-w-[56px] leading-tight shrink-0 pt-0.5">
-                        <p className="text-xs font-bold text-slate-900">{time}</p>
-                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">{item.duration}m</p>
+                        <p className="text-xs font-bold text-stone-900">{time}</p>
+                        <p className="text-[10px] text-stone-400 font-bold mt-0.5">{item.duration}m</p>
                       </div>
 
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-9 h-9 rounded-xl ${avatarBg} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0 border border-slate-700/5 shadow-sm`}>
+                        <div className={`w-9 h-9 rounded-xl ${avatarBg} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0 border border-stone-700/5 shadow-sm`}>
                           {initials}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-bold text-xs text-slate-900 truncate">
+                            <h4 className="font-bold text-xs text-stone-900 truncate">
                               {item.candidate_name}
                             </h4>
                             {item.isLive && (
@@ -317,8 +317,8 @@ export const CompanyInterviewsPage = () => {
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-slate-500 font-semibold mt-1">
-                            {item.job_title} &middot; <span className="text-violet-600 font-bold uppercase tracking-wider text-[9px]">{item.round_type}</span>
+                          <p className="text-[10px] text-stone-500 font-semibold mt-1">
+                            {item.job_title} &middot; <span className="text-emerald-600 font-bold uppercase tracking-wider text-[9px]">{item.round_type}</span>
                           </p>
                         </div>
                       </div>
@@ -340,10 +340,10 @@ export const CompanyInterviewsPage = () => {
                           disabled={item.application_status === 'rejected' || item.application_status === 'withdrawn'}
                           className={`text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-spring border cursor-pointer ${
                             (item.application_status === 'rejected' || item.application_status === 'withdrawn')
-                              ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
+                              ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed shadow-none'
                               : item.isLive
-                              ? 'bg-violet-600 text-white hover:bg-violet-700 border-violet-550 shadow-sm shadow-violet-200'
-                              : 'bg-white border-slate-200 text-slate-750 hover:bg-slate-50'
+                              ? 'bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-550 shadow-sm shadow-emerald-200'
+                              : 'bg-white border-stone-200 text-stone-750 hover:bg-stone-50'
                           }`}
                         >
                           <Video size={12} />
@@ -358,7 +358,7 @@ export const CompanyInterviewsPage = () => {
                             e.stopPropagation();
                             setFeedbackModal({ isOpen: true, interview: item });
                           }}
-                          className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-spring bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                          className="text-[10.5px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-spring bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 cursor-pointer"
                         >
                           <MessageSquare size={12} />
                           Feedback
@@ -377,29 +377,29 @@ export const CompanyInterviewsPage = () => {
             {activeInt ? (
               <div className="outer-bezel">
                 <div className="inner-core space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center justify-between border-b border-stone-100 pb-3">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${activeInt.isLive ? 'bg-red-500 animate-pulse' : 'bg-slate-400'}`} />
-                      <h3 className="font-bold text-slate-900 text-[10px] uppercase tracking-wider" style={{ fontFamily: 'Sora' }}>
+                      <span className={`w-2 h-2 rounded-full ${activeInt.isLive ? 'bg-red-500 animate-pulse' : 'bg-stone-400'}`} />
+                      <h3 className="font-bold text-stone-900 text-[10px] uppercase tracking-wider" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                         {activeInt.isLive ? 'Simulator Active' : 'Round details'}
                       </h3>
                     </div>
                   </div>
 
                   {/* Video preview mockup */}
-                  <div className="rounded-xl overflow-hidden aspect-[4/3] flex flex-col justify-between p-4 relative group shadow-inner border border-slate-950" style={{ background: 'radial-gradient(circle at center, #1f2937 0%, #111827 100%)' }}>
+                  <div className="rounded-xl overflow-hidden aspect-[4/3] flex flex-col justify-between p-4 relative group shadow-inner border border-stone-950" style={{ background: 'radial-gradient(circle at center, #1f2937 0%, #111827 100%)' }}>
                     {/* Simulated lens reflection */}
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none" />
 
                     <div className="absolute inset-0 flex flex-col items-center justify-center select-none pointer-events-none z-0">
-                      <div className="w-16 h-16 rounded-2xl bg-slate-800/40 border border-slate-700/35 flex items-center justify-center text-white font-extrabold text-xl backdrop-blur-sm group-hover:scale-[1.03] transition-spring">
+                      <div className="w-16 h-16 rounded-2xl bg-stone-800/40 border border-stone-700/35 flex items-center justify-center text-white font-extrabold text-xl backdrop-blur-sm group-hover:scale-[1.03] transition-spring">
                         {getInitials(activeInt.candidate_name)}
                       </div>
-                      <span className="text-[10px] text-slate-550 font-bold mt-2 tracking-wide font-mono uppercase">FEED STATUS: ONLINE</span>
+                      <span className="text-[10px] text-stone-550 font-bold mt-2 tracking-wide font-mono uppercase">FEED STATUS: ONLINE</span>
                     </div>
 
                     <div className="flex justify-between items-start relative z-10 w-full">
-                      <span className="bg-slate-950/80 text-white text-[9px] font-bold px-2 py-0.5 rounded-lg border border-slate-800/45 backdrop-blur-md">
+                      <span className="bg-stone-950/80 text-white text-[9px] font-bold px-2 py-0.5 rounded-lg border border-stone-800/45 backdrop-blur-md">
                         {activeInt.candidate_name}
                       </span>
                       <div className="flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-500 text-[8px] font-black px-2 py-0.5 rounded-full animate-pulse backdrop-blur-md">
@@ -409,10 +409,10 @@ export const CompanyInterviewsPage = () => {
                     </div>
 
                     <div className="flex items-end justify-between relative z-10 w-full">
-                      <span className="bg-slate-950/80 text-slate-300 text-[9px] font-bold px-2 py-0.5 rounded-lg border border-slate-800/45 backdrop-blur-md">
+                      <span className="bg-stone-950/80 text-stone-300 text-[9px] font-bold px-2 py-0.5 rounded-lg border border-stone-800/45 backdrop-blur-md">
                         {new Date(activeInt.scheduled_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} &middot; {new Date(activeInt.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      <span className="bg-violet-600/90 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border border-violet-500/20 backdrop-blur-md">
+                      <span className="bg-emerald-600/90 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border border-emerald-500/20 backdrop-blur-md">
                         {activeInt.round_type}
                       </span>
                     </div>
@@ -440,8 +440,8 @@ export const CompanyInterviewsPage = () => {
                         disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
                         className={`flex-1 text-xs font-bold py-2 rounded-lg transition-spring flex items-center justify-center gap-1.5 shadow-sm ${
                           (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
-                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                            : 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-200/50'
+                            ? 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200/50'
                         }`}
                       >
                         <Video size={13} />
@@ -456,35 +456,35 @@ export const CompanyInterviewsPage = () => {
                       disabled={activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn'}
                       className={`flex-1 border text-xs font-bold py-2 rounded-lg transition-spring flex items-center justify-center gap-1.5 ${
                         (activeInt.application_status === 'rejected' || activeInt.application_status === 'withdrawn')
-                          ? 'border-slate-100 bg-slate-50/50 text-slate-350 cursor-not-allowed'
-                          : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                          ? 'border-stone-100 bg-stone-50/50 text-stone-350 cursor-not-allowed'
+                          : 'border-stone-200 text-stone-700 hover:bg-stone-50'
                       }`}
                     >
-                      <CheckSquare size={13} className="text-slate-400" />
+                      <CheckSquare size={13} className="text-stone-400" />
                       Scorecard
                     </button>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="panel p-5 flex items-center justify-center text-slate-400 h-64 text-sm font-medium">
+              <div className="panel p-5 flex items-center justify-center text-stone-400 h-64 text-sm font-medium">
                 No active interview round details
               </div>
             )}
 
             {/* Calendar widget */}
             <div className="panel p-5 space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <h4 className="font-bold text-slate-900 text-xs" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                <h4 className="font-bold text-stone-900 text-xs" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
                   {calendarMonth}
                 </h4>
                 <div className="flex items-center gap-1">
-                  <button className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-600 cursor-pointer"><ChevronLeft size={14} /></button>
-                  <button className="p-1 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-600 cursor-pointer"><ChevronRight size={14} /></button>
+                  <button className="p-1 hover:bg-stone-50 rounded text-stone-400 hover:text-stone-600 cursor-pointer"><ChevronLeft size={14} /></button>
+                  <button className="p-1 hover:bg-stone-50 rounded text-stone-400 hover:text-stone-600 cursor-pointer"><ChevronRight size={14} /></button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-black text-slate-400 uppercase">
+              <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-black text-stone-400 uppercase">
                 <span>S</span>
                 <span>M</span>
                 <span>T</span>
@@ -522,43 +522,43 @@ export const CompanyInterviewsPage = () => {
         <Dialog open={!!selectedRequest} onOpenChange={(open) => { if (!open) setSelectedRequest(null); }}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle style={{ fontFamily: 'Sora, sans-serif' }} className="text-lg font-black text-slate-900">
+              <DialogTitle style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }} className="text-lg font-black text-stone-900">
                 Review Reschedule Request
               </DialogTitle>
-              <DialogDescription className="text-xs text-slate-500">
+              <DialogDescription className="text-xs text-stone-500">
                 Review the rescheduling request from {selectedRequest.candidate_name}.
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 pt-3">
-              <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-                <p className="text-xs text-slate-500"><strong>Candidate:</strong> {selectedRequest.candidate_name}</p>
-                <p className="text-xs text-slate-500"><strong>Job / Round:</strong> {selectedRequest.job_title} ({selectedRequest.round_type})</p>
-                <p className="text-xs text-slate-500"><strong>Original Scheduled Date:</strong> {new Date(selectedRequest.original_date).toLocaleString()}</p>
+              <div className="p-3 bg-stone-50 rounded-xl space-y-1">
+                <p className="text-xs text-stone-500"><strong>Candidate:</strong> {selectedRequest.candidate_name}</p>
+                <p className="text-xs text-stone-500"><strong>Job / Round:</strong> {selectedRequest.job_title} ({selectedRequest.round_type})</p>
+                <p className="text-xs text-stone-500"><strong>Original Scheduled Date:</strong> {new Date(selectedRequest.original_date).toLocaleString()}</p>
               </div>
 
               <div className="space-y-1 bg-blue-50 border border-blue-100 p-3 rounded-xl">
                 <p className="text-xs font-bold text-blue-800">Candidate&apos;s Requested New Time:</p>
-                <p className="text-sm font-bold text-slate-900">{new Date(selectedRequest.preferred_date).toLocaleString()}</p>
+                <p className="text-sm font-bold text-stone-900">{new Date(selectedRequest.preferred_date).toLocaleString()}</p>
                 {selectedRequest.reason && (
-                  <div className="text-xs text-slate-600 bg-white/70 rounded-lg p-2 mt-2 border border-slate-100 italic">
+                  <div className="text-xs text-stone-600 bg-white/70 rounded-lg p-2 mt-2 border border-stone-100 italic">
                     &ldquo;{selectedRequest.reason}&rdquo;
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Confirm or Adjust New Date &amp; Time</Label>
+                <Label className="text-[11px] font-bold text-stone-700 uppercase tracking-wider">Confirm or Adjust New Date &amp; Time</Label>
                 <Input
                   type="datetime-local"
                   required
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
-                  className="w-full text-slate-700 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                  className="w-full text-stone-700 bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                 />
               </div>
 
-              <div className="flex justify-between items-center pt-3 border-t border-slate-100">
+              <div className="flex justify-between items-center pt-3 border-t border-stone-100">
                 <button
                   type="button"
                   disabled={isHandlingRequest}
@@ -572,7 +572,7 @@ export const CompanyInterviewsPage = () => {
                     type="button"
                     variant="outline"
                     onClick={() => setSelectedRequest(null)}
-                    className="rounded-xl border border-slate-200 text-xs font-bold px-4 py-2 hover:bg-slate-50 text-slate-600"
+                    className="rounded-xl border border-stone-200 text-xs font-bold px-4 py-2 hover:bg-stone-50 text-stone-600"
                   >
                     Cancel
                   </Button>
@@ -580,7 +580,7 @@ export const CompanyInterviewsPage = () => {
                     type="button"
                     disabled={isHandlingRequest}
                     onClick={() => handleRescheduleAction(selectedRequest.id, 'approve', newTime)}
-                    className="rounded-xl font-bold text-xs bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 shadow-sm transition-all btn-premium px-4 py-2"
+                    className="rounded-xl font-bold text-xs bg-gradient-to-r from-emerald-600 to-emerald-600 text-white hover:from-emerald-700 hover:to-emerald-700 shadow-sm transition-all btn-premium px-4 py-2"
                   >
                     {isHandlingRequest ? 'Saving...' : 'Approve & Save'}
                   </Button>

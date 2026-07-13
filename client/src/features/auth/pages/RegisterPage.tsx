@@ -12,17 +12,17 @@ export const RegisterPage = () => {
   );
 
   return (
-    <div className="min-h-screen font-sans text-slate-900 bg-background flex flex-col">
+    <div className="min-h-screen font-sans text-stone-900 bg-background flex flex-col">
       {/* Navbar - dark themed for high contrast layout */}
       <nav className="w-full bg-[#0c0e14] px-8 py-3.5 flex items-center justify-between sticky top-0 z-50 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-violet-650 flex items-center justify-center text-white shadow-lg shadow-violet-900/40 relative">
+          <div className="w-8 h-8 rounded-xl bg-emerald-650 flex items-center justify-center text-white shadow-lg shadow-emerald-900/40 relative">
             <Sparkles size={14} />
             <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent" />
           </div>
           <div>
-            <h1 className="text-white text-[14px] font-extrabold tracking-tight leading-none" style={{ fontFamily: 'Sora' }}>RecruitAI</h1>
-            <p className="text-[8px] uppercase tracking-[0.16em] font-black mt-0.5 text-violet-400">ATS Engine</p>
+            <h1 className="text-white text-[14px] font-extrabold tracking-tight leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>RecruitAI</h1>
+            <p className="text-[8px] uppercase tracking-[0.16em] font-black mt-0.5 text-emerald-400">ATS Engine</p>
           </div>
         </Link>
 
@@ -35,7 +35,7 @@ export const RegisterPage = () => {
           </button>
           <button
             onClick={() => navigate('/login')}
-            className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-750 text-white text-[12px] font-bold transition-spring shadow-sm cursor-pointer shadow-violet-500/10"
+            className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-750 text-white text-[12px] font-bold transition-spring shadow-sm cursor-pointer shadow-emerald-500/10"
           >
             Internal Team Sign In
           </button>
@@ -47,12 +47,12 @@ export const RegisterPage = () => {
         <div className="w-full max-w-[760px] space-y-6">
           {/* Page heading */}
           <div className="text-center">
-            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora' }}>
+            <h2 className="text-2xl font-extrabold text-stone-900 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans' }}>
               Create your account
             </h2>
-            <p className="text-xs text-slate-400 font-semibold mt-1.5">
+            <p className="text-xs text-stone-400 font-semibold mt-1.5">
               Already registered?{' '}
-              <Link to="/login" className="text-violet-600 font-bold hover:text-violet-800 cursor-pointer">Sign in to workspace →</Link>
+              <Link to="/login" className="text-emerald-600 font-bold hover:text-emerald-800 cursor-pointer">Sign in to workspace →</Link>
             </p>
           </div>
 
@@ -69,18 +69,18 @@ export const RegisterPage = () => {
                   onClick={() => setRole(t.key as any)}
                   className={`flex items-center gap-3.5 px-5 py-4 rounded-xl border text-left transition-spring flex-1 max-w-[340px] cursor-pointer bg-white ${
                     isSelected
-                      ? 'border-violet-500 shadow-md shadow-violet-100/50 scale-[1.01]'
-                      : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
+                      ? 'border-emerald-500 shadow-md shadow-emerald-100/50 scale-[1.01]'
+                      : 'border-stone-200 hover:border-stone-300 hover:shadow-sm'
                   }`}
                 >
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-spring ${
-                    isSelected ? 'bg-violet-600 text-white shadow-sm shadow-violet-200' : 'bg-slate-100 text-slate-500'
+                    isSelected ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-200' : 'bg-stone-100 text-stone-500'
                   }`}>
                     <t.icon size={16} />
                   </div>
                   <div>
-                    <p className={`text-[12px] font-bold leading-tight ${isSelected ? 'text-violet-750' : 'text-slate-700'}`}>{t.label}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold leading-tight mt-1">{t.desc}</p>
+                    <p className={`text-[12px] font-bold leading-tight ${isSelected ? 'text-emerald-750' : 'text-stone-700'}`}>{t.label}</p>
+                    <p className="text-[10px] text-stone-400 font-semibold leading-tight mt-1">{t.desc}</p>
                   </div>
                 </button>
               );
@@ -90,11 +90,11 @@ export const RegisterPage = () => {
           {/* Form Card */}
           <div className="outer-bezel">
             <div className="inner-core !p-0 overflow-hidden">
-              <div className="px-8 pt-7 pb-5 border-b border-slate-100 bg-slate-50/30">
-                <h2 className="text-base font-extrabold tracking-tight text-slate-900" style={{ fontFamily: 'Sora' }}>
+              <div className="px-8 pt-7 pb-5 border-b border-stone-100 bg-stone-50/30">
+                <h2 className="text-base font-extrabold tracking-tight text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                   {role === 'internal' ? 'Deploy Recruiter Workspace' : 'Configure Candidate Profile'}
                 </h2>
-                <p className="text-[12px] text-slate-450 font-bold mt-1">
+                <p className="text-[12px] text-stone-450 font-bold mt-1">
                   {role === 'internal'
                     ? 'Register your company organization below to coordinate multi-tenant team members.'
                     : 'Configure your profile to start testing code sandbox mock rounds.'}

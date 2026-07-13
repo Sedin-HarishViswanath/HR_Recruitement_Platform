@@ -39,12 +39,12 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../../app/store';
 
 const GRADIENTS = [
-  'from-violet-500 to-purple-500',
+  'from-emerald-500 to-emerald-500',
   'from-blue-500 to-cyan-500',
   'from-emerald-500 to-teal-500',
   'from-rose-500 to-pink-500',
   'from-amber-500 to-orange-500',
-  'from-sky-500 to-indigo-500',
+  'from-sky-500 to-emerald-500',
 ];
 
 interface User {
@@ -123,9 +123,9 @@ export const UsersPage = () => {
 
   const getRoleBadge = (role: string) => {
     switch (role) {
-      case 'Admin': return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-none px-2.5 py-0.5"><Shield size={12} className="mr-1" /> Admin</Badge>;
+      case 'Admin': return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2.5 py-0.5"><Shield size={12} className="mr-1" /> Admin</Badge>;
       case 'Recruiter': return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none px-2.5 py-0.5">Recruiter</Badge>;
-      case 'Interviewer': return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-none px-2.5 py-0.5">Interviewer</Badge>;
+      case 'Interviewer': return <Badge className="bg-stone-100 text-stone-700 hover:bg-stone-100 border-none px-2.5 py-0.5">Interviewer</Badge>;
       default: return <Badge variant="outline">{role}</Badge>;
     }
   };
@@ -136,12 +136,12 @@ export const UsersPage = () => {
       {/* ── Workspace Header ── */}
       <div className="topbar-frost px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
-            Workspace &rsaquo; <span className="text-slate-600">Team</span>
+          <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1.5 mb-0.5">
+            Workspace &rsaquo; <span className="text-stone-600">Team</span>
           </p>
           <div className="flex items-baseline gap-2">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>Team</h1>
-            <span className="text-xs text-slate-400 font-medium">{users.length} members</span>
+            <h1 className="text-xl font-bold text-stone-900 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>Team</h1>
+            <span className="text-xs text-stone-400 font-medium">{users.length} members</span>
           </div>
         </div>
 
@@ -153,7 +153,7 @@ export const UsersPage = () => {
           }
         }}>
           <DialogTrigger asChild>
-            <Button className="bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl shadow-sm btn-premium text-xs h-9 px-4">
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm btn-premium text-xs h-9 px-4">
               <Plus size={14} className="mr-1.5" /> Invite Member
             </Button>
           </DialogTrigger>
@@ -165,15 +165,15 @@ export const UsersPage = () => {
                 </div>
                 <div className="space-y-2">
                   <DialogTitle className="text-center text-xl font-bold">User Invited Successfully!</DialogTitle>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-stone-500">
                     An email has been sent. You can also copy and share the invitation link directly:
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border">
+                <div className="flex items-center gap-2 bg-stone-50 p-2.5 rounded-xl border">
                   <input
                     readOnly
                     value={invitedLink}
-                    className="flex-1 bg-transparent text-xs text-slate-600 font-mono focus:outline-none overflow-x-auto"
+                    className="flex-1 bg-transparent text-xs text-stone-600 font-mono focus:outline-none overflow-x-auto"
                   />
                   <Button
                     size="sm"
@@ -187,7 +187,7 @@ export const UsersPage = () => {
                   </Button>
                 </div>
                 <Button
-                  className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold"
+                  className="w-full bg-stone-800 hover:bg-stone-900 text-white font-bold"
                   onClick={() => {
                     setIsInviteOpen(false);
                     setInvitedLink(null);
@@ -242,10 +242,10 @@ export const UsersPage = () => {
         {/* ── Metric Cards ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Total Members', value: metrics.total, icon: Users, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
+            { label: 'Total Members', value: metrics.total, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
             { label: 'Active', value: metrics.active, icon: UserCheck2, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
             { label: 'Recruiters', value: metrics.recruiters, icon: UserCog, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
-            { label: 'Interviewers', value: metrics.interviewers, icon: Shield, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
+            { label: 'Interviewers', value: metrics.interviewers, icon: Shield, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
           ].map((card) => {
             const Icon = card.icon;
             return (
@@ -255,9 +255,9 @@ export const UsersPage = () => {
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${card.bg} border ${card.border}`}>
                     <Icon size={15} className={card.color} />
                   </div>
-                  <p className="text-[9.5px] font-black text-slate-400 uppercase tracking-[0.12em] pt-0.5 text-right">{card.label}</p>
+                  <p className="text-[9.5px] font-black text-stone-400 uppercase tracking-[0.12em] pt-0.5 text-right">{card.label}</p>
                 </div>
-                <p className="text-[28px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
+                <p className="text-[28px] font-extrabold text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                   {loading ? '—' : card.value}
                 </p>
               </div>
@@ -268,13 +268,13 @@ export const UsersPage = () => {
         {/* ── Search Toolbar ── */}
         <div className="surface-raised !rounded-xl p-3 flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={13} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" size={13} />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 font-medium text-slate-700 placeholder:text-slate-400 transition-all"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-stone-200 bg-stone-50 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 font-medium text-stone-700 placeholder:text-stone-400 transition-all"
             />
           </div>
         </div>
@@ -282,42 +282,42 @@ export const UsersPage = () => {
         {/* ── Users Table ── */}
         <div className="surface-raised !rounded-xl overflow-hidden">
           <Table>
-            <TableHeader className="bg-slate-50/50">
+            <TableHeader className="bg-stone-50/50">
               <TableRow>
-                <TableHead className="w-[300px] text-[10px] font-semibold uppercase tracking-wider text-slate-500">Member</TableHead>
-                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Role</TableHead>
-                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Status</TableHead>
-                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Joined</TableHead>
-                <TableHead className="text-right text-[10px] font-semibold uppercase tracking-wider text-slate-500">Actions</TableHead>
+                <TableHead className="w-[300px] text-[10px] font-semibold uppercase tracking-wider text-stone-500">Member</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">Role</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">Status</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">Joined</TableHead>
+                <TableHead className="text-right text-[10px] font-semibold uppercase tracking-wider text-stone-500">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-20">
-                    <div className="w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                    <p className="text-xs text-slate-400 font-medium">Loading team...</p>
+                    <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                    <p className="text-xs text-stone-400 font-medium">Loading team...</p>
                   </TableCell>
                 </TableRow>
               ) : users.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-20">
-                    <Users size={28} className="mx-auto text-slate-200 mb-2" />
-                    <p className="text-sm font-bold text-slate-600">No team members found</p>
-                    <p className="text-xs text-slate-400 mt-1">Invite your first team member to get started.</p>
+                    <Users size={28} className="mx-auto text-stone-200 mb-2" />
+                    <p className="text-sm font-bold text-stone-600">No team members found</p>
+                    <p className="text-xs text-stone-400 mt-1">Invite your first team member to get started.</p>
                   </TableCell>
                 </TableRow>
               ) : (
                 users.map((user, i) => (
-                  <TableRow key={user.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <TableRow key={user.id} className="hover:bg-stone-50/50 transition-colors group">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]} flex items-center justify-center text-white font-extrabold text-[11px] shrink-0 shadow-sm`}>
                           {user.name[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-bold text-sm text-slate-900 group-hover:text-violet-700 transition-colors">{user.name}</p>
-                          <p className="text-[10.5px] text-slate-400 font-semibold">{user.email}</p>
+                          <p className="font-bold text-sm text-stone-900 group-hover:text-emerald-700 transition-colors">{user.name}</p>
+                          <p className="text-[10.5px] text-stone-400 font-semibold">{user.email}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -326,10 +326,10 @@ export const UsersPage = () => {
                       {user.is_active ? (
                         <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200 text-[9.5px] font-bold">Active</Badge>
                       ) : (
-                        <Badge className="bg-slate-100 text-slate-500 hover:bg-slate-100 border-slate-200 text-[9.5px] font-bold">Deactivated</Badge>
+                        <Badge className="bg-stone-100 text-stone-500 hover:bg-stone-100 border-stone-200 text-[9.5px] font-bold">Deactivated</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-[11px] text-slate-500 font-semibold">
+                    <TableCell className="text-[11px] text-stone-500 font-semibold">
                       {new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </TableCell>
                     <TableCell className="text-right">

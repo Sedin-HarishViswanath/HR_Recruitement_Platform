@@ -108,49 +108,49 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
           )}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">
+              <Label className="text-[10px] font-semibold uppercase text-stone-500 ml-1">
                 Name <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="Full Name" className="h-10 rounded-xl text-sm" {...register('name')} />
               {errors.name && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.name.message}</p>}
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">
+              <Label className="text-[10px] font-semibold uppercase text-stone-500 ml-1">
                 Email <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="you@example.com" className="h-10 rounded-xl text-sm" {...register('email')} />
               {errors.email && <p className="text-red-500 text-[9px] font-bold ml-1">{errors.email.message}</p>}
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">
-                Phone <span className="text-slate-400 font-normal">(optional)</span>
+              <Label className="text-[10px] font-semibold uppercase text-stone-500 ml-1">
+                Phone <span className="text-stone-400 font-normal">(optional)</span>
               </Label>
               <Input placeholder="Contact Number" className="h-10 rounded-xl text-sm" {...register('phone')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">
-                Location <span className="text-slate-400 font-normal">(optional)</span>
+              <Label className="text-[10px] font-semibold uppercase text-stone-500 ml-1">
+                Location <span className="text-stone-400 font-normal">(optional)</span>
               </Label>
               <Input placeholder="City, Country" className="h-10 rounded-xl text-sm" {...register('location')} />
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">
-              Skills <span className="text-slate-400 font-normal">(optional)</span>
+            <Label className="text-[10px] font-semibold uppercase text-stone-500 ml-1">
+              Skills <span className="text-stone-400 font-normal">(optional)</span>
             </Label>
             <Input placeholder="e.g. Ruby, Rails, React" className="h-10 rounded-xl text-sm" {...register('skills')} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">
+              <Label className="text-[10px] font-semibold uppercase text-stone-500 ml-1">
                 Password <span className="text-red-500">*</span>
               </Label>
               <Input type="password" placeholder="••••••••" className="h-10 rounded-xl text-sm" {...register('password')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-semibold uppercase text-slate-500 ml-1">
+              <Label className="text-[10px] font-semibold uppercase text-stone-500 ml-1">
                 Confirm <span className="text-red-500">*</span>
               </Label>
               <Input type="password" placeholder="••••••••" className="h-10 rounded-xl text-sm" {...register('confirmPassword')} />
@@ -162,8 +162,8 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
           </Button>
         </form>
 
-        <p className="text-center text-[12px] font-medium text-slate-500">
-          Already have an account? <button onClick={() => navigate('/login')} className="text-violet-600 font-bold hover:underline">Sign in</button>
+        <p className="text-center text-[12px] font-medium text-stone-500">
+          Already have an account? <button onClick={() => navigate('/login')} className="text-emerald-600 font-bold hover:underline">Sign in</button>
         </p>
       </div>
     );
@@ -179,29 +179,29 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
         )}
         {/* Company Details Section */}
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full inline-block">Company Details</h4>
-          <div className="grid grid-cols-2 gap-3 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full inline-block">Company Details</h4>
+          <div className="grid grid-cols-2 gap-3 bg-stone-50/50 border border-stone-100 rounded-xl p-4">
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Company name <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="Company Name" className="h-9 rounded-lg text-[13px]" {...register('companyName')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Domain <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="e.g. example.com" className="h-9 rounded-lg text-[13px]" {...register('domain')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
-                Company size <span className="text-slate-400 font-normal">(optional)</span>
+              <Label className="text-[10px] font-bold text-stone-500">
+                Company size <span className="text-stone-400 font-normal">(optional)</span>
               </Label>
               <Input placeholder="e.g. 1-10" className="h-9 rounded-lg text-[13px]" {...register('size')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
-                Industry <span className="text-slate-400 font-normal">(optional)</span>
+              <Label className="text-[10px] font-bold text-stone-500">
+                Industry <span className="text-stone-400 font-normal">(optional)</span>
               </Label>
               <Input placeholder="e.g. Software" className="h-9 rounded-lg text-[13px]" {...register('industry')} />
             </div>
@@ -210,41 +210,41 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
 
         {/* Address Section */}
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full inline-block">Address</h4>
-          <div className="space-y-3 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full inline-block">Address</h4>
+          <div className="space-y-3 bg-stone-50/50 border border-stone-100 rounded-xl p-4">
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Address line 1 <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="Address Line 1" className="h-9 rounded-lg text-[13px]" {...register('address1')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
-                Address line 2 <span className="text-slate-400 font-normal">(optional)</span>
+              <Label className="text-[10px] font-bold text-stone-500">
+                Address line 2 <span className="text-stone-400 font-normal">(optional)</span>
               </Label>
               <Input placeholder="Address Line 2" className="h-9 rounded-lg text-[13px]" {...register('address2')} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500">
+                <Label className="text-[10px] font-bold text-stone-500">
                   City <span className="text-red-500">*</span>
                 </Label>
                 <Input placeholder="City" className="h-9 rounded-lg text-[13px]" {...register('city')} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500">
+                <Label className="text-[10px] font-bold text-stone-500">
                   State <span className="text-red-500">*</span>
                 </Label>
                 <Input placeholder="State" className="h-9 rounded-lg text-[13px]" {...register('state')} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500">
+                <Label className="text-[10px] font-bold text-stone-500">
                   Country <span className="text-red-500">*</span>
                 </Label>
                 <Input placeholder="Country" className="h-9 rounded-lg text-[13px]" {...register('country')} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold text-slate-500">
+                <Label className="text-[10px] font-bold text-stone-500">
                   Postal code <span className="text-red-500">*</span>
                 </Label>
                 <Input placeholder="Postal code" className="h-9 rounded-lg text-[13px]" {...register('zip')} />
@@ -255,17 +255,17 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
 
         {/* Contact Section */}
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full inline-block">Contact</h4>
-          <div className="grid grid-cols-2 gap-3 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full inline-block">Contact</h4>
+          <div className="grid grid-cols-2 gap-3 bg-stone-50/50 border border-stone-100 rounded-xl p-4">
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Contact email <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="Contact email" className="h-9 rounded-lg text-[13px]" {...register('contactEmail')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
-                Contact phone <span className="text-slate-400 font-normal">(optional)</span>
+              <Label className="text-[10px] font-bold text-stone-500">
+                Contact phone <span className="text-stone-400 font-normal">(optional)</span>
               </Label>
               <Input placeholder="Contact phone" className="h-9 rounded-lg text-[13px]" {...register('contactPhone')} />
             </div>
@@ -274,28 +274,28 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
 
         {/* Admin User Section */}
         <div className="space-y-3">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full inline-block">Admin User Details</h4>
-          <div className="grid grid-cols-2 gap-3 bg-slate-50/50 border border-slate-100 rounded-xl p-4">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full inline-block">Admin User Details</h4>
+          <div className="grid grid-cols-2 gap-3 bg-stone-50/50 border border-stone-100 rounded-xl p-4">
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Name <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="Admin Name" className="h-9 rounded-lg text-[13px]" {...register('name')} />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Email <span className="text-red-500">*</span>
               </Label>
               <Input placeholder="Admin Email" className="h-9 rounded-lg text-[13px]" {...register('email')} />
             </div>
             <div className="space-y-1 col-span-2">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Password <span className="text-red-500">*</span>
               </Label>
               <Input type="password" placeholder="••••••••" className="h-9 rounded-lg text-[13px]" {...register('password')} />
             </div>
             <div className="space-y-1 col-span-2">
-              <Label className="text-[10px] font-bold text-slate-500">
+              <Label className="text-[10px] font-bold text-stone-500">
                 Confirm password <span className="text-red-500">*</span>
               </Label>
               <Input type="password" placeholder="••••••••" className="h-9 rounded-lg text-[13px]" {...register('confirmPassword')} />
@@ -307,8 +307,8 @@ export const SignupForm = ({ role }: { role: 'internal' | 'candidate', onToggleM
           {isLoading ? 'Processing...' : 'Register'}
         </Button>
 
-        <p className="text-center text-[12px] font-medium text-slate-500">
-          Already have an account? <button type="button" onClick={() => navigate('/login')} className="text-violet-600 font-bold hover:underline">Sign in</button>
+        <p className="text-center text-[12px] font-medium text-stone-500">
+          Already have an account? <button type="button" onClick={() => navigate('/login')} className="text-emerald-600 font-bold hover:underline">Sign in</button>
         </p>
       </form>
     </div>
