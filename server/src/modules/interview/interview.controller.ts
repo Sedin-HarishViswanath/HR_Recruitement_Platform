@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { interviewService } from './interview.service';
 import { aiDebriefService } from './ai-debrief.service';
+import { interviewCopilotService } from './interview-copilot.service';
 import { 
   scheduleInterviewSchema, 
   rescheduleInterviewSchema, 
@@ -260,6 +261,19 @@ export class InterviewController {
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
       return sendResponse(res, 500, false, 'Failed to generate AI debrief');
+    }
+  }
+
+  async getCopilotSuggestions(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const companyId = req.user.companyId;
+      if (!companyId) throw new AppError('Unauthorized', 401);
+      const suggestions = await interviewCopilotService.generate(id as string, companyId);
+      return sendResponse(res, 200, true, 'Copilot suggestions generated', suggestions);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to generate copilot suggestions');
     }
   }
 
