@@ -79,7 +79,6 @@ export const InterviewWorkspace = () => {
   // ── Beforeunload guard for live rounds ─────────────────────────────────────
   useEffect(() => {
     if (!interview) return;
-    const roundType = (interview.round_type || '').toLowerCase();
     // Only guard live rounds (not automated assessments)
     const isLive = !isAutomated(interview) && interview.status === 'scheduled';
     if (!isLive) return;
@@ -104,9 +103,9 @@ export const InterviewWorkspace = () => {
   // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white gap-4">
-        <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-slate-400 font-medium text-sm">Loading workspace...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-stone-900 text-white gap-4">
+        <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-stone-400 font-medium text-sm">Loading workspace...</p>
       </div>
     );
   }
@@ -114,16 +113,16 @@ export const InterviewWorkspace = () => {
   // ── Error ───────────────────────────────────────────────────────────────────
   if (error || !interview) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-6">
-        <div className="max-w-sm w-full bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-stone-900 text-white p-6">
+        <div className="max-w-sm w-full bg-stone-800 border border-stone-700 rounded-2xl p-8 text-center">
           <div className="w-14 h-14 bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-5">
             <AlertCircle size={28} className="text-red-400" />
           </div>
           <h2 className="text-lg font-bold text-white mb-2">Workspace Unavailable</h2>
-          <p className="text-slate-400 text-sm font-medium mb-6">{error || 'Interview not found.'}</p>
+          <p className="text-stone-400 text-sm font-medium mb-6">{error || 'Interview not found.'}</p>
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 mx-auto px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-colors cursor-pointer text-sm"
+            className="flex items-center gap-2 mx-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors cursor-pointer text-sm"
           >
             <ArrowLeft size={15} /> Go Back
           </button>
@@ -137,39 +136,39 @@ export const InterviewWorkspace = () => {
 
   // ── Shared header ───────────────────────────────────────────────────────────
   const WorkspaceHeader = () => (
-    <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-900 border-b border-slate-800 shrink-0">
+    <div className="flex items-center gap-3 px-4 py-2.5 bg-stone-900 border-b border-stone-800 shrink-0">
       <button
         onClick={() => navigate(-1)}
-        className="p-1.5 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+        className="p-1.5 text-stone-500 hover:text-white hover:bg-stone-800 rounded-lg transition-colors cursor-pointer"
       >
         <ArrowLeft size={16} />
       </button>
-      <div className="flex-1 flex items-center gap-4 min-w-0 text-[11px] text-slate-400 font-semibold">
+      <div className="flex-1 flex items-center gap-4 min-w-0 text-[11px] text-stone-400 font-semibold">
         <span className="flex items-center gap-1.5">
-          <User size={12} className="text-slate-600" />
-          <span className="text-slate-300 font-bold truncate max-w-[120px]">{interview.candidate_name || 'Candidate'}</span>
+          <User size={12} className="text-stone-600" />
+          <span className="text-stone-300 font-bold truncate max-w-[120px]">{interview.candidate_name || 'Candidate'}</span>
         </span>
-        <span className="text-slate-700">·</span>
+        <span className="text-stone-700">·</span>
         <span className="flex items-center gap-1.5">
-          <Briefcase size={12} className="text-slate-600" />
+          <Briefcase size={12} className="text-stone-600" />
           <span className="truncate max-w-[140px]">{interview.job_title || 'Position'}</span>
         </span>
         {interview.scheduled_at && (
           <>
-            <span className="text-slate-700">·</span>
+            <span className="text-stone-700">·</span>
             <span className="flex items-center gap-1.5">
-              <Calendar size={12} className="text-slate-600" />
+              <Calendar size={12} className="text-stone-600" />
               {new Date(interview.scheduled_at).toLocaleDateString()}
             </span>
-            <span className="text-slate-700">·</span>
+            <span className="text-stone-700">·</span>
             <span className="flex items-center gap-1.5">
-              <Clock size={12} className="text-slate-600" />
+              <Clock size={12} className="text-stone-600" />
               {new Date(interview.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </>
         )}
       </div>
-      <span className="shrink-0 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-widest rounded-full bg-violet-900/40 text-violet-300 border border-violet-800">
+      <span className="shrink-0 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-widest rounded-full bg-emerald-900/40 text-emerald-300 border border-emerald-800">
         {interview.round_type} Round
       </span>
     </div>
@@ -179,17 +178,17 @@ export const InterviewWorkspace = () => {
   if (roundType === 'aptitude' && automated && isCandidate) {
     return (
       <div className="flex flex-col h-screen w-full bg-[#f8fafc]">
-        <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-slate-200 shrink-0 shadow-sm/5">
+        <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-stone-200 shrink-0 shadow-sm/5">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
               <Briefcase size={15} />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900">{interview.company_name} — Aptitude Assessment</p>
-              <p className="text-xs text-slate-500 font-medium">{interview.job_title}</p>
+              <p className="text-sm font-bold text-stone-900">{interview.company_name} — Aptitude Assessment</p>
+              <p className="text-xs text-stone-500 font-medium">{interview.job_title}</p>
             </div>
           </div>
-          <span className="text-xs font-bold text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
+          <span className="text-xs font-bold text-stone-400 bg-stone-50 border border-stone-200 px-3 py-1 rounded-lg">
             20 Questions · Do not close this tab
           </span>
         </div>
@@ -228,35 +227,35 @@ export const InterviewWorkspace = () => {
     const passed = pct >= 70;
 
     return (
-      <div className="flex flex-col h-screen w-full bg-slate-900">
+      <div className="flex flex-col h-screen w-full bg-stone-900">
         <WorkspaceHeader />
         <div className="flex-1 flex items-center justify-center p-8">
-          <div className="max-w-sm w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 text-center space-y-6">
+          <div className="max-w-sm w-full bg-stone-800 border border-stone-700 rounded-3xl p-8 text-center space-y-6">
             <div className="w-16 h-16 bg-blue-900/30 rounded-2xl flex items-center justify-center mx-auto border border-blue-800">
               <Briefcase size={30} className="text-blue-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white capitalize" style={{ fontFamily: 'Sora' }}>
+              <h2 className="text-xl font-bold text-white capitalize" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                 {interview.round_type} Assessment
               </h2>
-              <p className="text-slate-400 text-sm font-medium mt-1">{interview.candidate_name}</p>
+              <p className="text-stone-400 text-sm font-medium mt-1">{interview.candidate_name}</p>
             </div>
 
             {isCompleted && displayScore ? (
               <div className="space-y-4">
-                <div className="bg-slate-900/60 rounded-2xl p-6 border border-slate-700">
-                  <div className="text-5xl font-black text-blue-400 mb-1" style={{ fontFamily: 'Sora' }}>
+                <div className="bg-stone-900/60 rounded-2xl p-6 border border-stone-700">
+                  <div className="text-5xl font-black text-blue-400 mb-1" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                     {displayScore.score}
-                    <span className="text-2xl text-slate-500">/{displayScore.total}</span>
+                    <span className="text-2xl text-stone-500">/{displayScore.total}</span>
                   </div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Final Score</p>
-                  <div className="w-full bg-slate-800 rounded-full h-2 mb-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-stone-500 mb-3">Final Score</p>
+                  <div className="w-full bg-stone-800 rounded-full h-2 mb-2">
                     <div
-                      className={`h-2 rounded-full transition-all duration-1000 ${passed ? 'bg-emerald-500' : 'bg-violet-500'}`}
+                      className={`h-2 rounded-full transition-all duration-1000 ${passed ? 'bg-emerald-500' : 'bg-emerald-500'}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className={`flex items-center justify-center gap-1.5 text-sm font-bold ${passed ? 'text-emerald-400' : 'text-violet-400'}`}>
+                  <div className={`flex items-center justify-center gap-1.5 text-sm font-bold ${passed ? 'text-emerald-400' : 'text-emerald-400'}`}>
                     {passed ? <CheckCircle2 size={15} /> : <Trophy size={15} />}
                     {pct}% — {passed ? 'Recommended to Hire' : 'Below Threshold'}
                   </div>
@@ -265,15 +264,15 @@ export const InterviewWorkspace = () => {
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-2 h-2 bg-violet-500 rounded-full animate-pulse" />
-                  <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-                  <div className="w-2 h-2 bg-violet-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+                  <div className="w-2 h-2 bg-emerald-300 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
                 </div>
                 <p className="text-amber-300 font-semibold text-sm">Assessment in progress...</p>
-                <p className="text-slate-400 text-xs font-medium leading-relaxed">
+                <p className="text-stone-400 text-xs font-medium leading-relaxed">
                   The candidate is taking the assessment. Score will appear here automatically when they submit.
                 </p>
-                <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-600 font-medium">
+                <div className="flex items-center justify-center gap-1.5 text-[10px] text-stone-600 font-medium">
                   <RefreshCw size={10} className="animate-spin" />
                   Waiting for submission
                 </div>
@@ -293,14 +292,14 @@ export const InterviewWorkspace = () => {
         <div className="flex items-center gap-3 px-4 py-2.5 bg-[#1a1d2e] border-b border-[#252840] shrink-0">
           <button
             onClick={() => navigate(-1)}
-            className="p-1.5 text-slate-600 hover:text-white rounded-lg transition-colors cursor-pointer"
+            className="p-1.5 text-stone-600 hover:text-white rounded-lg transition-colors cursor-pointer"
           >
             <ArrowLeft size={15} />
           </button>
           <div className="flex-1 flex items-center gap-3 min-w-0">
-            <span className="text-sm font-bold text-slate-200 truncate">{interview.company_name}</span>
-            <span className="text-slate-700">·</span>
-            <span className="text-[11px] text-slate-500 truncate">{interview.job_title}</span>
+            <span className="text-sm font-bold text-stone-200 truncate">{interview.company_name}</span>
+            <span className="text-stone-700">·</span>
+            <span className="text-[11px] text-stone-500 truncate">{interview.job_title}</span>
           </div>
           <span className="text-[9px] font-semibold uppercase tracking-widest text-emerald-400 border border-emerald-800 bg-emerald-900/20 px-3 py-1 rounded-full shrink-0">
             {liveRoundLabel}
@@ -340,9 +339,9 @@ export const InterviewWorkspace = () => {
 
   // ── FALLBACK ───
   return (
-    <div className="flex flex-col h-screen w-full bg-slate-900">
+    <div className="flex flex-col h-screen w-full bg-stone-900">
       <WorkspaceHeader />
-      <div className="flex-1 flex items-center justify-center text-slate-400">
+      <div className="flex-1 flex items-center justify-center text-stone-400">
         Workspace fallback — round state unsupported.
       </div>
     </div>

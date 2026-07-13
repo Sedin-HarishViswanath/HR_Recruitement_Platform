@@ -130,21 +130,21 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
 
       {/* ── AI banner ── */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200/60 rounded-xl">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-emerald-50 border border-emerald-200/60 rounded-xl">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center">
-            <Sparkles size={15} className="text-violet-600" />
+          <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+            <Sparkles size={15} className="text-emerald-600" />
           </div>
           <div>
-            <p className="text-[12px] font-bold text-violet-900">AI-Assisted Job Posting</p>
-            <p className="text-[11px] text-violet-500 font-medium">Fill in the title, then let Gemini write the description, skills, and salary.</p>
+            <p className="text-[12px] font-bold text-emerald-900">AI-Assisted Job Posting</p>
+            <p className="text-[11px] text-emerald-500 font-medium">Fill in the title, then let Gemini write the description, skills, and salary.</p>
           </div>
         </div>
         <button
           type="button"
           onClick={handleGenerate}
           disabled={isGenerating || !titleValue || titleValue.trim().length < 3}
-          className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-[0.97]"
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-[0.97]"
         >
           {isGenerating
             ? <><Loader2 size={13} className="animate-spin" /> Generating...</>
@@ -158,28 +158,28 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
 
         {/* Title */}
         <div className="space-y-1.5 md:col-span-2">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">
             Job Title <span className="text-red-500">*</span>
           </Label>
           <Input
             {...register('title')}
             placeholder="e.g. Senior Frontend Engineer"
-            className="h-10 text-sm rounded-xl border-slate-200 focus:border-violet-400 focus:ring-violet-200"
+            className="h-10 text-sm rounded-xl border-stone-200 focus:border-emerald-400 focus:ring-emerald-200"
           />
           {errors.title && <p className="text-red-500 text-xs">{errors.title.message as string}</p>}
         </div>
 
         {/* Department */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Department</Label>
-          <Input {...register('department')} placeholder="e.g. Engineering" className="h-10 text-sm rounded-xl border-slate-200" />
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">Department</Label>
+          <Input {...register('department')} placeholder="e.g. Engineering" className="h-10 text-sm rounded-xl border-stone-200" />
         </div>
 
         {/* Employment Type */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Employment Type</Label>
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">Employment Type</Label>
           <Select value={watch('employment_type')} onValueChange={(v: any) => setValue('employment_type', v)}>
-            <SelectTrigger className="h-10 text-sm rounded-xl border-slate-200">
+            <SelectTrigger className="h-10 text-sm rounded-xl border-stone-200">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -193,19 +193,19 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
 
         {/* Location */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Location</Label>
-          <Input {...register('location')} placeholder="e.g. San Francisco, CA" disabled={remote} className="h-10 text-sm rounded-xl border-slate-200 disabled:opacity-50" />
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">Location</Label>
+          <Input {...register('location')} placeholder="e.g. San Francisco, CA" disabled={remote} className="h-10 text-sm rounded-xl border-stone-200 disabled:opacity-50" />
           <div className="flex items-center gap-2 mt-1">
             <Checkbox id="remote" checked={remote} onCheckedChange={(v) => setValue('remote', v as boolean)} />
-            <label htmlFor="remote" className="text-xs font-medium text-slate-600 cursor-pointer select-none">Remote position</label>
+            <label htmlFor="remote" className="text-xs font-medium text-stone-600 cursor-pointer select-none">Remote position</label>
           </div>
         </div>
 
         {/* Experience Level */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Experience Level</Label>
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">Experience Level</Label>
           <Select value={watch('experience_level')} onValueChange={(v: any) => setValue('experience_level', v)}>
-            <SelectTrigger className="h-10 text-sm rounded-xl border-slate-200">
+            <SelectTrigger className="h-10 text-sm rounded-xl border-stone-200">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -218,25 +218,25 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
 
         {/* Interview Rounds */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">
             Interview Rounds <span className="text-red-500">*</span>
           </Label>
           <Input
             type="number" min="1" max="10"
             {...register('interview_rounds', { valueAsNumber: true })}
             placeholder="e.g. 3"
-            className="h-10 text-sm rounded-xl border-slate-200"
+            className="h-10 text-sm rounded-xl border-stone-200"
           />
           {errors.interview_rounds && <p className="text-red-500 text-xs">{errors.interview_rounds.message as string}</p>}
         </div>
 
         {/* Required Skills */}
         <div className="space-y-1.5 md:col-span-2">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Required Skills</Label>
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">Required Skills</Label>
           {skills.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-2">
               {skills.map(skill => (
-                <span key={skill} className="inline-flex items-center gap-1 bg-violet-50 text-violet-800 border border-violet-200 text-xs font-bold px-2.5 py-1 rounded-lg">
+                <span key={skill} className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1 rounded-lg">
                   {skill}
                   <button type="button" onClick={() => handleRemoveSkill(skill)} className="hover:text-red-600 cursor-pointer transition-colors ml-0.5">
                     <X size={12} />
@@ -251,12 +251,12 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
               onChange={e => setSkillInput(e.target.value)}
               onKeyDown={handleAddSkill}
               placeholder="Type a skill and press Enter..."
-              className="h-10 text-sm rounded-xl border-slate-200 flex-1"
+              className="h-10 text-sm rounded-xl border-stone-200 flex-1"
             />
             <button
               type="button"
               onClick={handleAddSkill}
-              className="h-10 px-4 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 transition-colors cursor-pointer"
+              className="h-10 px-4 text-xs font-bold bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl border border-stone-200 transition-colors cursor-pointer"
             >
               Add
             </button>
@@ -266,11 +266,11 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
         {/* Description */}
         <div className="space-y-1.5 md:col-span-2">
           <div className="flex items-center justify-between">
-            <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+            <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">
               Job Description <span className="text-red-500">*</span>
             </Label>
             {aiApplied && (
-              <span className="flex items-center gap-1 text-[9px] font-bold text-violet-600 bg-violet-50 border border-violet-200 px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                 <Sparkles size={9} /> AI-generated
               </span>
             )}
@@ -278,44 +278,44 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
           <Textarea
             {...register('description')}
             placeholder="Describe responsibilities, requirements, and benefits... (or use Generate with AI above)"
-            className="min-h-[220px] text-sm rounded-xl border-slate-200 focus:border-violet-400 focus:ring-violet-200 font-mono text-xs leading-relaxed"
+            className="min-h-[220px] text-sm rounded-xl border-stone-200 focus:border-emerald-400 focus:ring-emerald-200 font-mono text-xs leading-relaxed"
           />
           {errors.description && <p className="text-red-500 text-xs">{errors.description.message as string}</p>}
         </div>
 
         {/* Salary */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Salary Range (USD / year)</Label>
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">Salary Range (USD / year)</Label>
           <div className="flex items-center gap-2">
             <Input
               type="number"
               {...register('salary_min', { setValueAs: v => v === '' || isNaN(v) ? undefined : parseInt(v, 10) })}
               placeholder="Min"
-              className="h-10 text-sm rounded-xl border-slate-200"
+              className="h-10 text-sm rounded-xl border-stone-200"
             />
-            <span className="text-slate-400 font-bold shrink-0">—</span>
+            <span className="text-stone-400 font-bold shrink-0">—</span>
             <Input
               type="number"
               {...register('salary_max', { setValueAs: v => v === '' || isNaN(v) ? undefined : parseInt(v, 10) })}
               placeholder="Max"
-              className="h-10 text-sm rounded-xl border-slate-200"
+              className="h-10 text-sm rounded-xl border-stone-200"
             />
           </div>
         </div>
 
         {/* Deadline */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Application Deadline</Label>
-          <Input type="date" {...register('deadline')} className="h-10 text-sm rounded-xl border-slate-200" />
+          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">Application Deadline</Label>
+          <Input type="date" {...register('deadline')} className="h-10 text-sm rounded-xl border-stone-200" />
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-3 pt-5 border-t border-slate-100">
+      <div className="flex justify-end gap-3 pt-5 border-t border-stone-100">
         <button
           type="button"
           onClick={onCancel}
-          className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+          className="px-5 py-2.5 text-sm font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors cursor-pointer"
         >
           Cancel
         </button>
@@ -323,7 +323,7 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
           type="button"
           onClick={() => { setValue('status', 'draft'); handleSubmit(handleFormSubmit)(); }}
           disabled={isSubmitting}
-          className="px-5 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+          className="px-5 py-2.5 text-sm font-bold text-stone-700 bg-white border border-stone-200 hover:bg-stone-50 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
         >
           Save Draft
         </button>
@@ -331,7 +331,7 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
           type="submit"
           onClick={() => setValue('status', 'published')}
           disabled={isSubmitting}
-          className="px-6 py-2.5 text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl transition-all cursor-pointer shadow-sm shadow-violet-200 disabled:opacity-50 active:scale-[0.98]"
+          className="px-6 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all cursor-pointer shadow-sm shadow-emerald-200 disabled:opacity-50 active:scale-[0.98]"
         >
           {isSubmitting ? (
             <span className="flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> Publishing...</span>

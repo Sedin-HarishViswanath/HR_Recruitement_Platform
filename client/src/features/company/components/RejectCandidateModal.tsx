@@ -60,10 +60,10 @@ export const RejectCandidateModal = ({
               <XCircle size={20} className="text-red-500" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-slate-900 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <h3 className="text-[15px] font-bold text-stone-900 leading-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
                 Reject Candidate
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              <p className="text-[11px] text-stone-500 font-medium mt-0.5">
                 {candidateName}{jobTitle ? ` · ${jobTitle}` : ''}
               </p>
             </div>
@@ -71,7 +71,7 @@ export const RejectCandidateModal = ({
 
           {/* Reason picker */}
           <div className="space-y-2">
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Reason for rejection</p>
+            <p className="text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-2">Reason for rejection</p>
             <div className="grid grid-cols-1 gap-1.5">
               {REJECTION_REASONS.map((reason) => (
                 <button
@@ -80,7 +80,7 @@ export const RejectCandidateModal = ({
                   className={`text-left px-4 py-2.5 rounded-xl text-[12px] font-semibold border transition-all cursor-pointer ${
                     selectedReason === reason
                       ? 'bg-red-50 border-red-200 text-red-700 font-bold'
-                      : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                      : 'bg-white border-stone-200 text-stone-600 hover:border-stone-300 hover:bg-stone-50'
                   }`}
                 >
                   {reason}
@@ -91,16 +91,16 @@ export const RejectCandidateModal = ({
 
           {/* Optional message */}
           <div className="mt-4">
-            <label className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+            <label className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-2">
               <MessageSquare size={11} />
-              Personal message <span className="text-slate-400 font-normal normal-case">(optional)</span>
+              Personal message <span className="text-stone-400 font-normal normal-case">(optional)</span>
             </label>
             <textarea
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
               placeholder="Add a personal note to send with the rejection email..."
               rows={3}
-              className="w-full px-3.5 py-2.5 text-[12px] border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 transition-all resize-none placeholder:text-slate-400 font-medium text-slate-700"
+              className="w-full px-3.5 py-2.5 text-[12px] border border-stone-200 rounded-xl bg-stone-50 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 transition-all resize-none placeholder:text-stone-400 font-medium text-stone-700"
             />
           </div>
         </div>
@@ -110,7 +110,7 @@ export const RejectCandidateModal = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 text-sm font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
           >
             Cancel
           </button>

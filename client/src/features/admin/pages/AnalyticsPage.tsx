@@ -28,7 +28,7 @@ export const SuperAdminAnalyticsPage = () => {
     <div className="flex flex-col min-h-screen bg-[#f8fafc]">
       <DashboardHeader title="Platform Analytics" subtitle="Loading..." />
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     </div>
   );
@@ -38,7 +38,7 @@ export const SuperAdminAnalyticsPage = () => {
   const statMeta = [
     { label: 'Total Companies', value: data.kpis?.totalCompanies || 0, icon: Briefcase, gradient: 'from-amber-500 to-orange-500' },
     { label: 'Total Jobs', value: data.kpis?.totalJobs || 0, icon: Briefcase, gradient: 'from-teal-500 to-emerald-500' },
-    { label: 'Total Applications', value: data.kpis?.totalApplications || 0, icon: Users, gradient: 'from-violet-500 to-purple-500' },
+    { label: 'Total Applications', value: data.kpis?.totalApplications || 0, icon: Users, gradient: 'from-emerald-500 to-emerald-500' },
   ];
 
   return (
@@ -52,10 +52,10 @@ export const SuperAdminAnalyticsPage = () => {
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {statMeta.map((s, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 flex items-center justify-between shadow-sm">
+            <div key={i} className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 flex items-center justify-between shadow-sm">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
-                <p className="text-[22px] font-black text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{s.value}</p>
+                <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">{s.label}</p>
+                <p className="text-[22px] font-black text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>{s.value}</p>
               </div>
               <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center text-white shadow-sm`}>
                 <s.icon size={18} />
@@ -68,14 +68,14 @@ export const SuperAdminAnalyticsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
           {/* Companies By Status */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+          <div className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <Activity size={14} />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-[13px]" style={{ fontFamily: 'Sora, sans-serif' }}>Companies by Status</h3>
-                <p className="text-[10px] text-slate-400 font-medium">Distribution of registered companies</p>
+                <h3 className="font-bold text-stone-900 text-[13px]" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>Companies by Status</h3>
+                <p className="text-[10px] text-stone-400 font-medium">Distribution of registered companies</p>
               </div>
             </div>
 
@@ -91,32 +91,32 @@ export const SuperAdminAnalyticsPage = () => {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex items-center justify-center text-sm font-medium text-slate-400">No data available</div>
+                <div className="h-full flex items-center justify-center text-sm font-medium text-stone-400">No data available</div>
               )}
             </div>
           </div>
 
           {/* Top Companies */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+          <div className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 shadow-sm">
             <div className="mb-4">
-              <h3 className="font-bold text-slate-900 text-[13px]" style={{ fontFamily: 'Sora, sans-serif' }}>Top Companies by Jobs</h3>
-              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Companies with the most active job postings</p>
+              <h3 className="font-bold text-stone-900 text-[13px]" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>Top Companies by Jobs</h3>
+              <p className="text-[10px] text-stone-400 font-medium mt-0.5">Companies with the most active job postings</p>
             </div>
             <div className="space-y-2.5">
               {data.topCompanies && data.topCompanies.length > 0 ? data.topCompanies.map((company: any, i: number) => (
-                <div key={i} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors">
+                <div key={i} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-stone-50 border border-transparent hover:border-stone-100 transition-colors">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <div className="w-7 h-7 rounded-full bg-stone-100 text-stone-600 flex items-center justify-center text-[10px] font-bold">
                       #{i + 1}
                     </div>
-                    <span className="font-semibold text-slate-800 text-[12px]">{company.name}</span>
+                    <span className="font-semibold text-stone-800 text-[12px]">{company.name}</span>
                   </div>
-                  <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
+                  <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
                     {company.jobs_count} jobs
                   </span>
                 </div>
               )) : (
-                <div className="py-8 text-center text-[12px] font-medium text-slate-400">No top companies found</div>
+                <div className="py-8 text-center text-[12px] font-medium text-stone-400">No top companies found</div>
               )}
             </div>
           </div>

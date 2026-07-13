@@ -81,7 +81,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
       const boldMatch = rest.match(/^(.*?)\*\*(.+?)\*\*/);
       if (boldMatch) {
         if (boldMatch[1]) parts.push(<Fragment key={k++}>{boldMatch[1]}</Fragment>);
-        parts.push(<strong key={k++} className="font-bold text-slate-900">{boldMatch[2]}</strong>);
+        parts.push(<strong key={k++} className="font-bold text-stone-900">{boldMatch[2]}</strong>);
         rest = rest.slice(boldMatch[0].length);
         continue;
       }
@@ -90,7 +90,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
       if (codeMatch) {
         if (codeMatch[1]) parts.push(<Fragment key={k++}>{codeMatch[1]}</Fragment>);
         parts.push(
-          <code key={k++} className="bg-slate-100 text-violet-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-slate-200/60">
+          <code key={k++} className="bg-stone-100 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-stone-200/60">
             {codeMatch[2]}
           </code>
         );
@@ -116,9 +116,9 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
         i++;
       }
       elements.push(
-        <div key={nextKey()} className="my-2.5 rounded-xl overflow-hidden border border-slate-700/80 text-[11px] shadow-sm">
+        <div key={nextKey()} className="my-2.5 rounded-xl overflow-hidden border border-stone-700/80 text-[11px] shadow-sm">
           {lang && (
-            <div className="bg-[#1e2238] px-3 py-1.5 text-[9px] text-slate-400 font-mono font-bold uppercase tracking-wider border-b border-slate-700">
+            <div className="bg-[#1e2238] px-3 py-1.5 text-[9px] text-stone-400 font-mono font-bold uppercase tracking-wider border-b border-stone-700">
               {lang}
             </div>
           )}
@@ -136,7 +136,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
       const level = line.match(/^(#{1,3})\s/)?.[1]?.length || 1;
       const content = line.replace(/^#{1,3}\s/, '').trim();
       elements.push(
-        <p key={nextKey()} className={`font-bold text-slate-900 mt-3.5 mb-1.5 ${level === 1 ? 'text-sm' : level === 2 ? 'text-xs' : 'text-[11px]'}`} style={{ fontFamily: 'Sora' }}>
+        <p key={nextKey()} className={`font-bold text-stone-900 mt-3.5 mb-1.5 ${level === 1 ? 'text-sm' : level === 2 ? 'text-xs' : 'text-[11px]'}`} style={{ fontFamily: 'Plus Jakarta Sans' }}>
           {renderInline(content)}
         </p>
       );
@@ -148,8 +148,8 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
     const numMatch = line.trim().match(/^(\d+)\.\s+(.*)/);
     if (numMatch) {
       elements.push(
-        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed my-0.5">
-          <span className="text-violet-500 font-bold shrink-0 min-w-[16px]">{numMatch[1]}.</span>
+        <div key={nextKey()} className="flex gap-2 text-[12px] text-stone-700 font-medium leading-relaxed my-0.5">
+          <span className="text-emerald-500 font-bold shrink-0 min-w-[16px]">{numMatch[1]}.</span>
           <span>{renderInline(numMatch[2])}</span>
         </div>
       );
@@ -161,8 +161,8 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
     if (/^[-•*]\s/.test(line.trim())) {
       const content = line.trim().replace(/^[-•*]\s/, '');
       elements.push(
-        <div key={nextKey()} className="flex gap-2 text-[12px] text-slate-700 font-medium leading-relaxed my-0.5">
-          <span className="text-violet-400 font-bold shrink-0 mt-0.5">•</span>
+        <div key={nextKey()} className="flex gap-2 text-[12px] text-stone-700 font-medium leading-relaxed my-0.5">
+          <span className="text-emerald-400 font-bold shrink-0 mt-0.5">•</span>
           <span>{renderInline(content)}</span>
         </div>
       );
@@ -179,7 +179,7 @@ const renderSafeMarkdown = (text: string): React.ReactNode => {
 
     // Regular paragraph
     elements.push(
-      <p key={nextKey()} className="text-[12px] text-slate-700 font-medium leading-relaxed">
+      <p key={nextKey()} className="text-[12px] text-stone-700 font-medium leading-relaxed">
         {renderInline(line)}
       </p>
     );
@@ -311,20 +311,20 @@ export const PracticeRoom = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/candidate/interviews')}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-spring cursor-pointer"
+            className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-spring cursor-pointer"
           >
             <ArrowLeft size={16} />
           </button>
-          <div className="w-px h-5 bg-slate-200" />
+          <div className="w-px h-5 bg-stone-200" />
           <div className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded-xl ${cfg.bg} border border-slate-200/20 flex items-center justify-center`}>
+            <div className={`w-8 h-8 rounded-xl ${cfg.bg} border border-stone-200/20 flex items-center justify-center`}>
               <ModeIcon size={14} className={cfg.text} />
             </div>
             <div>
-              <h1 className="text-[13px] font-bold text-slate-900 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <h1 className="text-[13px] font-bold text-stone-900 leading-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
                 Practice Room
               </h1>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{cfg.label} Interview</p>
+              <p className="text-[9px] text-stone-400 font-bold uppercase tracking-wider">{cfg.label} Interview</p>
             </div>
           </div>
         </div>
@@ -332,7 +332,7 @@ export const PracticeRoom = () => {
         <div className="flex items-center gap-2">
           {/* Mode selector — only when session not started */}
           {!sessionStarted && (
-            <div className="flex bg-slate-100 border border-slate-200/50 p-0.5 rounded-xl gap-0.5">
+            <div className="flex bg-stone-100 border border-stone-200/50 p-0.5 rounded-xl gap-0.5">
               {(Object.entries(MODE_CONFIG) as [InterviewMode, typeof cfg][]).map(([key, c]) => {
                 const Icon = c.icon;
                 const isSelected = mode === key;
@@ -341,7 +341,7 @@ export const PracticeRoom = () => {
                     key={key}
                     onClick={() => setMode(key)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-spring cursor-pointer ${
-                      isSelected ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40' : 'text-slate-400 hover:text-slate-600'
+                      isSelected ? 'bg-white text-stone-900 shadow-sm border border-stone-200/40' : 'text-stone-400 hover:text-stone-600'
                     }`}
                   >
                     <Icon size={11} />
@@ -357,8 +357,8 @@ export const PracticeRoom = () => {
               onClick={() => setShowEditor(e => !e)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-spring border cursor-pointer ${
                 showEditor
-                  ? 'bg-slate-800 text-white border-slate-700 shadow-sm'
-                  : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 shadow-sm'
+                  ? 'bg-stone-800 text-white border-stone-700 shadow-sm'
+                  : 'bg-white text-stone-500 border-stone-200 hover:bg-stone-50 shadow-sm'
               }`}
             >
               <Code2 size={11} />
@@ -369,7 +369,7 @@ export const PracticeRoom = () => {
           {sessionStarted && (
             <button
               onClick={resetSession}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 transition-spring cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-stone-200 bg-white text-stone-500 hover:bg-stone-50 transition-spring cursor-pointer shadow-sm"
             >
               <RotateCcw size={11} />
               Reset Session
@@ -381,9 +381,9 @@ export const PracticeRoom = () => {
       {/* ── Main ── */}
       <div className="flex-1 flex min-h-0">
         {/* ── Chat panel ── */}
-        <div className={`flex flex-col ${showCodePanel ? 'w-[45%]' : 'w-full max-w-3xl mx-auto'} bg-white border-r border-slate-200/50`}>
+        <div className={`flex flex-col ${showCodePanel ? 'w-[45%]' : 'w-full max-w-3xl mx-auto'} bg-white border-r border-stone-200/50`}>
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scroll-smooth bg-slate-50/40">
+          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scroll-smooth bg-stone-50/40">
             {/* Welcome screen */}
             {!sessionStarted && messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center px-4 animate-fade-in">
@@ -392,10 +392,10 @@ export const PracticeRoom = () => {
                     <Sparkles size={24} className={cfg.text} />
                   </div>
                 </div>
-                <h2 className="text-base font-extrabold text-slate-900 mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+                <h2 className="text-base font-extrabold text-stone-900 mb-2" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
                   Mock {cfg.label} Interview
                 </h2>
-                <p className="text-[12px] text-slate-500 font-medium mb-8 max-w-xs leading-relaxed">
+                <p className="text-[12px] text-stone-500 font-medium mb-8 max-w-xs leading-relaxed">
                   {cfg.description}
                 </p>
 
@@ -410,8 +410,8 @@ export const PracticeRoom = () => {
                         onClick={() => { setMode(key); }}
                         className={`flex flex-col items-center gap-2 p-3.5 rounded-xl border transition-spring cursor-pointer text-center ${
                           isSelected
-                            ? 'bg-white border-violet-500 text-violet-600 shadow-md shadow-violet-100/50 scale-[1.02]'
-                            : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600'
+                            ? 'bg-white border-emerald-500 text-emerald-600 shadow-md shadow-emerald-100/50 scale-[1.02]'
+                            : 'bg-white border-stone-200 text-stone-400 hover:border-stone-300 hover:text-stone-600'
                         }`}
                       >
                         <Icon size={16} />
@@ -429,8 +429,8 @@ export const PracticeRoom = () => {
                   Begin Simulator
                 </button>
 
-                <div className="mt-8 flex gap-4 text-[10px] text-slate-400 font-bold">
-                  <span className="flex items-center gap-1"><Zap size={11} className="text-violet-400" /> AI Sandbox</span>
+                <div className="mt-8 flex gap-4 text-[10px] text-stone-400 font-bold">
+                  <span className="flex items-center gap-1"><Zap size={11} className="text-emerald-400" /> AI Sandbox</span>
                   <span className="flex items-center gap-1"><Code2 size={11} className="text-emerald-400" /> Interactive Review</span>
                 </div>
               </div>
@@ -445,25 +445,25 @@ export const PracticeRoom = () => {
                   className={`flex gap-3 ${!isModel ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
                 >
                   {isModel && (
-                    <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0 shadow-sm">
-                      <Bot size={14} className="text-violet-600" />
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 shadow-sm">
+                      <Bot size={14} className="text-emerald-600" />
                     </div>
                   )}
                   <div className={`max-w-[85%] rounded-2xl p-4 ${
                     !isModel
-                      ? 'bg-slate-900 text-white rounded-tr-none shadow-sm border border-slate-800'
-                      : 'bg-white border border-slate-200/80 text-slate-700 rounded-tl-none shadow-sm'
+                      ? 'bg-stone-900 text-white rounded-tr-none shadow-sm border border-stone-800'
+                      : 'bg-white border border-stone-200/80 text-stone-700 rounded-tl-none shadow-sm'
                   }`}>
                     {isModel
                       ? renderSafeMarkdown(msg.text)
                       : <p className="text-[12px] font-medium leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                     }
-                    <p className={`text-[9px] mt-2 font-bold uppercase tracking-wider ${!isModel ? 'text-slate-400' : 'text-slate-400'}`}>
+                    <p className={`text-[9px] mt-2 font-bold uppercase tracking-wider ${!isModel ? 'text-stone-400' : 'text-stone-400'}`}>
                       {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                   {!isModel && (
-                    <div className="w-8 h-8 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-sm border border-slate-700">
+                    <div className="w-8 h-8 rounded-xl bg-stone-800 text-white flex items-center justify-center shrink-0 shadow-sm border border-stone-700">
                       <User size={13} />
                     </div>
                   )}
@@ -474,14 +474,14 @@ export const PracticeRoom = () => {
             {/* Typing indicator */}
             {loading && (
               <div className="flex gap-3 items-start animate-fade-in">
-                <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0 shadow-sm">
-                  <Bot size={14} className="text-violet-600" />
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 shadow-sm">
+                  <Bot size={14} className="text-emerald-600" />
                 </div>
-                <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                <div className="bg-white border border-stone-200/80 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
                   <div className="flex items-center gap-1.5 py-1">
-                    <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -492,12 +492,12 @@ export const PracticeRoom = () => {
 
           {/* ── Input bar ── */}
           {sessionStarted && (
-            <div className="border-t border-slate-200/80 bg-white p-4 shrink-0">
+            <div className="border-t border-stone-200/80 bg-white p-4 shrink-0">
               <div className="flex items-end gap-2">
                 {showCodePanel && (
                   <button
                     onClick={shareCodeWithAI}
-                    className="flex items-center gap-1 px-3 py-2.5 rounded-xl text-[10px] font-bold text-violet-700 bg-violet-50 border border-violet-150 hover:bg-violet-100/70 transition-spring shrink-0 cursor-pointer shadow-sm"
+                    className="flex items-center gap-1 px-3 py-2.5 rounded-xl text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-150 hover:bg-emerald-100/70 transition-spring shrink-0 cursor-pointer shadow-sm"
                   >
                     <Sparkles size={11} />
                     Submit Code
@@ -514,7 +514,7 @@ export const PracticeRoom = () => {
                       mode === 'system_design' ? 'Describe your architectural layout...' :
                       'Discuss your logic or ask a question...'
                     }
-                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[12px] text-slate-700 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/10 focus:border-violet-400 transition-spring"
+                    className="w-full resize-none bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-[12px] text-stone-700 font-medium placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-400 transition-spring"
                     rows={1}
                     style={{ minHeight: '42px', maxHeight: '120px' }}
                     onInput={e => {
@@ -530,13 +530,13 @@ export const PracticeRoom = () => {
                   className={`p-3 rounded-xl text-white transition-spring cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-sm shrink-0 active:scale-95 ${
                     mode === 'behavioral' ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-200/50' :
                     mode === 'system_design' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-200/50' :
-                    'bg-violet-600 hover:bg-violet-700 shadow-violet-200/50'
+                    'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200/50'
                   }`}
                 >
                   {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 </button>
               </div>
-              <p className="text-[9px] text-slate-400 mt-2 px-1">
+              <p className="text-[9px] text-stone-400 mt-2 px-1">
                 Press <b>Enter</b> to send · <b>Shift+Enter</b> for newline
               </p>
             </div>
@@ -551,7 +551,7 @@ export const PracticeRoom = () => {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <select
-                    className="bg-[#252840] border border-[#3a3d5c] rounded-lg text-[11px] px-3 py-1.5 pr-7 focus:outline-none focus:ring-1 focus:ring-violet-500 appearance-none font-bold text-slate-300 cursor-pointer"
+                    className="bg-[#252840] border border-[#3a3d5c] rounded-lg text-[11px] px-3 py-1.5 pr-7 focus:outline-none focus:ring-1 focus:ring-emerald-500 appearance-none font-bold text-stone-300 cursor-pointer"
                     value={langIndex}
                     onChange={(e) => {
                       const idx = Number(e.target.value);
@@ -564,7 +564,7 @@ export const PracticeRoom = () => {
                       <option key={l.monaco} value={i}>{l.label}</option>
                     ))}
                   </select>
-                  <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                  <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none" />
                 </div>
                 <span className="text-[9px] text-[#8185af] font-black uppercase tracking-wider">Practice Sandbox</span>
               </div>
@@ -572,7 +572,7 @@ export const PracticeRoom = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={shareCodeWithAI}
-                  className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg font-bold transition-colors bg-violet-600/15 text-violet-400 border border-violet-500/20 hover:bg-violet-600/25 cursor-pointer"
+                  className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-lg font-bold transition-colors bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-600/25 cursor-pointer"
                 >
                   <Sparkles size={11} />
                   AI Feedback
@@ -580,7 +580,7 @@ export const PracticeRoom = () => {
                 <button
                   onClick={handleRunCode}
                   disabled={running}
-                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all shadow-sm shadow-emerald-900/40 cursor-pointer"
+                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:bg-stone-700 disabled:cursor-not-allowed text-white px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all shadow-sm shadow-emerald-900/40 cursor-pointer"
                 >
                   {running ? <Loader2 size={11} className="animate-spin" /> : <Play size={11} fill="white" />}
                   {running ? 'Running...' : 'Run'}
@@ -619,8 +619,8 @@ export const PracticeRoom = () => {
             <div className="h-[140px] border-t border-[#252840] bg-[#0d0f1a] shrink-0 flex flex-col">
               <div className="flex items-center justify-between px-4 py-1.5 border-b border-[#1e2035] shrink-0">
                 <div className="flex items-center gap-2">
-                  <Terminal size={11} className="text-slate-600" />
-                  <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Terminal Output</span>
+                  <Terminal size={11} className="text-stone-600" />
+                  <span className="text-[9px] text-stone-500 uppercase tracking-widest font-bold">Terminal Output</span>
                   {executionResult && (
                     executionResult.code === 0
                       ? <CheckCircle2 size={11} className="text-emerald-500" />
@@ -628,17 +628,17 @@ export const PracticeRoom = () => {
                   )}
                 </div>
                 {running && (
-                  <div className="flex items-center gap-1 text-[9px] text-slate-500">
+                  <div className="flex items-center gap-1 text-[9px] text-stone-500">
                     <Clock size={10} className="animate-spin" />
                     Executing...
                   </div>
                 )}
               </div>
               <pre className={`flex-1 overflow-auto px-4 py-3 text-[11px] font-mono whitespace-pre-wrap leading-relaxed ${
-                running ? 'text-slate-600 animate-pulse' :
+                running ? 'text-stone-600 animate-pulse' :
                 executionResult?.code === 0 ? 'text-emerald-300' :
                 executionResult ? 'text-red-400' :
-                'text-slate-500'
+                'text-stone-500'
               }`}>
                 {running
                   ? '⟳  Executing...'

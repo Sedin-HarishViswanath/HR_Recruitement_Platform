@@ -5,6 +5,42 @@ import { tfidfMatcherService } from './tfidf-matcher.service';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+export interface DetailedScreening {
+  score: number;
+  method: 'gemini' | 'tfidf' | 'keyword';
+  reason: string;
+  matched_skills: string[];
+  gaps: string[];
+}
+
+/**
+ * Pure parser for the detailed Gemini screening JSON.
+ * Tolerates ```json fences and surrounding prose; clamps score; coerces arrays.
+ * Returns null when there is no parseable object or the score is not numeric.
+ */
+export function parseGeminiScreening(
+  text: string,
+): { score: number; reason: string; matched_skills: string[]; gaps: string[] } | null {
+  const cleaned = (text || '').replace(/```json/gi, '').replace(/```/g, '').trim();
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if (start === -1 || end === -1) return null;
+  let parsed: any;
+  try {
+    parsed = JSON.parse(cleaned.slice(start, end + 1));
+  } catch {
+    return null;
+  }
+  const score = Number(parsed.score);
+  if (isNaN(score)) return null;
+  return {
+    score: Math.min(100, Math.max(0, Math.round(score))),
+    reason: typeof parsed.reason === 'string' ? parsed.reason : '',
+    matched_skills: Array.isArray(parsed.matched_skills) ? parsed.matched_skills.map(String) : [],
+    gaps: Array.isArray(parsed.gaps) ? parsed.gaps.map(String) : [],
+  };
+}
+
 export class AtsScreeningService {
   /**
    * Screen a resume against a job posting.
@@ -39,6 +75,109 @@ export class AtsScreeningService {
       // ── Gemini is PRIMARY (existing behavior) ──
       return this.cascadeGeminiFirst(candidateSkills, jobData, resumeText, keywordResult);
     }
+  }
+
+  /**
+   * Detailed screening for the autonomous agent: returns score + reasoning + gaps.
+   * Cascade: Gemini (rich) → TF-IDF → keyword. Never throws.
+   */
+  async screenResumeDetailed(
+    candidateSkills: string[],
+    jobData: any,
+    resumeText?: string,
+  ): Promise<DetailedScreening> {
+    const keyword = this.computeKeywordScore(candidateSkills, jobData);
+
+    if (env.GEMINI_API_KEY) {
+      try {
+        const g = await this.computeGeminiDetailed(candidateSkills, jobData, resumeText);
+        if (g) {
+          const blended = Math.round(g.score * 0.7 + keyword.ai_score * 0.3);
+          return {
+            score: Math.min(100, Math.max(0, blended)),
+            method: 'gemini',
+            reason: g.reason || 'AI-assessed fit.',
+            matched_skills: g.matched_skills.length ? g.matched_skills : keyword.matched_skills,
+            gaps: g.gaps,
+          };
+        }
+      } catch (err) {
+        logger.warn('Gemini detailed screening failed, falling back', { module: 'ATS', err });
+      }
+    }
+
+    try {
+      const t = tfidfMatcherService.computeTfIdfScore(candidateSkills, jobData, resumeText);
+      if (t.ai_score > 0) {
+        const required: string[] = jobData.required_skills || [];
+        const gaps = required.filter((s) => !t.matched_skills.includes(s));
+        return {
+          score: t.ai_score,
+          method: 'tfidf',
+          reason: `Statistical match on ${t.matched_skills.length}/${required.length || '—'} required skills.`,
+          matched_skills: t.matched_skills,
+          gaps,
+        };
+      }
+    } catch (err) {
+      logger.warn('TF-IDF detailed screening failed, falling back to keyword', { module: 'ATS', err });
+    }
+
+    const required: string[] = jobData.required_skills || [];
+    const gaps = required.filter((s) => !keyword.matched_skills.includes(s));
+    return {
+      score: keyword.ai_score,
+      method: 'keyword',
+      reason: `Keyword match on ${keyword.matched_skills.length}/${required.length || '—'} required skills.`,
+      matched_skills: keyword.matched_skills,
+      gaps,
+    };
+  }
+
+  private async computeGeminiDetailed(
+    candidateSkills: string[],
+    jobData: any,
+    resumeText?: string,
+  ): Promise<{ score: number; reason: string; matched_skills: string[]; gaps: string[] } | null> {
+    const requiredSkills: string[] = jobData.required_skills || [];
+    const jobDescription: string = (jobData.description || '').slice(0, 2000);
+    const skillsList = candidateSkills.slice(0, 30).join(', ') || 'Not specified';
+    const resumeSnippet = resumeText ? resumeText.slice(0, 1500) : `Skills: ${skillsList}`;
+
+    const prompt = `You are an expert ATS. Assess the candidate's fit for the job and reply ONLY with JSON.
+
+JOB TITLE: ${jobData.title || ''}
+REQUIRED SKILLS: ${requiredSkills.join(', ') || 'Not specified'}
+JOB DESCRIPTION (excerpt): ${jobDescription}
+
+CANDIDATE PROFILE:
+${resumeSnippet}
+
+Reply ONLY with valid JSON, no prose:
+{"score": <integer 0-100>, "reason": "<one concise sentence>", "matched_skills": ["<skill>"], "gaps": ["<missing required skill or concern>"]}`;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const response = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`,
+          {
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.2, maxOutputTokens: 256 },
+          },
+          { params: { key: env.GEMINI_API_KEY }, timeout: 15000 },
+        );
+        const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        return parseGeminiScreening(text);
+      } catch (err: any) {
+        if (err?.response?.status === 429 && attempt < 3) {
+          await sleep(attempt * 2000);
+          continue;
+        }
+        logger.warn('Gemini detailed error', { module: 'ATS', status: err?.response?.status });
+        return null;
+      }
+    }
+    return null;
   }
 
   /**

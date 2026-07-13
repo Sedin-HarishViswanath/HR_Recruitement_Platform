@@ -8,6 +8,7 @@ import {
 import { sendResponse } from '../../shared/utils/response';
 import { AppError } from '../../shared/errors/AppError';
 import { resumeParserService } from '../candidate/resume-parser.service';
+import { screeningAgentService } from './screening-agent.service';
 
 export class ApplicationController {
   async applyToJob(req: Request, res: Response) {
@@ -125,6 +126,39 @@ export class ApplicationController {
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
       return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async startScreen(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      const userId = req.user.userId;
+      if (!companyId) throw new AppError('Unauthorized', 401);
+      const { jobId } = req.params;
+      const result = await screeningAgentService.run({
+        jobId: jobId as string,
+        companyId,
+        userId,
+        limit: Number(req.body?.limit) || undefined,
+        force: req.body?.force === true,
+      });
+      return sendResponse(res, 202, true, 'Screening started', result);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to start screening');
+    }
+  }
+
+  async getScreenState(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      if (!companyId) throw new AppError('Unauthorized', 401);
+      const { jobId } = req.params;
+      const state = await screeningAgentService.getState(jobId as string, companyId);
+      return sendResponse(res, 200, true, 'Screening state retrieved', state);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to retrieve screening state');
     }
   }
 

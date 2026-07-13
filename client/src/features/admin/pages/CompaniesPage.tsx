@@ -97,7 +97,7 @@ export const CompaniesPage = () => {
       case 'rejected':
         return <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-100 text-[10px] font-semibold uppercase tracking-wider"><XCircle size={10} /> Rejected</div>;
       case 'revoked':
-        return <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold uppercase tracking-wider"><XCircle size={10} /> Revoked</div>;
+        return <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200 text-[10px] font-semibold uppercase tracking-wider"><XCircle size={10} /> Revoked</div>;
       default: return <Badge>{status}</Badge>;
     }
   };
@@ -113,12 +113,12 @@ export const CompaniesPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="metric-card p-4 sm:p-5 flex items-center gap-4 group cursor-default">
               <div className="metric-card-accent" />
-              <div className="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <Building2 size={18} />
               </div>
               <div>
                 <p className="section-eyebrow mb-0.5">Total Companies</p>
-                <h4 className="text-[22px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>{companies.length}</h4>
+                <h4 className="text-[22px] font-extrabold text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>{companies.length}</h4>
               </div>
             </div>
             <div className="metric-card p-4 sm:p-5 flex items-center gap-4 group cursor-default">
@@ -128,7 +128,7 @@ export const CompaniesPage = () => {
               </div>
               <div>
                 <p className="section-eyebrow mb-0.5">Pending Review</p>
-                <h4 className="text-[22px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
+                <h4 className="text-[22px] font-extrabold text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                   {companies.filter(c => c.status === 'pending').length}
                 </h4>
               </div>
@@ -140,7 +140,7 @@ export const CompaniesPage = () => {
               </div>
               <div>
                 <p className="section-eyebrow mb-0.5">Active Tenants</p>
-                <h4 className="text-[22px] font-extrabold text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>
+                <h4 className="text-[22px] font-extrabold text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                   {companies.filter(c => c.status === 'active').length}
                 </h4>
               </div>
@@ -148,19 +148,19 @@ export const CompaniesPage = () => {
           </div>
 
           {/* Filters */}
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center">
+          <div className="bg-white p-3.5 rounded-2xl border border-stone-200 shadow-sm flex flex-col md:flex-row gap-3 items-center">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={15} />
               <Input
                 placeholder="Search by company name or domain..."
-                className="h-10 pl-10 rounded-xl border-slate-100 bg-slate-50 focus:bg-white transition-all font-medium text-sm"
+                className="h-10 pl-10 rounded-xl border-stone-100 bg-stone-50 focus:bg-white transition-all font-medium text-sm"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
               <Select onValueChange={setStatusFilter} defaultValue="all">
-                <SelectTrigger className="h-10 w-[150px] rounded-xl border-slate-100 bg-slate-50 font-semibold text-slate-600 text-sm">
+                <SelectTrigger className="h-10 w-[150px] rounded-xl border-stone-100 bg-stone-50 font-semibold text-stone-600 text-sm">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -171,55 +171,55 @@ export const CompaniesPage = () => {
                   <SelectItem value="revoked">Revoked</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" className="h-10 rounded-xl border-slate-100 bg-slate-50 px-4 text-slate-600 hover:bg-slate-100 text-sm">
+              <Button variant="outline" className="h-10 rounded-xl border-stone-100 bg-stone-50 px-4 text-stone-600 hover:bg-stone-100 text-sm">
                 <Filter size={14} className="mr-2" /> Filters
               </Button>
             </div>
           </div>
 
           {/* Table */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/60 border-b border-slate-100">
-                    <th className="px-5 py-3.5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Company</th>
-                    <th className="px-4 py-3.5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Admin</th>
-                    <th className="px-4 py-3.5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Details</th>
-                    <th className="px-4 py-3.5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
-                    <th className="px-4 py-3.5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Registered</th>
-                    <th className="px-5 py-3.5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                  <tr className="bg-stone-50/60 border-b border-stone-100">
+                    <th className="px-5 py-3.5 text-[10px] font-black text-stone-500 uppercase tracking-widest">Company</th>
+                    <th className="px-4 py-3.5 text-[10px] font-black text-stone-500 uppercase tracking-widest">Admin</th>
+                    <th className="px-4 py-3.5 text-[10px] font-black text-stone-500 uppercase tracking-widest">Details</th>
+                    <th className="px-4 py-3.5 text-[10px] font-black text-stone-500 uppercase tracking-widest">Status</th>
+                    <th className="px-4 py-3.5 text-[10px] font-black text-stone-500 uppercase tracking-widest">Registered</th>
+                    <th className="px-5 py-3.5 text-[10px] font-black text-stone-500 uppercase tracking-widest text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-stone-50">
                   {loading ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <tr key={i} className="animate-pulse">
-                        <td colSpan={6} className="px-5 py-4 h-16 bg-slate-50/20" />
+                        <td colSpan={6} className="px-5 py-4 h-16 bg-stone-50/20" />
                       </tr>
                     ))
                   ) : companies.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-5 py-16 text-center">
                         <div className="flex flex-col items-center gap-2">
-                          <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300">
+                          <div className="w-12 h-12 rounded-2xl bg-stone-50 flex items-center justify-center text-stone-300">
                             <Building2 size={24} />
                           </div>
-                          <p className="text-slate-400 font-bold text-sm">No companies found</p>
+                          <p className="text-stone-400 font-bold text-sm">No companies found</p>
                         </div>
                       </td>
                     </tr>
                   ) : (
                     companies.map((company) => (
-                      <tr key={company.id} className="hover:bg-slate-50/60 transition-colors group">
+                      <tr key={company.id} className="hover:bg-stone-50/60 transition-colors group">
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-xl bg-blue-600/5 text-blue-600 flex items-center justify-center font-black text-base border border-blue-600/10 shrink-0">
                               {company.name[0]}
                             </div>
                             <div>
-                              <p className="font-bold text-slate-900 text-sm leading-none">{company.name}</p>
-                              <p className="text-[10px] text-slate-400 font-medium mt-1 flex items-center gap-1">
+                              <p className="font-bold text-stone-900 text-sm leading-none">{company.name}</p>
+                              <p className="text-[10px] text-stone-400 font-medium mt-1 flex items-center gap-1">
                                 <ExternalLink size={10} /> {company.domain}
                               </p>
                             </div>
@@ -227,24 +227,24 @@ export const CompaniesPage = () => {
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 shrink-0">
                               <Users size={12} />
                             </div>
                             <div>
-                              <p className="text-[11px] font-bold text-slate-700 leading-none">{company.admin_name || 'System Admin'}</p>
-                              <p className="text-[10px] text-slate-400 font-medium mt-0.5 truncate max-w-[140px]">{company.admin_email || `admin@${company.domain}`}</p>
+                              <p className="text-[11px] font-bold text-stone-700 leading-none">{company.admin_name || 'System Admin'}</p>
+                              <p className="text-[10px] text-stone-400 font-medium mt-0.5 truncate max-w-[140px]">{company.admin_email || `admin@${company.domain}`}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-3.5">
-                          <p className="text-[11px] font-bold text-slate-600">{company.industry || '—'}</p>
-                          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">{company.company_size ? `${company.company_size} employees` : '—'}</p>
+                          <p className="text-[11px] font-bold text-stone-600">{company.industry || '—'}</p>
+                          <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest mt-0.5">{company.company_size ? `${company.company_size} employees` : '—'}</p>
                         </td>
                         <td className="px-4 py-3.5">
                           {getStatusBadge(company.status)}
                         </td>
                         <td className="px-4 py-3.5">
-                          <div className="flex items-center gap-1.5 text-slate-500">
+                          <div className="flex items-center gap-1.5 text-stone-500">
                             <Calendar size={12} />
                             <span className="text-[11px] font-bold">{new Date(company.created_at).toLocaleDateString()}</span>
                           </div>
@@ -262,7 +262,7 @@ export const CompaniesPage = () => {
                                 <Button
                                   onClick={() => handleReject(company.id)}
                                   variant="outline"
-                                  className="h-8 px-3 rounded-lg border-slate-200 text-red-500 font-bold text-[11px] hover:bg-red-50 hover:border-red-100 active:scale-95 transition-all"
+                                  className="h-8 px-3 rounded-lg border-stone-200 text-red-500 font-bold text-[11px] hover:bg-red-50 hover:border-red-100 active:scale-95 transition-all"
                                 >
                                   Reject
                                 </Button>
@@ -292,11 +292,11 @@ export const CompaniesPage = () => {
               </table>
             </div>
 
-            <div className="bg-slate-50/40 px-5 py-3.5 border-t border-slate-100 flex items-center justify-between">
-              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">
+            <div className="bg-stone-50/40 px-5 py-3.5 border-t border-stone-100 flex items-center justify-between">
+              <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest">
                 {companies.length} organizations
               </p>
-              <Button variant="outline" className="h-7 w-7 p-0 rounded-lg border-slate-200 text-slate-400 text-xs" disabled>1</Button>
+              <Button variant="outline" className="h-7 w-7 p-0 rounded-lg border-stone-200 text-stone-400 text-xs" disabled>1</Button>
             </div>
           </div>
 

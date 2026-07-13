@@ -68,11 +68,11 @@ export const GenerateOfferModal = ({ isOpen, onClose, onSuccess, application }: 
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
               Annual Salary *
             </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
                 <DollarSign size={16} />
               </div>
               <input
@@ -80,13 +80,13 @@ export const GenerateOfferModal = ({ isOpen, onClose, onSuccess, application }: 
                 value={salary}
                 onChange={(e) => setSalary(e.target.value)}
                 placeholder="0.00"
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 <select 
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="bg-transparent border-none text-xs font-bold text-slate-500 focus:ring-0 outline-none cursor-pointer"
+                  className="bg-transparent border-none text-xs font-bold text-stone-500 focus:ring-0 outline-none cursor-pointer"
                 >
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
@@ -98,24 +98,24 @@ export const GenerateOfferModal = ({ isOpen, onClose, onSuccess, application }: 
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
               Start Date *
             </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
                 <Calendar size={16} />
               </div>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
               Additional Terms & Benefits
             </label>
             <textarea
@@ -123,7 +123,7 @@ export const GenerateOfferModal = ({ isOpen, onClose, onSuccess, application }: 
               onChange={(e) => setAdditionalTerms(e.target.value)}
               placeholder="E.g., Stock options, health insurance, sign-on bonus..."
               rows={4}
-              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm resize-none"
+              className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-sm resize-none"
             />
           </div>
         </div>
@@ -131,7 +131,7 @@ export const GenerateOfferModal = ({ isOpen, onClose, onSuccess, application }: 
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
+            className="px-4 py-2 text-sm font-bold text-stone-500 hover:bg-stone-100 rounded-xl transition-colors"
           >
             Cancel
           </button>

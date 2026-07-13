@@ -114,19 +114,19 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <MessageSquare size={20} className="text-violet-500" />
+            <MessageSquare size={20} className="text-emerald-500" />
             <span>Submit Interview Feedback</span>
           </DialogTitle>
         </DialogHeader>
 
         {/* Candidate Info */}
-        <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 mt-2">
+        <div className="flex items-center gap-3 p-3 bg-stone-50 rounded-xl border border-stone-100 mt-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
             {(interview.candidate_name || 'C')[0].toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-slate-900 truncate">{interview.candidate_name || 'Candidate'}</p>
-            <p className="text-xs text-slate-500 font-medium">
+            <p className="text-sm font-bold text-stone-900 truncate">{interview.candidate_name || 'Candidate'}</p>
+            <p className="text-xs text-stone-500 font-medium">
               {interview.job_title || 'Position'} &middot; {(interview.round_type || 'Interview').charAt(0).toUpperCase() + (interview.round_type || 'Interview').slice(1)} Round
             </p>
           </div>
@@ -135,7 +135,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
         <div className="space-y-5 pt-2">
           {/* Star Rating */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
               Overall Rating *
             </label>
             <div className="flex items-center gap-1">
@@ -152,14 +152,14 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
                     size={28}
                     className={`transition-colors duration-150 ${
                       star <= (hoveredStar || rating)
-                        ? 'fill-amber-400 text-violet-400'
-                        : 'text-slate-200 hover:text-slate-300'
+                        ? 'fill-amber-400 text-emerald-400'
+                        : 'text-stone-200 hover:text-stone-300'
                     }`}
                   />
                 </button>
               ))}
               {rating > 0 && (
-                <span className="ml-2 text-sm font-bold text-slate-600">
+                <span className="ml-2 text-sm font-bold text-stone-600">
                   {rating}/5 &ndash; {['', 'Poor', 'Below Average', 'Average', 'Good', 'Excellent'][rating]}
                 </span>
               )}
@@ -168,7 +168,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
 
           {/* Strengths */}
           <div>
-            <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
               <ThumbsUp size={13} className="text-emerald-500" />
               Strengths *
             </label>
@@ -177,14 +177,14 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
               onChange={(e) => setStrengths(e.target.value)}
               placeholder="What did the candidate do well? Technical skills, communication, problem-solving..."
               rows={3}
-              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-violet-400 transition-all resize-none placeholder:text-slate-400"
+              className="w-full px-4 py-3 text-sm border border-stone-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-emerald-400 transition-all resize-none placeholder:text-stone-400"
             />
-            <p className="text-[10px] text-slate-400 mt-1 font-medium">{strengths.length}/2000 characters (min 10)</p>
+            <p className="text-[10px] text-stone-400 mt-1 font-medium">{strengths.length}/2000 characters (min 10)</p>
           </div>
 
           {/* Weaknesses */}
           <div>
-            <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
               <ThumbsDown size={13} className="text-red-400" />
               Areas for Improvement *
             </label>
@@ -193,14 +193,14 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
               onChange={(e) => setWeaknesses(e.target.value)}
               placeholder="Where could the candidate improve? Knowledge gaps, communication issues..."
               rows={3}
-              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-violet-400 transition-all resize-none placeholder:text-slate-400"
+              className="w-full px-4 py-3 text-sm border border-stone-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-emerald-400 transition-all resize-none placeholder:text-stone-400"
             />
-            <p className="text-[10px] text-slate-400 mt-1 font-medium">{weaknesses.length}/2000 characters (min 10)</p>
+            <p className="text-[10px] text-stone-400 mt-1 font-medium">{weaknesses.length}/2000 characters (min 10)</p>
           </div>
 
           {/* Recommendation */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
               Recommendation *
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -212,7 +212,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all ${
                     recommendation === opt.value
                       ? `${opt.color} border-current shadow-sm scale-[1.02]`
-                      : 'bg-white border-slate-150 text-slate-500 hover:border-slate-300'
+                      : 'bg-white border-stone-150 text-stone-500 hover:border-stone-300'
                   }`}
                 >
                   <span className="text-base">{opt.icon}</span>
@@ -224,25 +224,25 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
 
           {/* Additional Comments */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Additional Comments <span className="text-slate-400 font-normal">(optional)</span>
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
+              Additional Comments <span className="text-stone-400 font-normal">(optional)</span>
             </label>
             <textarea
               value={additionalComments}
               onChange={(e) => setAdditionalComments(e.target.value)}
               placeholder="Any additional notes for the hiring team..."
               rows={2}
-              className="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-violet-400 transition-all resize-none placeholder:text-slate-400"
+              className="w-full px-4 py-3 text-sm border border-stone-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-emerald-400 transition-all resize-none placeholder:text-stone-400"
             />
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-2">
+        <div className="flex justify-end gap-3 pt-4 border-t border-stone-100 mt-2">
           <button
             type="button"
             onClick={handleClose}
-            className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            className="px-5 py-2.5 text-sm font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
           >
             Cancel
           </button>
@@ -250,7 +250,7 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
             type="button"
             onClick={handleSubmit}
             disabled={submitting || rating === 0 || !recommendation}
-            className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 rounded-xl shadow-sm shadow-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 rounded-xl shadow-sm shadow-emerald-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'Submitting...' : 'Submit Feedback'}
           </button>

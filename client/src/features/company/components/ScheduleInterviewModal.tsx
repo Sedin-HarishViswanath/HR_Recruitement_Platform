@@ -120,7 +120,7 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess, preselected
           <div className="flex items-center gap-2">
             {isAutomated
               ? <Cpu size={16} className="text-emerald-500" />
-              : <Video size={16} className="text-violet-500" />}
+              : <Video size={16} className="text-emerald-500" />}
             <DialogTitle>
               {isAutomated ? 'Create Automated Assessment' : 'Schedule Live Interview'}
             </DialogTitle>
@@ -242,7 +242,7 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess, preselected
               className={`font-bold rounded-xl shadow-sm transition-all text-white ${
                 isAutomated
                   ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800'
-                  : 'bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800'
+                  : 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800'
               }`}
             >
               {loading

@@ -16,15 +16,15 @@ const getInitials = (name: string) => {
 
 const avatarColors = [
   'bg-sky-500', 'bg-emerald-500', 'bg-orange-500', 'bg-pink-500',
-  'bg-purple-500', 'bg-teal-500', 'bg-red-500', 'bg-blue-500',
+  'bg-emerald-500', 'bg-teal-500', 'bg-red-500', 'bg-blue-500',
 ];
 
 
 const roundTypeColor: Record<string, string> = {
-  aptitude: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  aptitude: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   technical: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  hr: 'bg-violet-50 text-violet-700 border-violet-200',
-  final: 'bg-violet-50 text-violet-700 border-violet-200',
+  hr: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  final: 'bg-emerald-50 text-emerald-700 border-emerald-200',
 };
 
 // Removing mockCandidates
@@ -166,30 +166,30 @@ export const CompanyCandidatesPage = () => {
       {/* Search Header Bar matching Image 1 */}
       <div className="topbar-frost px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-40">
         <div>
-          <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
+          <div className="text-xs text-stone-400 font-medium flex items-center gap-1.5 mb-1">
             <span>Workspace</span>
             <span>&rsaquo;</span>
-            <span className="text-slate-600 font-semibold">Candidates</span>
+            <span className="text-stone-600 font-semibold">Candidates</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+            <h1 className="text-xl font-bold text-stone-900 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
               Candidates
             </h1>
-            <span className="text-xs text-slate-400 font-medium">{dbCandidates.length} in your talent pool</span>
+            <span className="text-xs text-stone-400 font-medium">{dbCandidates.length} in your talent pool</span>
           </div>
         </div>
 
         {/* Action Controls */}
         <div className="flex flex-1 md:flex-none items-center gap-3 max-w-xl">
           <div className="relative flex-1 min-w-[240px] md:w-[320px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={14} />
             <form onSubmit={handleSearch}>
               <input
                 type="text"
                 placeholder="Search candidates, jobs..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50/50 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500 font-medium text-slate-700 placeholder:text-slate-400 transition-all"
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-stone-200 bg-stone-50/50 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 font-medium text-stone-700 placeholder:text-stone-400 transition-all"
               />
             </form>
           </div>
@@ -199,7 +199,7 @@ export const CompanyCandidatesPage = () => {
       <div className="flex-1 flex flex-col md:grid md:grid-cols-[240px_1fr] max-w-[1600px] w-full mx-auto">
         
         {/* Left Filters Sidebar */}
-        <aside className="border-r border-slate-100/80 bg-white p-5 space-y-6 md:sticky md:top-[73px] md:h-[calc(100vh-73px)] overflow-y-auto hidden md:block">
+        <aside className="border-r border-stone-100/80 bg-white p-5 space-y-6 md:sticky md:top-[73px] md:h-[calc(100vh-73px)] overflow-y-auto hidden md:block">
 
           {/* Saved Searches */}
           <div className="space-y-2">
@@ -224,13 +224,13 @@ export const CompanyCandidatesPage = () => {
                   onClick={() => setActiveSavedSearch(item.name)}
                   className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     activeSavedSearch === item.name
-                      ? 'bg-violet-50/70 text-violet-600'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      ? 'bg-emerald-50/70 text-emerald-600'
+                      : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
                   }`}
                 >
                   <span className="truncate">{item.name}</span>
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
-                    activeSavedSearch === item.name ? 'bg-violet-100 text-violet-600' : 'bg-slate-50 text-slate-400'
+                    activeSavedSearch === item.name ? 'bg-emerald-100 text-emerald-600' : 'bg-stone-50 text-stone-400'
                   }`}>
                     {item.count}
                   </span>
@@ -239,13 +239,13 @@ export const CompanyCandidatesPage = () => {
             </div>
           </div>
 
-          <hr className="border-slate-100" />
+          <hr className="border-stone-100" />
 
           {/* Department Filters */}
           <div className="space-y-3">
             <h3 className="section-eyebrow">Filters</h3>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-500">Department</label>
+              <label className="text-[11px] font-bold text-stone-500">Department</label>
               <div className="space-y-2">
                 {[
                   { name: 'Engineering', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Engineering')).length },
@@ -254,17 +254,17 @@ export const CompanyCandidatesPage = () => {
                   { name: 'Data', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Data')).length },
                   { name: 'Sales', count: dbCandidates.filter(c => (c.departments || '').split(',').map((d: any) => d.trim()).includes('Sales')).length },
                 ].map((dept) => (
-                  <label key={dept.name} className="flex items-center justify-between text-xs text-slate-600 hover:text-slate-950 font-semibold cursor-pointer">
+                  <label key={dept.name} className="flex items-center justify-between text-xs text-stone-600 hover:text-stone-950 font-semibold cursor-pointer">
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         checked={selectedDepts.includes(dept.name)}
                         onChange={() => toggleDept(dept.name)}
-                        className="rounded border-slate-300 text-violet-600 focus:ring-violet-500/20 w-3.5 h-3.5"
+                        className="rounded border-stone-300 text-emerald-600 focus:ring-emerald-500/20 w-3.5 h-3.5"
                       />
                       <span>{dept.name}</span>
                     </div>
-                    <span className="text-[10px] text-slate-400">{dept.count}</span>
+                    <span className="text-[10px] text-stone-400">{dept.count}</span>
                   </label>
                 ))}
               </div>
@@ -274,8 +274,8 @@ export const CompanyCandidatesPage = () => {
           {/* AI Score Slider */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-[11px] font-bold text-slate-500">AI score</label>
-              <span className="text-[11px] font-black text-slate-800">{aiScoreRange}&ndash;100</span>
+              <label className="text-[11px] font-bold text-stone-500">AI score</label>
+              <span className="text-[11px] font-black text-stone-800">{aiScoreRange}&ndash;100</span>
             </div>
             <div className="relative pt-1">
               <input
@@ -284,9 +284,9 @@ export const CompanyCandidatesPage = () => {
                 max="100"
                 value={aiScoreRange}
                 onChange={(e) => setAiScoreRange(Number(e.target.value))}
-                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-violet-600"
+                className="w-full h-1.5 bg-stone-100 rounded-lg appearance-none cursor-pointer accent-emerald-600"
               />
-              <div className="flex justify-between text-[9px] text-slate-400 font-bold mt-1">
+              <div className="flex justify-between text-[9px] text-stone-400 font-bold mt-1">
                 <span>0</span>
                 <span>50</span>
                 <span>100</span>
@@ -296,7 +296,7 @@ export const CompanyCandidatesPage = () => {
 
           {/* Location Filters */}
           <div className="space-y-2.5">
-            <label className="text-[11px] font-bold text-slate-500">Location</label>
+            <label className="text-[11px] font-bold text-stone-500">Location</label>
             <div className="flex flex-wrap gap-1.5">
               {['Remote', 'NYC', 'SF', 'London', 'Berlin'].map((loc) => {
                 const isSelected = selectedLocations.includes(loc);
@@ -306,8 +306,8 @@ export const CompanyCandidatesPage = () => {
                     onClick={() => toggleLocation(loc)}
                     className={`text-[10px] font-bold px-2.5 py-1 rounded-md border flex items-center gap-1 transition-all ${
                       isSelected
-                        ? 'bg-violet-50 border-violet-200 text-violet-600'
-                        : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                        : 'bg-white border-stone-200 text-stone-500 hover:border-stone-300 hover:text-stone-700'
                     }`}
                   >
                     <span>{loc}</span>
@@ -321,11 +321,11 @@ export const CompanyCandidatesPage = () => {
 
         {/* Right main candidates panel */}
         <main className="p-5 space-y-4">
-          <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold mb-1">
+          <div className="flex items-center justify-between text-[11px] text-stone-400 font-semibold mb-1">
             <span><strong>{filteredCandidates.length}</strong> matching candidates</span>
             <div className="flex items-center gap-1">
               <span>Sort:</span>
-              <select className="bg-transparent border-none outline-none font-bold text-slate-700 text-[11px] cursor-pointer">
+              <select className="bg-transparent border-none outline-none font-bold text-stone-700 text-[11px] cursor-pointer">
                 <option value="ai-score">AI score</option>
                 <option value="completeness">Completeness</option>
                 <option value="newest">Newest</option>
@@ -337,12 +337,12 @@ export const CompanyCandidatesPage = () => {
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-28 rounded-xl bg-white border border-slate-100 animate-pulse" />
+                <div key={i} className="h-28 rounded-xl bg-white border border-stone-100 animate-pulse" />
               ))}
             </div>
           ) : filteredCandidates.length === 0 ? (
             <div className="py-16 text-center card-premium">
-              <p className="text-[13px] text-slate-400 font-medium">No candidates match the criteria.</p>
+              <p className="text-[13px] text-stone-400 font-medium">No candidates match the criteria.</p>
             </div>
           ) : (
             <div className="space-y-3 animate-stagger">
@@ -355,7 +355,7 @@ export const CompanyCandidatesPage = () => {
                   <div
                     key={candidate.id}
                     onClick={() => setSelectedCandidate(candidate)}
-                    className="bg-white border border-slate-200/80 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer transition-all hover:border-slate-300 hover:shadow-sm group relative"
+                    className="bg-white border border-stone-200/80 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer transition-all hover:border-stone-300 hover:shadow-sm group relative"
                   >
                     {/* Left Info Column */}
                     <div className="flex items-start gap-3.5 min-w-0 flex-1">
@@ -368,20 +368,20 @@ export const CompanyCandidatesPage = () => {
                       {/* Details Info */}
                       <div className="min-w-0 space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-bold text-[14px] text-slate-900 leading-tight group-hover:text-violet-600 transition-colors">
+                          <h4 className="font-bold text-[14px] text-stone-900 leading-tight group-hover:text-emerald-600 transition-colors">
                             {candidate.name}
                           </h4>
                           {candidate.star && (
                             <Star size={13} className="fill-amber-400 text-amber-400 shrink-0" />
                           )}
                           {matchingJobs > 0 && (
-                            <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-violet-500/10 text-violet-700 border border-violet-500/20 shrink-0 uppercase tracking-wide">
+                            <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 shrink-0 uppercase tracking-wide">
                               {matchingJobs} matching jobs
                             </span>
                           )}
                         </div>
                         
-                        <p className="text-[11.5px] text-slate-500 font-medium leading-none">
+                        <p className="text-[11.5px] text-stone-500 font-medium leading-none">
                           {candidate.location?.includes('·') ? candidate.location : `${candidate.location || 'Remote'} · Remote`} &middot; {candidate.experience_years || 5}y
                         </p>
 
@@ -391,7 +391,7 @@ export const CompanyCandidatesPage = () => {
                             {candidate.skills.map((skill: string) => (
                               <span
                                 key={skill}
-                                className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-slate-500/10 text-slate-650 border border-slate-500/20"
+                                className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-stone-500/10 text-stone-650 border border-stone-500/20"
                               >
                                 {skill}
                               </span>
@@ -408,34 +408,34 @@ export const CompanyCandidatesPage = () => {
                       <div className="flex flex-col items-center">
                         <div className="relative w-11 h-11">
                           <svg className="w-full h-full transform -rotate-90">
-                            <circle className="text-slate-100" strokeWidth="3" stroke="currentColor" fill="transparent" r="18" cx="22" cy="22" />
-                            <circle className="text-violet-600" strokeWidth="3" strokeDasharray={113} strokeDashoffset={113 - (113 * candidate.ai_score) / 100} strokeLinecap="round" stroke="currentColor" fill="transparent" r="18" cx="22" cy="22" />
+                            <circle className="text-stone-100" strokeWidth="3" stroke="currentColor" fill="transparent" r="18" cx="22" cy="22" />
+                            <circle className="text-emerald-600" strokeWidth="3" strokeDasharray={113} strokeDashoffset={113 - (113 * candidate.ai_score) / 100} strokeLinecap="round" stroke="currentColor" fill="transparent" r="18" cx="22" cy="22" />
                           </svg>
-                          <span className="absolute inset-0 flex items-center justify-center font-black text-slate-800 text-[11px]">
+                          <span className="absolute inset-0 flex items-center justify-center font-black text-stone-800 text-[11px]">
                             {candidate.ai_score}
                           </span>
                         </div>
-                        <span className="text-[8px] font-semibold uppercase text-slate-400 mt-1 tracking-wider">AI FIT</span>
+                        <span className="text-[8px] font-semibold uppercase text-stone-400 mt-1 tracking-wider">AI FIT</span>
                       </div>
 
                       {/* Source */}
                       <div className="text-right leading-none min-w-[70px]">
-                        <p className="text-[11px] font-bold text-slate-800">{candidate.source || 'LinkedIn'}</p>
-                        <p className="text-[8px] font-bold uppercase text-slate-400 mt-1 tracking-wider">source</p>
+                        <p className="text-[11px] font-bold text-stone-800">{candidate.source || 'LinkedIn'}</p>
+                        <p className="text-[8px] font-bold uppercase text-stone-400 mt-1 tracking-wider">source</p>
                       </div>
 
                       {/* Interaction icons */}
                       <div className="flex items-center gap-1">
-                        <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                        <button className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-50 rounded-lg transition-colors">
                           <MessageSquare size={14} />
                         </button>
-                        <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                        <button className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-50 rounded-lg transition-colors">
                           <Bookmark size={14} />
                         </button>
                       </div>
 
                       {/* View button */}
-                      <button className="text-[11px] font-bold border border-slate-200 rounded-lg px-3 py-2 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm shrink-0">
+                      <button className="text-[11px] font-bold border border-stone-200 rounded-lg px-3 py-2 text-stone-700 bg-white hover:bg-stone-50 transition-colors shadow-sm shrink-0">
                         View &rarr;
                       </button>
                     </div>
@@ -451,19 +451,19 @@ export const CompanyCandidatesPage = () => {
 
       {/* Selected Candidate Drawer Modal */}
       {selectedCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedCandidate(null)}>
-          <div className="w-full max-w-2xl max-h-[90vh] rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col animate-scale-in" onClick={(event) => event.stopPropagation()}>
-            <div className="flex items-start justify-between border-b border-slate-100 p-5 shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/45 p-4 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedCandidate(null)}>
+          <div className="w-full max-w-2xl max-h-[90vh] rounded-2xl border border-stone-200 bg-white shadow-2xl flex flex-col animate-scale-in" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-start justify-between border-b border-stone-100 p-5 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-12 h-12 rounded-xl bg-violet-600 flex items-center justify-center text-white font-extrabold text-[13px] shrink-0 shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-extrabold text-[13px] shrink-0 shadow-md">
                   {getInitials(selectedCandidate.name)}
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-lg font-black text-slate-900 truncate" style={{ fontFamily: 'Sora' }}>{selectedCandidate.name}</h2>
-                  <p className="text-[12px] text-slate-500 font-medium truncate">{selectedCandidate.bio || 'Candidate profile'}</p>
+                  <h2 className="text-lg font-black text-stone-900 truncate" style={{ fontFamily: 'Plus Jakarta Sans' }}>{selectedCandidate.name}</h2>
+                  <p className="text-[12px] text-stone-500 font-medium truncate">{selectedCandidate.bio || 'Candidate profile'}</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedCandidate(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+              <button onClick={() => setSelectedCandidate(null)} className="rounded-lg p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700">
                 <X size={18} />
               </button>
             </div>
@@ -471,31 +471,31 @@ export const CompanyCandidatesPage = () => {
             <div className="flex-1 overflow-y-auto">
               <div className="grid gap-4 p-5 md:grid-cols-[1fr_220px]">
                 <div className="space-y-4">
-                  <div className="grid gap-2 text-[13px] font-semibold text-slate-600">
-                    <a href={`mailto:${selectedCandidate.email}`} className="flex items-center gap-2 text-violet-600 hover:underline">
+                  <div className="grid gap-2 text-[13px] font-semibold text-stone-600">
+                    <a href={`mailto:${selectedCandidate.email}`} className="flex items-center gap-2 text-emerald-600 hover:underline">
                       <Mail size={14} /> {selectedCandidate.email}
                     </a>
                     {selectedCandidate.phone && (
                       <span className="flex items-center gap-2">
-                        <Phone size={14} className="text-slate-400" /> {selectedCandidate.phone}
+                        <Phone size={14} className="text-stone-400" /> {selectedCandidate.phone}
                       </span>
                     )}
                     {selectedCandidate.location && (
                       <span className="flex items-center gap-2">
-                        <MapPin size={14} className="text-slate-400" /> {selectedCandidate.location}
+                        <MapPin size={14} className="text-stone-400" /> {selectedCandidate.location}
                       </span>
                     )}
                     <span className="flex items-center gap-2">
-                      <BriefcaseBusiness size={14} className="text-slate-400" /> {selectedCandidate.applied_jobs_count || 0} application(s)
+                      <BriefcaseBusiness size={14} className="text-stone-400" /> {selectedCandidate.applied_jobs_count || 0} application(s)
                     </span>
                   </div>
 
                   {selectedCandidate.skills?.length > 0 && (
                     <div>
-                      <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Skills</p>
+                      <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-stone-400">Skills</p>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedCandidate.skills.map((skill: string) => (
-                          <span key={skill} className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                          <span key={skill} className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-stone-100 text-stone-700 border border-stone-200">
                             {skill}
                           </span>
                         ))}
@@ -504,17 +504,17 @@ export const CompanyCandidatesPage = () => {
                   )}
                 </div>
 
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Profile</p>
-                  <p className="mt-2 text-3xl font-black text-slate-900" style={{ fontFamily: 'Sora' }}>{selectedCandidate.ai_score || 80}%</p>
-                  <p className="mt-1 text-[12px] font-medium text-slate-500">AI Score Match</p>
+                <div className="rounded-xl border border-stone-100 bg-stone-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Profile</p>
+                  <p className="mt-2 text-3xl font-black text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>{selectedCandidate.ai_score || 80}%</p>
+                  <p className="mt-1 text-[12px] font-medium text-stone-500">AI Score Match</p>
                   <div className="mt-4 space-y-2">
                     {selectedCandidate.resume_url && (
-                      <a href={selectedCandidate.resume_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-violet-300 hover:text-violet-600 transition-colors">
+                      <a href={selectedCandidate.resume_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-stone-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-stone-700 hover:border-emerald-300 hover:text-emerald-600 transition-colors">
                         View Resume
                       </a>
                     )}
-                    <a href={selectedCandidate.linkedin_url || `https://linkedin.com/in/${selectedCandidate.name.toLowerCase().replace(' ', '')}`} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-slate-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-slate-700 hover:border-blue-300 hover:text-blue-600 transition-colors">
+                    <a href={selectedCandidate.linkedin_url || `https://linkedin.com/in/${selectedCandidate.name.toLowerCase().replace(' ', '')}`} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-stone-200 bg-white px-3 py-2 text-center text-[12px] font-bold text-stone-700 hover:border-blue-300 hover:text-blue-600 transition-colors">
                       LinkedIn
                     </a>
                   </div>
@@ -523,20 +523,20 @@ export const CompanyCandidatesPage = () => {
 
               {/* Interview Transcripts Section */}
               <div className="px-5 pb-5">
-                <div className="border-t border-slate-100 pt-4">
+                <div className="border-t border-stone-100 pt-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <FileText size={14} className="text-violet-500" />
-                    <p className="text-[12px] font-bold uppercase tracking-wider text-slate-700">Interview Rounds & Transcripts</p>
+                    <FileText size={14} className="text-emerald-500" />
+                    <p className="text-[12px] font-bold uppercase tracking-wider text-stone-700">Interview Rounds & Transcripts</p>
                   </div>
 
                   {loadingInterviews ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 size={20} className="text-violet-400 animate-spin mr-2" />
-                      <span className="text-[12px] text-slate-400 font-medium">Loading interviews...</span>
+                      <Loader2 size={20} className="text-emerald-400 animate-spin mr-2" />
+                      <span className="text-[12px] text-stone-400 font-medium">Loading interviews...</span>
                     </div>
                   ) : candidateInterviews.length === 0 ? (
-                    <div className="py-6 text-center rounded-xl border border-slate-100 bg-slate-50/50">
-                      <p className="text-[12px] text-slate-400 font-medium">No transcripts scheduled for this candidate yet.</p>
+                    <div className="py-6 text-center rounded-xl border border-stone-100 bg-stone-50/50">
+                      <p className="text-[12px] text-stone-400 font-medium">No transcripts scheduled for this candidate yet.</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -544,12 +544,12 @@ export const CompanyCandidatesPage = () => {
                         const dateStr = iv.scheduled_at
                           ? new Date(iv.scheduled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                           : '';
-                        const typeStyle = roundTypeColor[iv.round_type?.toLowerCase()] || 'bg-slate-100 text-slate-600';
+                        const typeStyle = roundTypeColor[iv.round_type?.toLowerCase()] || 'bg-stone-100 text-stone-600';
                         const isCompleted = iv.status === 'completed';
                         return (
                           <div
                             key={iv.id}
-                            className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-white hover:border-violet-200 transition-colors"
+                            className="flex items-center gap-3 p-3 rounded-xl border border-stone-100 bg-white hover:border-emerald-200 transition-colors"
                           >
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
@@ -557,23 +557,23 @@ export const CompanyCandidatesPage = () => {
                                   {iv.round_type || 'Interview'}
                                 </span>
                                 {iv.round_number && (
-                                  <span className="text-[10px] text-slate-400 font-medium">Round {iv.round_number}</span>
+                                  <span className="text-[10px] text-stone-400 font-medium">Round {iv.round_number}</span>
                                 )}
                                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                  isCompleted ? 'bg-emerald-50 text-emerald-700' : 'bg-violet-50 text-violet-600'
+                                  isCompleted ? 'bg-emerald-50 text-emerald-700' : 'bg-emerald-50 text-emerald-600'
                                 }`}>
                                   {isCompleted ? 'Completed' : iv.status}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
+                              <div className="flex items-center gap-3 text-[11px] text-stone-500 font-medium">
                                 {dateStr && (
                                   <span className="flex items-center gap-1">
-                                    <Calendar size={10} className="text-slate-400" /> {dateStr}
+                                    <Calendar size={10} className="text-stone-400" /> {dateStr}
                                   </span>
                                 )}
                                 {iv.interviewer_name && <span>&middot; {iv.interviewer_name}</span>}
                                 {iv.aptitude_score != null && (
-                                  <span className="text-indigo-600 font-bold">Score: {iv.aptitude_score}/20</span>
+                                  <span className="text-emerald-600 font-bold">Score: {iv.aptitude_score}/20</span>
                                 )}
                               </div>
                             </div>
@@ -590,8 +590,8 @@ export const CompanyCandidatesPage = () => {
                               })}
                               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-bold transition-all shrink-0 ${
                                 iv.has_transcript || iv.recording_url
-                                  ? 'bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100'
-                                  : 'bg-slate-50 text-slate-400 border border-slate-200'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                  : 'bg-stone-50 text-stone-400 border border-stone-200'
                               }`}
                             >
                               <FileText size={12} />

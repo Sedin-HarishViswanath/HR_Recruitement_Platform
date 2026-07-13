@@ -14,7 +14,7 @@ const REC_COLOR: Record<string, string> = {
 };
 
 const AVATAR_GRADIENTS = [
-  'from-violet-500 to-purple-600',
+  'from-emerald-500 to-emerald-600',
   'from-blue-500 to-cyan-500',
   'from-emerald-500 to-teal-600',
 ];
@@ -42,15 +42,15 @@ export const CandidateCompareModal = ({
         {/* Header */}
         <div className="topbar-frost px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-violet-50 rounded-xl flex items-center justify-center border border-violet-100">
-              <Users size={15} className="text-violet-600" />
+            <div className="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+              <Users size={15} className="text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-[14px] font-bold text-slate-900" style={{ fontFamily: 'Sora' }}>Candidate Comparison</h2>
-              <p className="text-[10px] text-slate-400 font-medium">{candidates.length} candidates side-by-side</p>
+              <h2 className="text-[14px] font-bold text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>Candidate Comparison</h2>
+              <p className="text-[10px] text-stone-400 font-medium">{candidates.length} candidates side-by-side</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer text-slate-400 hover:text-slate-700">
+          <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-lg transition-colors cursor-pointer text-stone-400 hover:text-stone-700">
             <X size={16} />
           </button>
         </div>
@@ -66,38 +66,38 @@ export const CandidateCompareModal = ({
                   {getInitials(c.candidate_name || c.user_name)}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 leading-tight">{c.candidate_name || c.user_name || 'Unknown'}</p>
-                  <p className="text-[10px] text-slate-400 font-medium truncate max-w-[130px] mx-auto">{c.job_title || '—'}</p>
+                  <p className="text-sm font-bold text-stone-900 leading-tight">{c.candidate_name || c.user_name || 'Unknown'}</p>
+                  <p className="text-[10px] text-stone-400 font-medium truncate max-w-[130px] mx-auto">{c.job_title || '—'}</p>
                 </div>
               </div>
             ))}
 
             {/* ── AI Match Score ── */}
-            <div className="flex items-center text-[11px] font-bold text-slate-500 py-3 border-t border-slate-100">
-              <span className="flex items-center gap-1"><Sparkles size={11} className="text-violet-500" /> AI Fit Score</span>
+            <div className="flex items-center text-[11px] font-bold text-stone-500 py-3 border-t border-stone-100">
+              <span className="flex items-center gap-1"><Sparkles size={11} className="text-emerald-500" /> AI Fit Score</span>
             </div>
             {candidates.map((c) => (
-              <div key={c.id} className="flex items-center justify-center py-3 border-t border-slate-100">
+              <div key={c.id} className="flex items-center justify-center py-3 border-t border-stone-100">
                 {c.ai_score != null ? (
                   <div className="text-center">
-                    <div className="text-2xl font-black text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>{c.ai_score}%</div>
-                    <div className="w-full h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+                    <div className="text-2xl font-black text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>{c.ai_score}%</div>
+                    <div className="w-full h-1.5 bg-stone-100 rounded-full mt-1.5 overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${c.ai_score >= 75 ? 'bg-emerald-500' : c.ai_score >= 55 ? 'bg-violet-500' : 'bg-amber-500'}`}
+                        className={`h-full rounded-full ${c.ai_score >= 75 ? 'bg-emerald-500' : c.ai_score >= 55 ? 'bg-emerald-500' : 'bg-amber-500'}`}
                         style={{ width: `${c.ai_score}%`, transition: 'width 0.7s ease' }}
                       />
                     </div>
                   </div>
                 ) : (
-                  <span className="text-[11px] text-slate-400 font-medium">—</span>
+                  <span className="text-[11px] text-stone-400 font-medium">—</span>
                 )}
               </div>
             ))}
 
             {/* ── Status ── */}
-            <div className="flex items-center text-[11px] font-bold text-slate-500 py-3 border-t border-slate-100">Status</div>
+            <div className="flex items-center text-[11px] font-bold text-stone-500 py-3 border-t border-stone-100">Status</div>
             {candidates.map((c) => (
-              <div key={c.id} className="flex items-center justify-center py-3 border-t border-slate-100">
+              <div key={c.id} className="flex items-center justify-center py-3 border-t border-stone-100">
                 <span className="text-[9.5px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                   {(c.status || 'applied').replace(/_/g, ' ')}
                 </span>
@@ -105,19 +105,19 @@ export const CandidateCompareModal = ({
             ))}
 
             {/* ── Application Date ── */}
-            <div className="flex items-center text-[11px] font-bold text-slate-500 py-3 border-t border-slate-100">Applied</div>
+            <div className="flex items-center text-[11px] font-bold text-stone-500 py-3 border-t border-stone-100">Applied</div>
             {candidates.map((c) => (
-              <div key={c.id} className="flex items-center justify-center py-3 border-t border-slate-100">
-                <span className="text-[11px] text-slate-600 font-semibold">
+              <div key={c.id} className="flex items-center justify-center py-3 border-t border-stone-100">
+                <span className="text-[11px] text-stone-600 font-semibold">
                   {c.created_at ? new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
                 </span>
               </div>
             ))}
 
             {/* ── Matched skills ── */}
-            <div className="flex items-start text-[11px] font-bold text-slate-500 py-3 border-t border-slate-100 mt-1">Matched Skills</div>
+            <div className="flex items-start text-[11px] font-bold text-stone-500 py-3 border-t border-stone-100 mt-1">Matched Skills</div>
             {candidates.map((c) => (
-              <div key={c.id} className="py-3 border-t border-slate-100">
+              <div key={c.id} className="py-3 border-t border-stone-100">
                 {c.matched_skills?.length > 0 ? (
                   <div className="flex flex-wrap gap-1 justify-center">
                     {(c.matched_skills as string[]).slice(0, 5).map((s: string) => (
@@ -126,46 +126,46 @@ export const CandidateCompareModal = ({
                       </span>
                     ))}
                     {c.matched_skills.length > 5 && (
-                      <span className="text-[9px] text-slate-400 font-medium">+{c.matched_skills.length - 5} more</span>
+                      <span className="text-[9px] text-stone-400 font-medium">+{c.matched_skills.length - 5} more</span>
                     )}
                   </div>
                 ) : (
-                  <p className="text-[10px] text-slate-400 text-center">—</p>
+                  <p className="text-[10px] text-stone-400 text-center">—</p>
                 )}
               </div>
             ))}
 
             {/* ── Latest feedback recommendation ── */}
-            <div className="flex items-center text-[11px] font-bold text-slate-500 py-3 border-t border-slate-100">Recommendation</div>
+            <div className="flex items-center text-[11px] font-bold text-stone-500 py-3 border-t border-stone-100">Recommendation</div>
             {candidates.map((c) => (
-              <div key={c.id} className="flex items-center justify-center py-3 border-t border-slate-100">
+              <div key={c.id} className="flex items-center justify-center py-3 border-t border-stone-100">
                 {c.latest_recommendation ? (
-                  <span className={`text-[9px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_COLOR[c.latest_recommendation] || 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+                  <span className={`text-[9px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border ${REC_COLOR[c.latest_recommendation] || 'bg-stone-50 text-stone-600 border-stone-200'}`}>
                     {REC_LABEL[c.latest_recommendation] || c.latest_recommendation}
                   </span>
                 ) : (
-                  <span className="text-[10px] text-slate-400 font-medium">Pending</span>
+                  <span className="text-[10px] text-stone-400 font-medium">Pending</span>
                 )}
               </div>
             ))}
 
             {/* ── Interview rounds completed ── */}
-            <div className="flex items-center text-[11px] font-bold text-slate-500 py-3 border-t border-slate-100">Rounds Done</div>
+            <div className="flex items-center text-[11px] font-bold text-stone-500 py-3 border-t border-stone-100">Rounds Done</div>
             {candidates.map((c) => (
-              <div key={c.id} className="flex items-center justify-center py-3 border-t border-slate-100">
-                <span className="text-[13px] font-extrabold text-slate-800" style={{ fontFamily: 'Sora' }}>
+              <div key={c.id} className="flex items-center justify-center py-3 border-t border-stone-100">
+                <span className="text-[13px] font-extrabold text-stone-800" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                   {c.latest_interview_round || 0}
-                  <span className="text-[10px] text-slate-400 font-medium"> / {c.interview_rounds || 1}</span>
+                  <span className="text-[10px] text-stone-400 font-medium"> / {c.interview_rounds || 1}</span>
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-100 bg-white shrink-0 flex justify-end">
+        <div className="px-6 py-4 border-t border-stone-100 bg-white shrink-0 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+            className="px-5 py-2 text-sm font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors cursor-pointer"
           >
             Close
           </button>

@@ -170,27 +170,27 @@ export const OnboardingWizard = () => {
 
   if (loading) return (
     <div className="flex justify-center items-center h-screen">
-      <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm border p-8">
 
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
               Step {step} of 2
             </span>
-            <span className="text-sm font-medium text-violet-600">
+            <span className="text-sm font-medium text-emerald-600">
               {step === 1 ? 'Company Profile' : 'Location & Contact'}
             </span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full">
+          <div className="h-2 bg-stone-100 rounded-full">
             <div
-              className="h-full bg-violet-600 rounded-full transition-all duration-300"
+              className="h-full bg-emerald-600 rounded-full transition-all duration-300"
               style={{ width: `${(step / 2) * 100}%` }}
             />
           </div>
@@ -259,7 +259,7 @@ export const OnboardingWizard = () => {
                 <Textarea {...register('bio')} placeholder="Tell us about your company..." className="h-28 resize-none" />
               </div>
 
-              <Button type="button" onClick={onNext} className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold">
+              <Button type="button" onClick={onNext} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
                 Save & Continue
               </Button>
             </div>
@@ -326,7 +326,7 @@ export const OnboardingWizard = () => {
                 <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1">
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold">
+                <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
                   Complete Setup
                 </Button>
               </div>

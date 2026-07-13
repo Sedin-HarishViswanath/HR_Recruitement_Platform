@@ -166,16 +166,16 @@ export const CandidateOnboardingWizard = () => {
     set4('skills', newSkills);
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen bg-slate-50">Loading...</div>;
+  if (loading) return <div className="flex justify-center items-center h-screen bg-stone-50">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm border p-8">
         
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Step {step} of 4</span>
+            <span className="text-sm font-semibold text-stone-500 uppercase tracking-wider">Step {step} of 4</span>
             <span className="text-sm font-medium text-blue-600">
               {step === 1 && 'Personal Info'}
               {step === 2 && 'Resume & Summary'}
@@ -183,7 +183,7 @@ export const CandidateOnboardingWizard = () => {
               {step === 4 && 'Preferences & Skills'}
             </span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full">
+          <div className="h-2 bg-stone-100 rounded-full">
             <div className="h-full bg-blue-600 rounded-full transition-all duration-300" style={{ width: `${(step / 4) * 100}%` }} />
           </div>
         </div>
@@ -225,7 +225,7 @@ export const CandidateOnboardingWizard = () => {
           <form onSubmit={handle2(onStep2Submit)} className="space-y-6 animate-in fade-in duration-500">
             <div className="space-y-4">
               <Label>Resume Upload</Label>
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center bg-slate-50">
+              <div className="border-2 border-dashed border-stone-300 rounded-xl p-8 text-center bg-stone-50">
                 <Input 
                   type="file" 
                   accept=".pdf" 
@@ -238,12 +238,12 @@ export const CandidateOnboardingWizard = () => {
                     <svg className="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                   </div>
                   <span className="text-blue-600 font-medium hover:underline">Click to upload PDF</span>
-                  <p className="text-xs text-slate-500 mt-1">Max 5MB</p>
+                  <p className="text-xs text-stone-500 mt-1">Max 5MB</p>
                 </Label>
-                {resumeFile && <p className="mt-3 text-sm font-medium text-slate-700">Selected: {resumeFile.name}</p>}
+                {resumeFile && <p className="mt-3 text-sm font-medium text-stone-700">Selected: {resumeFile.name}</p>}
               </div>
               
-              <div className="text-center text-sm text-slate-500 my-2">OR</div>
+              <div className="text-center text-sm text-stone-500 my-2">OR</div>
               
               <div className="space-y-2">
                 <Label>Resume Drive Link</Label>

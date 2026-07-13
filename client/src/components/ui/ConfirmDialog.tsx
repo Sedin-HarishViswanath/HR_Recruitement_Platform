@@ -66,10 +66,10 @@ export const ConfirmDialog = ({
           </div>
 
           {/* Text */}
-          <h3 className="text-[15px] font-bold text-slate-900 mb-1.5 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+          <h3 className="text-[15px] font-bold text-stone-900 mb-1.5 leading-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
             {title}
           </h3>
-          <p className="text-[13px] text-slate-500 font-medium leading-relaxed">
+          <p className="text-[13px] text-stone-500 font-medium leading-relaxed">
             {description}
           </p>
         </div>
@@ -79,7 +79,7 @@ export const ConfirmDialog = ({
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 text-sm font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
           >
             {cancelLabel}
           </button>

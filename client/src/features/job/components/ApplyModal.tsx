@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -85,7 +85,7 @@ export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalPr
       }
     }}>
       <DialogTrigger asChild>
-        {trigger || <Button className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium w-full">Apply Now</Button>}
+        {trigger || <Button className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium w-full">Apply Now</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
@@ -127,14 +127,14 @@ export const ApplyModal = ({ jobId, jobTitle, onSuccess, trigger }: ApplyModalPr
               }}
               className="cursor-pointer"
             />
-            <p className="text-xs text-slate-400">Each application requires a target PDF resume.</p>
+            <p className="text-xs text-stone-400">Each application requires a target PDF resume.</p>
           </div>
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium">
+            <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold rounded-xl shadow-sm transition-all btn-premium">
               {isSubmitting ? 'Submitting...' : 'Confirm & Submit Application'}
             </Button>
           </div>

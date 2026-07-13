@@ -39,7 +39,7 @@ const REC_CONFIG = {
 const RatingDots = ({ value, max = 5 }: { value: number; max?: number }) => (
   <div className="flex gap-1">
     {Array.from({ length: max }).map((_, i) => (
-      <div key={i} className={`w-2 h-2 rounded-full transition-all ${i < value ? 'bg-violet-600' : 'bg-slate-200'}`} />
+      <div key={i} className={`w-2 h-2 rounded-full transition-all ${i < value ? 'bg-emerald-600' : 'bg-stone-200'}`} />
     ))}
   </div>
 );
@@ -48,7 +48,7 @@ const ScoreRing = ({ score }: { score: number }) => {
   const r = 28;
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (score / 100) * circumference;
-  const color = score >= 75 ? '#10b981' : score >= 50 ? '#8b5cf6' : '#f59e0b';
+  const color = score >= 75 ? '#10b981' : score >= 50 ? '#3f7e5c' : '#f59e0b';
 
   return (
     <div className="relative w-20 h-20">
@@ -64,8 +64,8 @@ const ScoreRing = ({ score }: { score: number }) => {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-[18px] font-black text-slate-900 leading-none" style={{ fontFamily: 'Sora' }}>{score}</span>
-        <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider">/100</span>
+        <span className="text-[18px] font-black text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>{score}</span>
+        <span className="text-[8px] text-stone-500 font-bold uppercase tracking-wider">/100</span>
       </div>
     </div>
   );
@@ -101,14 +101,14 @@ export const AIDebriefModal = ({
       <DialogContent className="max-w-2xl p-0 border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-5 shrink-0">
+        <div className="bg-gradient-to-r from-emerald-600 to-emerald-600 px-6 py-5 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-white/15 rounded-xl flex items-center justify-center border border-white/20">
               <Brain size={18} className="text-white" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white leading-tight" style={{ fontFamily: 'Sora' }}>AI Interview Debrief</h2>
-              <p className="text-violet-200 text-[11px] font-medium mt-0.5">
+              <h2 className="text-base font-bold text-white leading-tight" style={{ fontFamily: 'Plus Jakarta Sans' }}>AI Interview Debrief</h2>
+              <p className="text-emerald-200 text-[11px] font-medium mt-0.5">
                 {candidateName && `${candidateName}`}{jobTitle && ` · ${jobTitle}`}{roundType && ` · ${roundType} Round`}
               </p>
             </div>
@@ -121,16 +121,16 @@ export const AIDebriefModal = ({
           {/* Empty state — trigger generation */}
           {!debrief && !loading && (
             <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
-              <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mb-5 border border-violet-100">
-                <Sparkles size={28} className="text-violet-600" />
+              <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-5 border border-emerald-100">
+                <Sparkles size={28} className="text-emerald-600" />
               </div>
-              <h3 className="text-[15px] font-bold text-slate-900 mb-2" style={{ fontFamily: 'Sora' }}>Generate AI Analysis</h3>
-              <p className="text-[13px] text-slate-500 font-medium leading-relaxed max-w-sm mb-8">
+              <h3 className="text-[15px] font-bold text-stone-900 mb-2" style={{ fontFamily: 'Plus Jakarta Sans' }}>Generate AI Analysis</h3>
+              <p className="text-[13px] text-stone-500 font-medium leading-relaxed max-w-sm mb-8">
                 Gemini AI will analyze the interview feedback and transcript to produce a structured debrief with scores, strengths, and hiring recommendation.
               </p>
               <button
                 onClick={generate}
-                className="flex items-center gap-2 px-7 py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm rounded-xl transition-all cursor-pointer shadow-lg shadow-violet-200 active:scale-[0.98]"
+                className="flex items-center gap-2 px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all cursor-pointer shadow-lg shadow-emerald-200 active:scale-[0.98]"
               >
                 <Sparkles size={14} />
                 Generate Debrief
@@ -142,13 +142,13 @@ export const AIDebriefModal = ({
           {loading && (
             <div className="flex flex-col items-center justify-center py-16 px-8 text-center gap-4">
               <div className="relative w-16 h-16">
-                <div className="absolute inset-0 rounded-full border-4 border-violet-100" />
-                <div className="absolute inset-0 rounded-full border-4 border-violet-600 border-t-transparent animate-spin" />
-                <Brain size={20} className="absolute inset-0 m-auto text-violet-600" />
+                <div className="absolute inset-0 rounded-full border-4 border-emerald-100" />
+                <div className="absolute inset-0 rounded-full border-4 border-emerald-600 border-t-transparent animate-spin" />
+                <Brain size={20} className="absolute inset-0 m-auto text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-800">Analyzing interview...</p>
-                <p className="text-[11px] text-slate-400 font-medium mt-0.5">Gemini is reading feedback and transcripts</p>
+                <p className="text-sm font-bold text-stone-800">Analyzing interview...</p>
+                <p className="text-[11px] text-stone-400 font-medium mt-0.5">Gemini is reading feedback and transcripts</p>
               </div>
             </div>
           )}
@@ -158,7 +158,7 @@ export const AIDebriefModal = ({
             <div className="p-6 space-y-6">
 
               {/* Top row: score + recommendation */}
-              <div className="flex items-center gap-6 p-5 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-6 p-5 bg-stone-50 rounded-2xl border border-stone-100">
                 <ScoreRing score={debrief.overall_score} />
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -166,11 +166,11 @@ export const AIDebriefModal = ({
                       <span className={`w-1.5 h-1.5 rounded-full ${rec.dot}`} />
                       {rec.label}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">
+                    <span className="text-[10px] text-stone-400 font-medium">
                       Generated {new Date(debrief.generated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-[12px] text-slate-700 font-medium leading-relaxed">{debrief.summary}</p>
+                  <p className="text-[12px] text-stone-700 font-medium leading-relaxed">{debrief.summary}</p>
                 </div>
               </div>
 
@@ -179,13 +179,13 @@ export const AIDebriefModal = ({
                 {[
                   { label: 'Communication', value: debrief.communication_rating, icon: MessageSquare, color: 'text-blue-600' },
                   { label: 'Technical', value: debrief.technical_rating, icon: Code2, color: 'text-emerald-600' },
-                  { label: 'Culture Fit', value: debrief.culture_fit_rating, icon: Users, color: 'text-violet-600' },
+                  { label: 'Culture Fit', value: debrief.culture_fit_rating, icon: Users, color: 'text-emerald-600' },
                 ].map(({ label, value, icon: Icon, color }) => (
-                  <div key={label} className="bg-white border border-slate-200/80 rounded-xl p-4 text-center space-y-2 shadow-sm">
+                  <div key={label} className="bg-white border border-stone-200/80 rounded-xl p-4 text-center space-y-2 shadow-sm">
                     <Icon size={16} className={`${color} mx-auto`} />
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</p>
+                    <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">{label}</p>
                     <RatingDots value={value} />
-                    <p className="text-[10px] text-slate-400 font-semibold">{value}/5</p>
+                    <p className="text-[10px] text-stone-400 font-semibold">{value}/5</p>
                   </div>
                 ))}
               </div>
@@ -198,7 +198,7 @@ export const AIDebriefModal = ({
                   </p>
                   <ul className="space-y-1.5">
                     {debrief.key_strengths.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2 text-[12px] text-slate-700 font-medium">
+                      <li key={i} className="flex items-start gap-2 text-[12px] text-stone-700 font-medium">
                         <Star size={11} className="text-emerald-500 mt-0.5 shrink-0" />
                         {s}
                       </li>
@@ -211,7 +211,7 @@ export const AIDebriefModal = ({
                   </p>
                   <ul className="space-y-1.5">
                     {debrief.areas_to_improve.map((a, i) => (
-                      <li key={i} className="flex items-start gap-2 text-[12px] text-slate-700 font-medium">
+                      <li key={i} className="flex items-start gap-2 text-[12px] text-stone-700 font-medium">
                         <AlertTriangle size={11} className="text-amber-500 mt-0.5 shrink-0" />
                         {a}
                       </li>
@@ -221,30 +221,30 @@ export const AIDebriefModal = ({
               </div>
 
               {/* Next steps */}
-              <div className="bg-violet-50/50 border border-violet-100 rounded-xl p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-700 mb-2 flex items-center gap-1.5">
+              <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 mb-2 flex items-center gap-1.5">
                   <ArrowRight size={11} /> Suggested Next Steps
                 </p>
-                <p className="text-[12px] text-slate-700 font-medium leading-relaxed">{debrief.suggested_next_steps}</p>
+                <p className="text-[12px] text-stone-700 font-medium leading-relaxed">{debrief.suggested_next_steps}</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 border-t border-stone-100 bg-white flex items-center justify-between shrink-0">
           {debrief ? (
             <button
               onClick={() => { setDebrief(null); generate(); }}
               disabled={loading}
-              className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-700 transition-colors cursor-pointer disabled:opacity-40"
+              className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 hover:text-stone-700 transition-colors cursor-pointer disabled:opacity-40"
             >
               <RotateCcw size={12} /> Regenerate
             </button>
           ) : <div />}
           <button
             onClick={handleClose}
-            className="px-5 py-2 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
+            className="px-5 py-2 text-sm font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors cursor-pointer"
           >
             Close
           </button>
