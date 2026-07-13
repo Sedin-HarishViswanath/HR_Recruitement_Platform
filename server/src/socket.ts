@@ -5,6 +5,10 @@ import { verifyAccessToken } from './shared/utils/jwt';
 
 let io: SocketIOServer;
 
+// In-memory code state per interview room (cleared on server restart — acceptable for live sessions).
+// Module-scope so it can be read outside the socket layer (see getInterviewCode below).
+const interviewCode: Record<string, { code: string; language: string }> = {};
+
 export const setupSocket = (server: HTTPServer) => {
   io = new SocketIOServer(server, {
     cors: {
@@ -31,9 +35,6 @@ export const setupSocket = (server: HTTPServer) => {
       next(new Error('Invalid or expired token'));
     }
   });
-
-  // In-memory code state per interview room (cleared on server restart — acceptable for live sessions)
-  const interviewCode: Record<string, { code: string; language: string }> = {};
 
   io.on('connection', (socket) => {
     const userId = (socket as any).userId as string;
@@ -107,3 +108,6 @@ export const notifyUser = (userId: string, event: string, data: unknown) => {
 export const notifyCompany = (companyId: string, event: string, data: unknown) => {
   if (io) io.to(`company_${companyId}`).emit(event, data);
 };
+
+export const getInterviewCode = (interviewId: string): { code: string; language: string } | undefined =>
+  interviewCode[interviewId];
