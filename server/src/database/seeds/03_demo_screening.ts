@@ -41,7 +41,10 @@ export async function seed(knex: Knex): Promise<void> {
 
   // ── Company ──
   const [company] = await knex('companies')
-    .insert({ name: COMPANY_NAME, domain: 'northwind.demo', status: 'active', active: true, contact_email: RECRUITER_EMAIL })
+    .insert({
+      name: COMPANY_NAME, domain: 'northwind.demo', company_size: '51-200',
+      status: 'active', active: true, contact_email: RECRUITER_EMAIL,
+    })
     .returning(['id']);
 
   // ── Recruiter user + membership ──
