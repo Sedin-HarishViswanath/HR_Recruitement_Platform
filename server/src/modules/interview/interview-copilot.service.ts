@@ -19,8 +19,13 @@ export class InterviewCopilotService {
       .orderBy('created_at', 'asc')
       .limit(30);
 
-    const codeAware = interview.round_type === 'technical';
-    const codeState = codeAware ? getInterviewCode(interviewId) : undefined;
+    // Code awareness is data-driven, not round_type-driven: 'technical' rounds
+    // in this app are always the automated solo assessment (AUTOMATED_ROUND_TYPES
+    // includes 'technical') and never reach this live-copilot code path, while the
+    // live layout's CodeEditor is mounted unconditionally for every live round
+    // (hr/final). So "code aware" simply means "the candidate has typed code."
+    const codeState = getInterviewCode(interviewId);
+    const codeAware = !!codeState && codeState.code.trim().length > 0;
 
     const fallback = (): CopilotResponse => ({
       questions: getFallbackQuestions(interview.round_type || 'hr'),

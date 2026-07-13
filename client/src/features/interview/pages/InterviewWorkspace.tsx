@@ -10,6 +10,7 @@ import { CodeEditor } from '../components/CodeEditor';
 import { AptitudeTest } from '../components/AptitudeTest';
 import { TechnicalAssessment } from '../components/TechnicalAssessment';
 import { MeetingPanel } from '../components/MeetingPanel';
+import { InterviewCopilotPanel } from '../components/InterviewCopilotPanel';
 import { SubmitFeedbackModal } from '../../company/components/SubmitFeedbackModal';
 import {
   ArrowLeft, Calendar, Clock, User, Briefcase, AlertCircle,
@@ -91,14 +92,22 @@ export const InterviewWorkspace = () => {
     return () => window.removeEventListener('beforeunload', handler);
   }, [interview]);
 
+  const [feedbackPrefill, setFeedbackPrefill] = useState<any>(null);
+
   const promptForFeedback = useCallback(() => {
     if (isCandidate) return;
     if (interview?.status === 'completed') {
       toast.info('Feedback has already been submitted for this interview.');
       return;
     }
+    setFeedbackPrefill(null);
     setShowFeedbackModal(true);
   }, [isCandidate, interview]);
+
+  const handleUseCopilotSuggestion = useCallback((scorecard: any) => {
+    setFeedbackPrefill(scorecard);
+    setShowFeedbackModal(true);
+  }, []);
 
   // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
@@ -323,6 +332,14 @@ export const InterviewWorkspace = () => {
               onMeetingWindowClosed={promptForFeedback}
             />
           </div>
+          {!isCandidate && (
+            <div className="w-[320px] shrink-0 h-full border-l border-[#252840] overflow-hidden">
+              <InterviewCopilotPanel
+                interviewId={interview.id}
+                onUseSuggestion={handleUseCopilotSuggestion}
+              />
+            </div>
+          )}
         </div>
 
         {!isCandidate && (
@@ -331,6 +348,7 @@ export const InterviewWorkspace = () => {
             onClose={() => setShowFeedbackModal(false)}
             onSuccess={() => navigate('/company/interviews')}
             interview={interview}
+            prefill={feedbackPrefill}
           />
         )}
       </div>
