@@ -46,4 +46,8 @@ router.patch('/:id/notes', authenticate, authorize('Admin', 'Recruiter'), applic
 router.get('/job/:jobId/pipeline', authenticate, authorize('Admin', 'Recruiter'), applicationController.getPipeline.bind(applicationController));
 router.get('/job/:jobId/summary', authenticate, authorize('Admin', 'Recruiter'), applicationController.getPipelineSummary.bind(applicationController));
 
+// Autonomous screening agent routes
+router.post('/job/:jobId/screen', authenticate, authorize('Admin', 'Recruiter'), applicationController.startScreen.bind(applicationController));
+router.get('/job/:jobId/screen/state', authenticate, authorize('Admin', 'Recruiter'), applicationController.getScreenState.bind(applicationController));
+
 export default router;
