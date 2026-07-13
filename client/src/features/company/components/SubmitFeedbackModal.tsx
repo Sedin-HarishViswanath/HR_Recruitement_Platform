@@ -19,6 +19,12 @@ interface SubmitFeedbackModalProps {
     job_title?: string;
     round_type?: string;
   };
+  prefill?: {
+    rating?: number | null;
+    recommendation?: string | null;
+    strengths?: string | null;
+    weaknesses?: string | null;
+  } | null;
 }
 
 const recommendationOptions = [
@@ -28,7 +34,7 @@ const recommendationOptions = [
   { value: 'strong_no_hire', label: 'Strong No Hire', color: 'bg-red-50 text-red-700 border-red-200', icon: '🚫' },
 ];
 
-export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: SubmitFeedbackModalProps) => {
+export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview, prefill }: SubmitFeedbackModalProps) => {
   const [rating, setRating] = useState(0);
   const [hoveredStar, setHoveredStar] = useState(0);
   const [strengths, setStrengths] = useState('');
@@ -39,15 +45,15 @@ export const SubmitFeedbackModal = ({ isOpen, onClose, onSuccess, interview }: S
 
   useEffect(() => {
     if (isOpen) {
-      setRating(0);
+      setRating(prefill?.rating ?? 0);
       setHoveredStar(0);
-      setStrengths('');
-      setWeaknesses('');
-      setRecommendation('');
+      setStrengths(prefill?.strengths ?? '');
+      setWeaknesses(prefill?.weaknesses ?? '');
+      setRecommendation(prefill?.recommendation ?? '');
       setAdditionalComments('');
       setSubmitting(false);
     }
-  }, [isOpen]);
+  }, [isOpen, prefill]);
 
   const isDirty =
     rating > 0 ||

@@ -52,6 +52,7 @@ router.post('/:id/recording', authenticate, authorize('Interviewer', 'Recruiter'
 
 router.get('/:id', authenticate, interviewController.getById.bind(interviewController));
 router.post('/:id/debrief', authenticate, authorize('Admin', 'Recruiter', 'Interviewer'), interviewController.generateDebrief.bind(interviewController));
+router.post('/:id/copilot', authenticate, authorize('Admin', 'Recruiter', 'Interviewer'), interviewController.getCopilotSuggestions.bind(interviewController));
 router.get('/:id/plagiarism-report', authenticate, authorize('Admin', 'Recruiter', 'Interviewer'), interviewController.getPlagiarismReport.bind(interviewController));
 
 // Workspace routes (Common)
