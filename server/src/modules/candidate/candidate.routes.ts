@@ -1,25 +1,15 @@
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'path';
 import { candidateController } from './candidate.controller';
 import { authenticate } from '../../shared/middlewares/auth.middleware';
 import { authorize } from '../../shared/middlewares/role.middleware';
 
 const router = Router();
 
-// Configure Multer for resume uploads
-const storage = multer.diskStorage({
-  destination: (req: any, file: any, cb: any) => {
-    cb(null, path.join(__dirname, '../../../uploads/resumes/'));
-  },
-  filename: (req: any, file: any, cb: any) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `resume-${req.user?.candidateId}-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
-
+// Resume uploads are held in memory, then persisted to object storage (MinIO)
+// via the storage service — the buffer is also used directly for AI parsing.
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req: any, file: any, cb: any) => {
     if (file.mimetype === 'application/pdf') {

@@ -11,6 +11,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // recharts v3 pulls in decimal.js-light (CommonJS). Pre-bundle both so Vite
+  // resolves the CJS default export correctly and avoids the runtime
+  // "import_decimal.default is not a constructor" crash on chart pages.
+  optimizeDeps: {
+    include: ['recharts', 'decimal.js-light'],
+  },
   server: {
     port: 5173,
     proxy: {

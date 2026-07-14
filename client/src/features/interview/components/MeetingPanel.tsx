@@ -57,98 +57,6 @@ export const MeetingPanel = ({
   const meetingWindowRef = useRef<Window | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
-  // Video recording state
-  const [recordingVideo, setRecordingVideo] = useState(false);
-  const [videoUploadStatus, setVideoUploadStatus] = useState<string | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordedChunksRef = useRef<Blob[]>([]);
-
-  const startVideoRecording = async () => {
-    try {
-      const displayStream = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: 'browser' },
-        audio: { echoCancellation: true, noiseSuppression: true }
-      });
-
-      let micStream: MediaStream | null = null;
-      try {
-        micStream = await navigator.mediaDevices.getUserMedia({
-          audio: { echoCancellation: true, noiseSuppression: true }
-        });
-      } catch (err) {
-        toast.warning('Microphone permission denied. Your voice will not be in the recording.');
-      }
-
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const audioCtx = new AudioContextClass();
-      const dest = audioCtx.createMediaStreamDestination();
-
-      if (displayStream.getAudioTracks().length > 0) {
-        const displayAudioSource = audioCtx.createMediaStreamSource(new MediaStream(displayStream.getAudioTracks()));
-        displayAudioSource.connect(dest);
-      }
-
-      if (micStream && micStream.getAudioTracks().length > 0) {
-        const micAudioSource = audioCtx.createMediaStreamSource(new MediaStream(micStream.getAudioTracks()));
-        micAudioSource.connect(dest);
-      }
-
-      const combinedStream = new MediaStream([
-        ...displayStream.getVideoTracks(),
-        ...dest.stream.getAudioTracks()
-      ]);
-
-      const mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
-      mediaRecorderRef.current = mediaRecorder;
-      recordedChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          recordedChunksRef.current.push(e.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        const videoBlob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-        displayStream.getTracks().forEach(track => track.stop());
-        if (micStream) micStream.getTracks().forEach(track => track.stop());
-
-        const formData = new FormData();
-        formData.append('recording', videoBlob, `interview-${interviewId}.webm`);
-
-        setVideoUploadStatus('uploading');
-        toast.info('Uploading meeting recording...');
-        try {
-          await api.post(`/interviews/${interviewId}/recording`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
-          setVideoUploadStatus('success');
-          toast.success('Recording uploaded successfully!');
-        } catch (err) {
-          setVideoUploadStatus('error');
-          toast.error('Failed to upload recording.');
-        }
-      };
-
-      displayStream.getVideoTracks()[0].onended = () => {
-        stopVideoRecording();
-      };
-
-      mediaRecorder.start(1000);
-      setRecordingVideo(true);
-    } catch (err) {
-      toast.error('Screen recording permission denied or not supported.');
-      throw err;
-    }
-  };
-
-  const stopVideoRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
-      setRecordingVideo(false);
-    }
-  };
-
   useEffect(() => {
     const fetchRoom = async () => {
       try {
@@ -353,22 +261,11 @@ export const MeetingPanel = ({
     startJitsiPolling(meetingWindow);
   };
 
-  // Optional recording — separate from join
-  const handleStartRecording = async () => {
-    try {
-      await startVideoRecording();
-      toast.success('Screen recording started. Switch to the meeting tab to record.');
-    } catch {
-      // error already toasted inside startVideoRecording
-    }
-  };
-
   const handleEndMeeting = () => {
     if (meetingWindowRef.current && !meetingWindowRef.current.closed) {
       try { meetingWindowRef.current.close(); } catch { /* cross-origin */ }
     }
     stopTranscription();
-    stopVideoRecording();
     setMeetingEnded(true);
     onMeetingWindowClosed?.();
   };
@@ -558,53 +455,6 @@ export const MeetingPanel = ({
               </div>
             )}
 
-            {/* Video Recording Card — optional, separate from join */}
-            {participantRole === 'interviewer' && (
-              <div className="bg-[#1a1d2e] rounded-2xl border border-[#2a2d3e] p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-black text-white">Meeting Recording</p>
-                  {recordingVideo && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/20 text-rose-400 border border-rose-600/30">
-                      <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" /> Recording
-                    </div>
-                  )}
-                </div>
-                <p className="text-[10px] text-stone-500 mb-3">
-                  Optionally record the meeting after joining. Select the meeting tab when prompted.
-                </p>
-                {!recordingVideo ? (
-                  <button
-                    onClick={handleStartRecording}
-                    disabled={!meetingJoined || meetingEnded}
-                    className="w-full flex items-center justify-center gap-2 py-1.5 bg-[#252840] hover:bg-[#2a2d50] disabled:opacity-40 text-stone-300 font-bold text-xs rounded-xl transition-all border border-[#3a3d5e]"
-                  >
-                    Start Recording
-                  </button>
-                ) : (
-                  <button
-                    onClick={stopVideoRecording}
-                    className="w-full flex items-center justify-center gap-2 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 font-bold text-xs rounded-xl transition-all border border-rose-600/30"
-                  >
-                    Stop Recording
-                  </button>
-                )}
-                {videoUploadStatus === 'uploading' && (
-                  <div className="flex items-center gap-2 text-[10px] text-emerald-400 mt-2">
-                    <Loader2 size={12} className="animate-spin" /> Uploading recording to server...
-                  </div>
-                )}
-                {videoUploadStatus === 'success' && (
-                  <div className="flex items-center gap-2 text-[10px] text-emerald-400 mt-2">
-                    <Check size={12} /> Recording saved successfully!
-                  </div>
-                )}
-                {videoUploadStatus === 'error' && (
-                  <div className="flex items-center gap-2 text-[10px] text-red-400 mt-2">
-                    ✗ Failed to upload recording.
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         )}
 

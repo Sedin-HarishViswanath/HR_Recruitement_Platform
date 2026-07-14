@@ -9,6 +9,18 @@ import {
   CreateApplicationInput 
 } from './application.schema';
 import { atsScreeningService } from './ats-screening.service';
+import { generateJSON } from '../../shared/utils/llm';
+
+/** Parse a column that may arrive as a JSON string or an already-parsed value. */
+function coerceJson(value: any): any {
+  if (value == null) return null;
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
 
 export class ApplicationService {
   async applyToJob(candidateId: string, data: ApplyInput, resumeText?: string) {
@@ -202,6 +214,87 @@ export class ApplicationService {
 
   async updateNotes(id: string, notes: string) {
     return applicationRepository.updateInternalNotes(id, notes);
+  }
+
+  /**
+   * AI head-to-head comparison of 2-3 shortlisted candidates for a role.
+   * Grounds the verdict in each candidate's screening data + resume so the
+   * recommendation is evidence-based rather than a re-statement of scores.
+   */
+  async compareCandidates(companyId: string, applicationIds: string[]) {
+    const ids = [...new Set((applicationIds || []).map(String))];
+    if (ids.length < 2) throw new AppError('Select at least 2 candidates to compare', 400);
+    if (ids.length > 3) throw new AppError('You can compare up to 3 candidates at once', 400);
+
+    const rows = await db('applications')
+      .join('candidates', 'applications.candidate_id', 'candidates.id')
+      .join('jobs', 'applications.job_id', 'jobs.id')
+      .whereIn('applications.id', ids)
+      .where('jobs.company_id', companyId)
+      .select(
+        'applications.id as application_id',
+        'applications.ai_score',
+        'applications.matched_skills',
+        'applications.screening_breakdown',
+        'candidates.name as candidate_name',
+        'candidates.resume_text',
+        'jobs.title as job_title',
+        'jobs.required_skills',
+      );
+
+    if (rows.length < 2) throw new AppError('Candidates not found for comparison', 404);
+
+    const requiredSkills: string[] = coerceJson(rows[0].required_skills) || rows[0].required_skills || [];
+    const jobTitle: string = rows[0].job_title || 'the role';
+
+    const blocks = rows.map((r: any, i: number) => {
+      const breakdown = coerceJson(r.screening_breakdown) || {};
+      const matched: string[] = coerceJson(r.matched_skills) || breakdown.matched_skills || [];
+      const gaps: string[] = breakdown.gaps || [];
+      const resumeSnippet = (r.resume_text || '').slice(0, 1200) || 'No resume text on file.';
+      return `CANDIDATE ${i + 1} — ${r.candidate_name}
+AI fit score: ${r.ai_score ?? 'N/A'}/100
+Matched required skills: ${Array.isArray(matched) ? matched.join(', ') || 'none' : 'none'}
+Gaps: ${Array.isArray(gaps) ? gaps.join(', ') || 'none noted' : 'none noted'}
+Screening note: ${breakdown.reason || 'N/A'}
+Resume excerpt: ${resumeSnippet}`;
+    }).join('\n\n');
+
+    const prompt = `You are a hiring manager choosing between shortlisted candidates for ONE role. Compare them on the evidence below and recommend who to advance. Judge demonstrated, relevant experience — not scores alone or keyword presence. Be specific and fair; call out the real trade-offs.
+
+ROLE: ${jobTitle}
+REQUIRED SKILLS: ${Array.isArray(requiredSkills) ? requiredSkills.join(', ') : 'Not specified'}
+
+${blocks}
+
+Reply ONLY with valid JSON, no prose:
+{"winner": <candidate number of who to advance first>, "summary": "<2-3 sentences: who to advance and why, and the key trade-off vs the others>", "assessments": [{"n": <candidate number>, "text": "<one sentence: this candidate's distinct edge and their main risk relative to the others>"}]}`;
+
+    const ai = await generateJSON<{
+      winner?: number;
+      summary?: string;
+      assessments?: { n?: number; text?: string }[];
+    }>({ prompt, temperature: 0.3, maxTokens: 600 });
+
+    // Map the model's candidate numbers back to real application ids/names.
+    const byNumber = (n: any) => rows[Number(n) - 1];
+    const winnerRow = byNumber(ai.winner);
+    const perCandidate = rows.map((r: any, i: number) => {
+      const a = (ai.assessments || []).find((x) => Number(x.n) === i + 1);
+      return {
+        application_id: String(r.application_id),
+        name: r.candidate_name,
+        text: a?.text || '',
+      };
+    });
+
+    return {
+      recommended: winnerRow
+        ? { application_id: String(winnerRow.application_id), name: winnerRow.candidate_name }
+        : null,
+      summary: ai.summary || '',
+      per_candidate: perCandidate,
+    };
   }
 }
 

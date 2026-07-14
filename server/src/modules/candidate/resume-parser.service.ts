@@ -1,8 +1,8 @@
 import axios from 'axios';
-import fs from 'fs/promises';
 import { PDFParse } from 'pdf-parse';
 import { env } from '../../config/env';
 import { logger } from '../../shared/utils/logger';
+import { generateText } from '../../shared/utils/llm';
 
 export interface ParsedResume {
   summary?: string;
@@ -145,9 +145,8 @@ const SECTION_PATTERNS: Record<string, RegExp> = {
 /**
  * Extract raw text from a PDF file using pdf-parse (pure JS, no API needed).
  */
-async function extractTextFromPdf(filePath: string): Promise<string | null> {
+async function extractTextFromPdf(fileBuffer: Buffer): Promise<string | null> {
   try {
-    const fileBuffer = await fs.readFile(filePath);
     const parser = new PDFParse({ data: fileBuffer });
     const data = await parser.getText();
     const text = (data.text || '').trim();
@@ -464,18 +463,18 @@ export class ResumeParserService {
    * external API is down, the candidate still gets skills extracted
    * and a non-zero ATS score.
    */
-  async parsePdf(filePath: string): Promise<ParsedResume | null> {
+  async parsePdf(fileBuffer: Buffer): Promise<ParsedResume | null> {
     // ── Step 1: Local text extraction (always) ──────────────────────
-    const resumeText = await extractTextFromPdf(filePath);
+    const resumeText = await extractTextFromPdf(fileBuffer);
 
     if (!resumeText) {
       // If we can't even extract text from the PDF, try Gemini with binary as last resort
       logger.warn('[ResumeParser] Local text extraction failed, attempting Gemini binary parse', { module: 'ResumeParser' });
-      return this.parseWithGeminiBinary(filePath);
+      return this.parseWithGeminiBinary(fileBuffer);
     }
 
-    // ── Step 2: Try Gemini with extracted text (lightweight) ────────
-    if (env.GEMINI_API_KEY) {
+    // ── Step 2: Try AI with extracted text (Gemini → Groq fallback) ──
+    if (env.GEMINI_API_KEY || env.GROQ_API_KEY) {
       const geminiResult = await this.parseWithGeminiText(resumeText);
       if (geminiResult) {
         // Ensure resume_text is always populated
@@ -495,7 +494,7 @@ export class ResumeParserService {
    * This is significantly cheaper in token cost and much less likely
    * to trigger rate limits compared to sending the raw PDF.
    */
-  private async parseWithGeminiText(resumeText: string, maxRetries = 2): Promise<ParsedResume | null> {
+  private async parseWithGeminiText(resumeText: string): Promise<ParsedResume | null> {
     // Trim text to avoid token bloat
     const snippet = resumeText.slice(0, 4000);
 
@@ -504,86 +503,49 @@ export class ResumeParserService {
 RESUME TEXT:
 ${snippet}`;
 
-    for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
-      try {
-        const response = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`,
-          {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.1 },
-          },
-          {
-            params: { key: env.GEMINI_API_KEY },
-            timeout: 20000,
-          }
-        );
-
-        const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text) {
-          logger.warn('[ResumeParser] Gemini text-parse returned empty response', { module: 'ResumeParser' });
-          return null;
-        }
-
-        let parsed: ParsedResume;
-        try {
-          parsed = parseJsonBlock(text);
-        } catch (parseErr) {
-          logger.error('[ResumeParser] Failed to parse Gemini JSON from text-parse', { module: 'ResumeParser' });
-          return null;
-        }
-
-        logger.info('[ResumeParser] Gemini text-parse successful', { module: 'ResumeParser' });
-
-        return {
-          summary: typeof parsed.summary === 'string' ? parsed.summary.slice(0, 1000) : undefined,
-          skills: Array.isArray(parsed.skills)
-            ? parsed.skills.map(s => String(s).trim()).filter(Boolean).slice(0, 40)
-            : undefined,
-          resume_text: typeof parsed.resume_text === 'string' ? parsed.resume_text : resumeText.slice(0, 3000),
-          experience: Array.isArray(parsed.experience) ? parsed.experience : undefined,
-          education: Array.isArray(parsed.education) ? parsed.education : undefined,
-          projects: Array.isArray(parsed.projects) ? parsed.projects : undefined,
-          certifications: Array.isArray(parsed.certifications) ? parsed.certifications : undefined,
-          resume_data: parsed,
-        };
-      } catch (err: any) {
-        const status = err?.response?.status;
-
-        if (status === 429 && attempt <= maxRetries) {
-          const delay = Math.pow(2, attempt) * 1000;
-          logger.warn(`[ResumeParser] Gemini rate limit (text-parse). Attempt ${attempt}/${maxRetries}. Retrying in ${delay}ms...`, { module: 'ResumeParser' });
-          await sleep(delay);
-          continue;
-        }
-
-        if (status === 429) {
-          logger.warn('[ResumeParser] Gemini rate limited — falling back to local parse', { module: 'ResumeParser' });
-          return null; // Caller will use local fallback
-        }
-
-        logger.warn('[ResumeParser] Gemini text-parse error, falling back to local', { module: 'ResumeParser', status, message: err?.message });
+    try {
+      // Gemini primary with automatic Groq fallback.
+      const text = await generateText({ prompt, temperature: 0.1, maxTokens: 2048, json: true });
+      if (!text) {
+        logger.warn('[ResumeParser] AI text-parse returned empty response', { module: 'ResumeParser' });
         return null;
       }
-    }
 
-    return null;
+      let parsed: ParsedResume;
+      try {
+        parsed = parseJsonBlock(text);
+      } catch (parseErr) {
+        logger.error('[ResumeParser] Failed to parse AI JSON from text-parse', { module: 'ResumeParser' });
+        return null;
+      }
+
+      logger.info('[ResumeParser] AI text-parse successful', { module: 'ResumeParser' });
+
+      return {
+        summary: typeof parsed.summary === 'string' ? parsed.summary.slice(0, 1000) : undefined,
+        skills: Array.isArray(parsed.skills)
+          ? parsed.skills.map(s => String(s).trim()).filter(Boolean).slice(0, 40)
+          : undefined,
+        resume_text: typeof parsed.resume_text === 'string' ? parsed.resume_text : resumeText.slice(0, 3000),
+        experience: Array.isArray(parsed.experience) ? parsed.experience : undefined,
+        education: Array.isArray(parsed.education) ? parsed.education : undefined,
+        projects: Array.isArray(parsed.projects) ? parsed.projects : undefined,
+        certifications: Array.isArray(parsed.certifications) ? parsed.certifications : undefined,
+        resume_data: parsed,
+      };
+    } catch (err: any) {
+      logger.warn('[ResumeParser] AI text-parse error, falling back to local', { module: 'ResumeParser', message: err?.message });
+      return null;
+    }
   }
 
   /**
    * Legacy: Parse with Gemini using the raw binary PDF.
    * Only used when local text extraction fails (e.g., scanned/image PDFs).
    */
-  private async parseWithGeminiBinary(filePath: string, maxRetries = 2): Promise<ParsedResume | null> {
+  private async parseWithGeminiBinary(file: Buffer, maxRetries = 2): Promise<ParsedResume | null> {
     if (!env.GEMINI_API_KEY) {
       logger.warn('[ResumeParser] GEMINI_API_KEY not set — skipping binary parse', { module: 'ResumeParser' });
-      return null;
-    }
-
-    let file: Buffer;
-    try {
-      file = await fs.readFile(filePath);
-    } catch (err) {
-      logger.error('[ResumeParser] Failed to read resume file for binary parse', { module: 'ResumeParser' });
       return null;
     }
 

@@ -1,5 +1,6 @@
 // Reading this as: company team workspace and analytics dashboard, with a modern B2B layout, leaning toward Fluent/Primer-inspired structured components + calibrated status labels.
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Users, Briefcase, Calendar, TrendingUp, ChevronRight } from 'lucide-react';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
@@ -61,6 +62,7 @@ const statMeta = [
 ];
 
 export const CompanyDashboard = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -174,7 +176,10 @@ export const CompanyDashboard = () => {
         <div className="panel overflow-hidden">
           <div className="panel-header">
             <h2 className="text-[15px] font-bold text-stone-900" style={{ fontFamily: 'Plus Jakarta Sans' }}>Recent applications</h2>
-            <button className="text-[12px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 transition-colors active:scale-[0.98] cursor-pointer">
+            <button
+              onClick={() => navigate('/company/applications')}
+              className="text-[12px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-0.5 transition-colors active:scale-[0.98] cursor-pointer"
+            >
               View all <ChevronRight size={13} />
             </button>
           </div>
@@ -182,7 +187,10 @@ export const CompanyDashboard = () => {
             {recentApplications.length > 0 ? recentApplications.map((app: any, i: number) => {
               const name = app.candidate_name || app.user_name || 'Candidate';
               return (
-                <div key={app.id || i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-stone-50/60 transition-all group cursor-pointer">
+                <div
+                  key={app.id || i}
+                  onClick={() => navigate(app.job_id ? `/company/applications?job_id=${app.job_id}` : '/company/applications')}
+                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-stone-50/60 transition-all group cursor-pointer">
                   <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradients[i % avatarGradients.length]} flex items-center justify-center text-white font-bold text-[10px] uppercase shrink-0 shadow-sm`}>
                     {getInitials(name)}
                   </div>

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { candidateService } from './candidate.service';
+import { storageService } from '../../shared/storage/storage.service';
 import {
   wizardStep1Schema,
   wizardStep2Schema,
@@ -64,15 +65,16 @@ export class CandidateController {
   uploadResume = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const candidateId = req.user?.candidateId || req.user?.userId;
-      if (!(req as any).file) {
+      const file = (req as any).file;
+      if (!file) {
         return res.status(400).json({ success: false, message: 'No resume file uploaded' });
       }
 
-      const resumeUrl = `/uploads/resumes/${(req as any).file.filename}`;
+      const { url } = await storageService.saveResume(file.buffer, file.originalname);
       const updated = await candidateService.uploadResume(
         candidateId as string,
-        resumeUrl,
-        (req as any).file.path
+        url,
+        file.buffer
       );
       res.json({ success: true, data: updated });
     } catch (err) {

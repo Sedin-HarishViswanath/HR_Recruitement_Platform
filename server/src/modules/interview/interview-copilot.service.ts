@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { db } from '../../config/db';
 import { env } from '../../config/env';
 import { AppError } from '../../shared/errors/AppError';
 import { logger } from '../../shared/utils/logger';
+import { generateText } from '../../shared/utils/llm';
 import { interviewRepository } from './interview.repository';
 import { getInterviewCode } from '../../socket';
 import { parseCopilotResponse, getFallbackQuestions, CopilotResponse } from './interview-copilot.helpers';
@@ -34,7 +34,7 @@ export class InterviewCopilotService {
       meta: { transcript_entries_used: transcripts.length, code_aware: codeAware, method: 'fallback' },
     });
 
-    if (!env.GEMINI_API_KEY) return fallback();
+    if (!env.GEMINI_API_KEY && !env.GROQ_API_KEY) return fallback();
 
     const context = await db('interviews')
       .select('candidates.name as candidate_name', 'jobs.title as job_title', 'jobs.required_skills')
@@ -52,7 +52,7 @@ export class InterviewCopilotService {
       ? `\nCURRENT CODE (${codeState?.language || 'unknown'}):\n${codeState?.code ? codeState.code.slice(0, 2000) : 'No code written yet.'}\n`
       : '';
 
-    const prompt = `You are a live interview copilot helping an interviewer in real time.
+    const prompt = `You are a live interview copilot assisting an interviewer in real time. Your job is to help them dig deeper and stay objective, using ONLY what has actually been said (and any code written) so far.
 
 CANDIDATE: ${context?.candidate_name || 'Unknown'}
 ROLE: ${context?.job_title || 'Unknown'}
@@ -62,28 +62,27 @@ REQUIRED SKILLS: ${(context?.required_skills || []).join(', ') || 'Not specified
 TRANSCRIPT SO FAR (last ${transcripts.length} exchanges):
 ${transcriptText.slice(0, 3000)}
 ${codeSection}
+Produce:
+- questions: 2-3 sharp follow-ups that build on what the candidate JUST said — push for depth, a concrete example, a trade-off, or an edge case. If code is present, include a question about their actual code (a bug, its complexity, or how it handles an edge case). Never generic or yes/no. If the transcript is too short to judge, give 2 strong role-relevant opening questions tied to the required skills.
+- claim_flags: 0-3 statements the candidate made that are vague, unverifiable, or possibly overstated; for each, give a specific way to verify it. Only flag real claims — do not invent.
+- scorecard_suggestion: a calibrated draft grounded in transcript evidence. If there is not yet enough signal, use null for rating and recommendation and keep strengths/weaknesses brief or empty.
+
 Reply ONLY with JSON, no prose:
-{"questions": ["<follow-up question>"], "claim_flags": [{"claim": "<what they said>", "concern": "<what to verify>"}], "scorecard_suggestion": {"rating": <1-5>, "recommendation": "<strong_hire|hire|no_hire|strong_no_hire>", "strengths": "<short draft text>", "weaknesses": "<short draft text>"}}
-Return 2-3 questions and 0-3 claim_flags. If the transcript is too short to judge, still return 2 generic but role-relevant opening questions.`;
+{"questions": ["<follow-up question>"], "claim_flags": [{"claim": "<what they said>", "concern": "<what to verify and how>"}], "scorecard_suggestion": {"rating": <1-5 or null>, "recommendation": "<strong_hire|hire|no_hire|strong_no_hire or null>", "strengths": "<short evidence-based draft>", "weaknesses": "<short evidence-based draft>"}}`;
 
     try {
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`,
-        { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 512 } },
-        { params: { key: env.GEMINI_API_KEY }, timeout: 20000 },
-      );
-      const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const text = await generateText({ prompt, temperature: 0.3, maxTokens: 512, json: true });
       const parsed = parseCopilotResponse(text);
       if (!parsed) return fallback();
 
       return {
         ...parsed,
-        meta: { transcript_entries_used: transcripts.length, code_aware: codeAware, method: 'gemini' },
+        meta: { transcript_entries_used: transcripts.length, code_aware: codeAware, method: 'ai' },
       };
     } catch (err: any) {
-      logger.warn('Interview copilot Gemini call failed, using fallback', {
+      logger.warn('Interview copilot AI call failed, using fallback', {
         module: 'COPILOT',
-        status: err?.response?.status,
+        message: err?.message,
       });
       return fallback();
     }

@@ -96,9 +96,9 @@ export class CandidateService {
     return candidateRepository.updateProfile(candidateId, updatedData);
   }
 
-  async uploadResume(candidateId: string, resumeUrl: string, filePath: string) {
+  async uploadResume(candidateId: string, resumeUrl: string, fileBuffer: Buffer) {
     const profile = await this.getProfile(candidateId);
-    const parsed = await resumeParserService.parsePdf(filePath).catch(() => null);
+    const parsed = await resumeParserService.parsePdf(fileBuffer).catch(() => null);
     const updatedData: any = { resume_url: resumeUrl };
 
     if (parsed) {

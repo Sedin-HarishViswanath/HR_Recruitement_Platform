@@ -9,6 +9,7 @@ import { sendResponse } from '../../shared/utils/response';
 import { AppError } from '../../shared/errors/AppError';
 import { resumeParserService } from '../candidate/resume-parser.service';
 import { screeningAgentService } from './screening-agent.service';
+import { storageService } from '../../shared/storage/storage.service';
 
 export class ApplicationController {
   async applyToJob(req: Request, res: Response) {
@@ -22,8 +23,9 @@ export class ApplicationController {
       let resumeText = undefined;
 
       if (req.file) {
-        resumeUrl = `/uploads/resumes/${req.file.filename}`;
-        const parsedPdf = await resumeParserService.parsePdf(req.file.path).catch(() => null);
+        const saved = await storageService.saveResume(req.file.buffer, req.file.originalname);
+        resumeUrl = saved.url;
+        const parsedPdf = await resumeParserService.parsePdf(req.file.buffer).catch(() => null);
         if (parsedPdf && parsedPdf.resume_text) {
           resumeText = parsedPdf.resume_text;
         }
@@ -38,6 +40,22 @@ export class ApplicationController {
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
       return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
+  async compareCandidates(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      if (!companyId) throw new AppError('Unauthorized', 401);
+      const applicationIds = req.body?.application_ids;
+      if (!Array.isArray(applicationIds)) {
+        return sendResponse(res, 400, false, 'application_ids array is required');
+      }
+      const result = await applicationService.compareCandidates(companyId, applicationIds);
+      return sendResponse(res, 200, true, 'Comparison generated', result);
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Failed to generate comparison');
     }
   }
 

@@ -28,6 +28,15 @@ const envSchema = z.object({
   // Custom ML flags
   USE_CUSTOM_ML: z.string().default('true').transform(v => v === 'true'),
   PLAGIARISM_THRESHOLD: z.string().default('70').transform(v => parseInt(v, 10)),
+
+  // MinIO / S3-compatible object storage (resumes). When endpoint+keys are
+  // absent, the app falls back to local-disk storage automatically.
+  MINIO_ENDPOINT: z.string().optional(),
+  MINIO_PORT: z.string().default('9000').transform(v => parseInt(v, 10)),
+  MINIO_USE_SSL: z.string().default('false').transform(v => v === 'true'),
+  MINIO_ACCESS_KEY: z.string().optional(),
+  MINIO_SECRET_KEY: z.string().optional(),
+  MINIO_BUCKET: z.string().default('resumes'),
 });
 
 const envVars = envSchema.safeParse(process.env);

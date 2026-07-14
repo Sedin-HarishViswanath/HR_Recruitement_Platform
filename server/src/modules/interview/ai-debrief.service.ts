@@ -1,10 +1,8 @@
-import axios from 'axios';
 import { db } from '../../config/db';
 import { env } from '../../config/env';
 import { AppError } from '../../shared/errors/AppError';
 import { logger } from '../../shared/utils/logger';
-
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+import { generateJSON } from '../../shared/utils/llm';
 
 export interface AIDebrief {
   overall_score: number;
@@ -91,49 +89,27 @@ Generate a structured JSON debrief. Respond ONLY with this exact JSON format:
 
 Base your assessment on the feedback and transcript. Be balanced and constructive.`;
 
-    if (!env.GEMINI_API_KEY) {
-      throw new AppError('AI debrief requires a Gemini API key to be configured', 503);
+    if (!env.GEMINI_API_KEY && !env.GROQ_API_KEY) {
+      throw new AppError('AI debrief requires a Gemini or Groq API key to be configured', 503);
     }
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        const response = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`,
-          {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.3, maxOutputTokens: 512 },
-          },
-          { params: { key: env.GEMINI_API_KEY }, timeout: 20000 }
-        );
+    try {
+      // Gemini primary with automatic Groq fallback.
+      const parsed = await generateJSON<AIDebrief>({ prompt, temperature: 0.3, maxTokens: 512 });
+      parsed.generated_at = new Date().toISOString();
 
-        const text: string = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-        const start = cleaned.indexOf('{');
-        const end = cleaned.lastIndexOf('}');
-        if (start === -1 || end === -1) throw new Error('Invalid JSON from Gemini');
+      // Clamp values
+      parsed.overall_score = Math.min(100, Math.max(0, Number(parsed.overall_score) || 50));
+      parsed.communication_rating = Math.min(5, Math.max(1, Number(parsed.communication_rating) || 3));
+      parsed.technical_rating = Math.min(5, Math.max(1, Number(parsed.technical_rating) || 3));
+      parsed.culture_fit_rating = Math.min(5, Math.max(1, Number(parsed.culture_fit_rating) || 3));
 
-        const parsed = JSON.parse(cleaned.slice(start, end + 1)) as AIDebrief;
-        parsed.generated_at = new Date().toISOString();
-
-        // Clamp values
-        parsed.overall_score = Math.min(100, Math.max(0, Number(parsed.overall_score) || 50));
-        parsed.communication_rating = Math.min(5, Math.max(1, Number(parsed.communication_rating) || 3));
-        parsed.technical_rating = Math.min(5, Math.max(1, Number(parsed.technical_rating) || 3));
-        parsed.culture_fit_rating = Math.min(5, Math.max(1, Number(parsed.culture_fit_rating) || 3));
-
-        logger.info(`AI debrief generated for interview ${interviewId}`, { module: 'AIDebrief' });
-        return parsed;
-      } catch (err: any) {
-        if (err?.response?.status === 429 && attempt < 3) {
-          await sleep(attempt * 2000);
-          continue;
-        }
-        logger.error('Failed to generate AI debrief', { module: 'AIDebrief', err: err?.message });
-        throw new AppError('Failed to generate AI debrief. Please try again.', 502);
-      }
+      logger.info(`AI debrief generated for interview ${interviewId}`, { module: 'AIDebrief' });
+      return parsed;
+    } catch (err: any) {
+      logger.error('Failed to generate AI debrief', { module: 'AIDebrief', err: err?.message });
+      throw new AppError('Failed to generate AI debrief. Please try again.', 502);
     }
-
-    throw new AppError('AI debrief generation failed after retries', 502);
   }
 }
 

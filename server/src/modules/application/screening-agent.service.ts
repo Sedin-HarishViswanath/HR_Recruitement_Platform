@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
-import axios from 'axios';
 import { db } from '../../config/db';
 import { env } from '../../config/env';
 import { AppError } from '../../shared/errors/AppError';
 import { logger } from '../../shared/utils/logger';
+import { generateText } from '../../shared/utils/llm';
 import { notifyCompany } from '../../socket';
 import { atsScreeningService } from './ats-screening.service';
 import {
@@ -67,7 +67,7 @@ export class ScreeningAgentService {
 
   private async execute(job: any, applications: any[], companyId: string, run_id: string) {
     const jobId = job.id;
-    const method_hint = env.GEMINI_API_KEY ? 'ai' : 'heuristic';
+    const method_hint = (env.GEMINI_API_KEY || env.GROQ_API_KEY) ? 'ai' : 'heuristic';
     notifyCompany(companyId, 'screen:started', { jobId, run_id, total: applications.length, method_hint });
 
     const scored: ScoredCandidate[] = [];
@@ -138,25 +138,24 @@ export class ScreeningAgentService {
       questions: cand.gaps.slice(0, 3).map((g) => ({ q: `Walk me through your experience with ${g}.`, targets: `${g} gap` })),
       generated_at: now,
     };
-    if (!env.GEMINI_API_KEY) return fallback;
+    if (!env.GEMINI_API_KEY && !env.GROQ_API_KEY) return fallback;
 
-    const prompt = `Generate a focused interview kit for this candidate. Reply ONLY with JSON.
+    const prompt = `You are a senior interviewer preparing a focused kit to screen ONE candidate for a specific role. Design questions that separate real, hands-on ability from surface familiarity.
 
 ROLE: ${job.title}
-CANDIDATE STRENGTHS: ${cand.matched_skills.join(', ') || 'general'}
-CANDIDATE GAPS/CONCERNS: ${cand.gaps.join(', ') || 'none noted'}
+EVIDENCED STRENGTHS (validate these are genuine and deep): ${cand.matched_skills.join(', ') || 'general background'}
+GAPS / CONCERNS (probe these to establish the true level): ${cand.gaps.join(', ') || 'none noted'}
+
+Write 4-5 specific, open-ended questions:
+- For each gap: a question that reveals whether the candidate has real depth or only passing exposure (ask for a concrete example, a trade-off they made, or how they'd handle a realistic scenario).
+- For key strengths: a question that pressure-tests the claim with a "tell me about a time you…" or a design/debugging scenario.
+- Avoid generic or yes/no questions and anything answerable by reciting definitions.
 
 Reply ONLY with valid JSON:
-{"focus_areas": ["<area>"], "questions": [{"q": "<interview question>", "targets": "<which gap/strength it probes>"}]}
-Generate 4-5 questions that probe the gaps and validate the strengths.`;
+{"focus_areas": ["<the 2-4 themes these questions cover>"], "questions": [{"q": "<the interview question>", "targets": "<the specific gap or strength it probes>"}]}`;
 
     try {
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`,
-        { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 512 } },
-        { params: { key: env.GEMINI_API_KEY }, timeout: 20000 },
-      );
-      const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const text = await generateText({ prompt, temperature: 0.4, maxTokens: 512, json: true });
       const parsed = parseKitJson(text);
       if (!parsed || parsed.questions.length === 0) return { ...fallback, error: true };
       return { ...parsed, generated_at: now };

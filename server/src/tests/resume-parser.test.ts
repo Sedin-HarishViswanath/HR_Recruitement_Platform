@@ -1,12 +1,5 @@
 import { resumeParserService } from '../modules/candidate/resume-parser.service';
 import { env } from '../config/env';
-import fs from 'fs/promises';
-import { PDFParse } from 'pdf-parse';
-
-// Mock fs/promises
-jest.mock('fs/promises', () => ({
-  readFile: jest.fn(),
-}));
 
 // Mock pdf-parse
 jest.mock('pdf-parse', () => {
@@ -40,6 +33,7 @@ B.S. in Computer Science - Stanford University (2019)
 
 describe('ResumeParserService', () => {
   const originalGeminiKey = env.GEMINI_API_KEY;
+  const originalGroqKey = env.GROQ_API_KEY;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -47,26 +41,29 @@ describe('ResumeParserService', () => {
 
   afterAll(() => {
     env.GEMINI_API_KEY = originalGeminiKey;
+    env.GROQ_API_KEY = originalGroqKey;
   });
 
   describe('Local Rule-Based Parsing (Fallback)', () => {
-    it('should extract text from PDF and parse skills, experience, and education locally when Gemini is disabled', async () => {
-      // Disable Gemini to force local parsing fallback
+    it('should extract text from PDF and parse skills, experience, and education locally when AI is disabled', async () => {
+      // Disable both AI providers to force local parsing fallback
       env.GEMINI_API_KEY = '';
+      env.GROQ_API_KEY = '';
 
-      (fs.readFile as jest.Mock).mockResolvedValue(Buffer.from('%PDF-1.4 mock'));
-
-      const result = await resumeParserService.parsePdf('resume.pdf');
+      const result = await resumeParserService.parsePdf(Buffer.from('%PDF-1.4 mock'));
 
       expect(result).not.toBeNull();
       if (result) {
-        // Verify skills extraction
+        // Verify skills extraction. The local parser normalizes casing
+        // idiosyncratically (e.g. "node.js", "Typescript"), so assert on the
+        // set of skills case-insensitively rather than exact strings.
         expect(result.skills).toBeDefined();
-        expect(result.skills).toContain('React');
-        expect(result.skills).toContain('node.js');
-        expect(result.skills).toContain('Typescript');
-        expect(result.skills).toContain('Docker');
-        expect(result.skills).toContain('Postgresql');
+        const skillsLower = (result.skills || []).map((s) => s.toLowerCase());
+        expect(skillsLower).toContain('react');
+        expect(skillsLower).toContain('node.js');
+        expect(skillsLower).toContain('typescript');
+        expect(skillsLower).toContain('docker');
+        expect(skillsLower).toContain('postgresql');
 
         // Verify summary
         expect(result.summary).toContain('Passionate software engineer');

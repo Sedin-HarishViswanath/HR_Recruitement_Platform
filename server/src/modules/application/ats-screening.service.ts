@@ -1,13 +1,14 @@
-import axios from 'axios';
 import { env } from '../../config/env';
 import { logger } from '../../shared/utils/logger';
+import { generateText } from '../../shared/utils/llm';
 import { tfidfMatcherService } from './tfidf-matcher.service';
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+/** True when at least one hosted LLM provider is configured. */
+const aiAvailable = () => !!env.GEMINI_API_KEY || !!env.GROQ_API_KEY;
 
 export interface DetailedScreening {
   score: number;
-  method: 'gemini' | 'tfidf' | 'keyword';
+  method: 'ai' | 'tfidf' | 'keyword';
   reason: string;
   matched_skills: string[];
   gaps: string[];
@@ -88,14 +89,14 @@ export class AtsScreeningService {
   ): Promise<DetailedScreening> {
     const keyword = this.computeKeywordScore(candidateSkills, jobData);
 
-    if (env.GEMINI_API_KEY) {
+    if (aiAvailable()) {
       try {
-        const g = await this.computeGeminiDetailed(candidateSkills, jobData, resumeText);
+        const g = await this.computeAiDetailed(candidateSkills, jobData, resumeText);
         if (g) {
           const blended = Math.round(g.score * 0.7 + keyword.ai_score * 0.3);
           return {
             score: Math.min(100, Math.max(0, blended)),
-            method: 'gemini',
+            method: 'ai',
             reason: g.reason || 'AI-assessed fit.',
             matched_skills: g.matched_skills.length ? g.matched_skills : keyword.matched_skills,
             gaps: g.gaps,
@@ -134,50 +135,51 @@ export class AtsScreeningService {
     };
   }
 
-  private async computeGeminiDetailed(
+  private async computeAiDetailed(
     candidateSkills: string[],
     jobData: any,
     resumeText?: string,
   ): Promise<{ score: number; reason: string; matched_skills: string[]; gaps: string[] } | null> {
     const requiredSkills: string[] = jobData.required_skills || [];
-    const jobDescription: string = (jobData.description || '').slice(0, 2000);
-    const skillsList = candidateSkills.slice(0, 30).join(', ') || 'Not specified';
-    const resumeSnippet = resumeText ? resumeText.slice(0, 1500) : `Skills: ${skillsList}`;
+    const jobDescription: string = (jobData.description || '').slice(0, 2500);
+    const skillsList = candidateSkills.slice(0, 40).join(', ') || 'None listed';
+    const resumeSnippet = resumeText ? resumeText.slice(0, 3000) : 'No resume text provided.';
 
-    const prompt = `You are an expert ATS. Assess the candidate's fit for the job and reply ONLY with JSON.
+    const prompt = `You are a rigorous, senior technical recruiter screening a candidate against ONE role. Judge demonstrated ability, not keyword presence. Base every claim on evidence in the candidate's profile below — never invent experience.
 
-JOB TITLE: ${jobData.title || ''}
-REQUIRED SKILLS: ${requiredSkills.join(', ') || 'Not specified'}
-JOB DESCRIPTION (excerpt): ${jobDescription}
+=== ROLE ===
+Title: ${jobData.title || 'Unspecified'}
+Required skills (treat as MUST-HAVES): ${requiredSkills.join(', ') || 'Not specified'}
+Job description:
+${jobDescription || 'Not provided'}
 
-CANDIDATE PROFILE:
+=== CANDIDATE ===
+Listed skills: ${skillsList}
+Resume text:
 ${resumeSnippet}
 
-Reply ONLY with valid JSON, no prose:
-{"score": <integer 0-100>, "reason": "<one concise sentence>", "matched_skills": ["<skill>"], "gaps": ["<missing required skill or concern>"]}`;
+=== HOW TO SCORE (0-100) ===
+Weigh must-have required skills most heavily. For each, look for EVIDENCE of real use (projects, responsibilities, outcomes), depth, recency, and seniority that matches the role — a passing mention counts far less than demonstrated, recent, hands-on work. Missing must-haves should pull the score down materially. Do not reward keyword stuffing or unsupported claims.
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        const response = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`,
-          {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.2, maxOutputTokens: 256 },
-          },
-          { params: { key: env.GEMINI_API_KEY }, timeout: 15000 },
-        );
-        const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        return parseGeminiScreening(text);
-      } catch (err: any) {
-        if (err?.response?.status === 429 && attempt < 3) {
-          await sleep(attempt * 2000);
-          continue;
-        }
-        logger.warn('Gemini detailed error', { module: 'ATS', status: err?.response?.status });
-        return null;
-      }
+Calibration anchors:
+- 85-100: Strong evidence across nearly all must-haves; seniority and recency clearly fit.
+- 65-84: Most must-haves evidenced; a few gaps or shallow/older experience.
+- 45-64: Partial overlap; several must-haves missing or only mentioned, not demonstrated.
+- 20-44: Few relevant must-haves evidenced; likely needs significant ramp-up.
+- 0-19: Little to no relevant evidence for this role.
+
+=== OUTPUT ===
+Reply ONLY with valid JSON, no prose:
+{"score": <integer 0-100>, "reason": "<1-2 sentences naming the decisive strengths and the biggest gap, grounded in the resume>", "matched_skills": ["<required skills with real evidence in the resume>"], "gaps": ["<required skills that are missing or only weakly evidenced>"]}
+Only list required skills in matched_skills and gaps. Keep each to at most 8 items.`;
+
+    try {
+      const text = await generateText({ prompt, temperature: 0.2, maxTokens: 500, json: true });
+      return parseGeminiScreening(text);
+    } catch (err: any) {
+      logger.warn('AI detailed screening error', { module: 'ATS', message: err?.message });
+      return null;
     }
-    return null;
   }
 
   /**
@@ -189,20 +191,20 @@ Reply ONLY with valid JSON, no prose:
     resumeText: string | undefined,
     keywordResult: { ai_score: number; matched_skills: string[] },
   ): Promise<{ ai_score: number; matched_skills: string[]; scoring_method: string }> {
-    // 1. Try Gemini
-    if (env.GEMINI_API_KEY) {
+    // 1. Try AI (Gemini → Groq)
+    if (aiAvailable()) {
       try {
-        const geminiScore = await this.computeGeminiScore(candidateSkills, jobData, resumeText);
-        if (geminiScore !== null) {
-          const blended = Math.round(geminiScore * 0.7 + keywordResult.ai_score * 0.3);
+        const aiScore = await this.computeAiScore(candidateSkills, jobData, resumeText);
+        if (aiScore !== null) {
+          const blended = Math.round(aiScore * 0.7 + keywordResult.ai_score * 0.3);
           return {
             ai_score: Math.min(100, Math.max(0, blended)),
             matched_skills: keywordResult.matched_skills,
-            scoring_method: 'gemini',
+            scoring_method: 'ai',
           };
         }
       } catch (err) {
-        logger.warn('Gemini scoring failed, falling back to TF-IDF', { module: 'ATS', err });
+        logger.warn('AI scoring failed, falling back to TF-IDF', { module: 'ATS', err });
       }
     }
 
@@ -250,20 +252,20 @@ Reply ONLY with valid JSON, no prose:
       logger.warn('TF-IDF primary scoring failed, falling back to Gemini', { module: 'ATS', err });
     }
 
-    // 2. Fallback: Gemini
-    if (env.GEMINI_API_KEY) {
+    // 2. Fallback: AI (Gemini → Groq)
+    if (aiAvailable()) {
       try {
-        const geminiScore = await this.computeGeminiScore(candidateSkills, jobData, resumeText);
-        if (geminiScore !== null) {
-          const blended = Math.round(geminiScore * 0.7 + keywordResult.ai_score * 0.3);
+        const aiScore = await this.computeAiScore(candidateSkills, jobData, resumeText);
+        if (aiScore !== null) {
+          const blended = Math.round(aiScore * 0.7 + keywordResult.ai_score * 0.3);
           return {
             ai_score: Math.min(100, Math.max(0, blended)),
             matched_skills: keywordResult.matched_skills,
-            scoring_method: 'gemini',
+            scoring_method: 'ai',
           };
         }
       } catch (err) {
-        logger.warn('Gemini fallback scoring failed', { module: 'ATS', err });
+        logger.warn('AI fallback scoring failed', { module: 'ATS', err });
       }
     }
 
@@ -275,83 +277,59 @@ Reply ONLY with valid JSON, no prose:
    * Gemini-based semantic scoring.
    * Prompts the model to return a score 0–100 as a JSON object.
    */
-  private async computeGeminiScore(
+  private async computeAiScore(
     candidateSkills: string[],
     jobData: any,
     resumeText?: string,
-    maxRetries = 2,
   ): Promise<number | null> {
     const requiredSkills: string[] = jobData.required_skills || [];
     const jobDescription: string = (jobData.description || '').slice(0, 2000); // trim to avoid token bloat
     const jobTitle: string = jobData.title || '';
 
-    const skillsList = candidateSkills.slice(0, 30).join(', ') || 'Not specified';
+    const skillsList = candidateSkills.slice(0, 40).join(', ') || 'None listed';
     const resumeSnippet = resumeText
-      ? resumeText.slice(0, 1500)
-      : `Skills: ${skillsList}`;
+      ? resumeText.slice(0, 2500)
+      : 'No resume text provided.';
 
-    const prompt = `You are an expert ATS (Applicant Tracking System). Score the candidate's fit for the job.
+    const prompt = `You are a rigorous technical recruiter scoring ONE candidate against ONE role. Judge demonstrated ability from the evidence below — reward real, recent, hands-on use of the required skills, not keyword mentions. Never assume experience that is not stated.
 
 JOB TITLE: ${jobTitle}
-REQUIRED SKILLS: ${requiredSkills.join(', ') || 'Not specified'}
+REQUIRED SKILLS (must-haves): ${requiredSkills.join(', ') || 'Not specified'}
 JOB DESCRIPTION (excerpt): ${jobDescription}
 
-CANDIDATE PROFILE:
+CANDIDATE — listed skills: ${skillsList}
+CANDIDATE — resume text:
 ${resumeSnippet}
 
 Respond ONLY with valid JSON in this exact format:
-{"score": <integer 0-100>, "reason": "<one sentence>"}
+{"score": <integer 0-100>, "reason": "<one evidence-grounded sentence naming the key strength and biggest gap>"}
 
-Score rubric:
-- 85-100: Excellent match — most required skills present, strong experience alignment
-- 65-84: Good match — several required skills, relevant experience
-- 45-64: Partial match — some skills overlap, may need training
-- 20-44: Weak match — few relevant skills
-- 0-19: Poor match — little to no relevant skills`;
+Score rubric (missing must-haves pull the score down materially):
+- 85-100: Strong evidence across nearly all must-haves; seniority and recency fit
+- 65-84: Most must-haves evidenced; a few gaps or shallow/older experience
+- 45-64: Partial overlap; several must-haves missing or only mentioned
+- 20-44: Few relevant must-haves evidenced
+- 0-19: Little to no relevant evidence`;
 
-    for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
-      try {
-        const response = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${env.GEMINI_MODEL}:generateContent`,
-          {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.1, maxOutputTokens: 128 },
-          },
-          {
-            params: { key: env.GEMINI_API_KEY },
-            timeout: 15000,
-          }
-        );
+    try {
+      const text = await generateText({ prompt, temperature: 0.1, maxTokens: 160, json: true });
+      const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const start = cleaned.indexOf('{');
+      const end = cleaned.lastIndexOf('}');
+      if (start === -1 || end === -1) return null;
 
-        const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        // Parse the JSON score from the response
-        const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-        const start = cleaned.indexOf('{');
-        const end = cleaned.lastIndexOf('}');
-        if (start === -1 || end === -1) return null;
+      const parsed = JSON.parse(cleaned.slice(start, end + 1));
+      const score = Number(parsed.score);
 
-        const parsed = JSON.parse(cleaned.slice(start, end + 1));
-        const score = Number(parsed.score);
-
-        if (!isNaN(score) && score >= 0 && score <= 100) {
-          logger.debug(`Gemini score: ${score} — ${parsed.reason || ''}`, { module: 'ATS' });
-          return score;
-        }
-
-        return null;
-      } catch (err: any) {
-        if (err?.response?.status === 429 && attempt <= maxRetries) {
-          logger.warn(`Gemini rate limit — retrying in ${attempt * 2}s`, { module: 'ATS' });
-          await sleep(attempt * 2000);
-          continue;
-        }
-        // Non-retryable or max retries exhausted
-        logger.warn('Gemini scoring error', { module: 'ATS', status: err?.response?.status, message: err?.message });
-        return null;
+      if (!isNaN(score) && score >= 0 && score <= 100) {
+        logger.debug(`AI score: ${score} — ${parsed.reason || ''}`, { module: 'ATS' });
+        return score;
       }
+      return null;
+    } catch (err: any) {
+      logger.warn('AI scoring error', { module: 'ATS', message: err?.message });
+      return null;
     }
-
-    return null;
   }
 
   /**

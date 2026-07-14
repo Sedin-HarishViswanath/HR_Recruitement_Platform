@@ -14,7 +14,7 @@ interface CopilotResponse {
   questions: string[];
   claim_flags: ClaimFlag[];
   scorecard_suggestion: ScorecardSuggestion;
-  meta: { transcript_entries_used: number; code_aware: boolean; method: 'gemini' | 'fallback' };
+  meta: { transcript_entries_used: number; code_aware: boolean; method: 'ai' | 'fallback' };
 }
 interface Props {
   interviewId: string;

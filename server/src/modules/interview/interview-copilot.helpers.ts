@@ -14,7 +14,7 @@ export interface CopilotResponse {
   questions: string[];
   claim_flags: ClaimFlag[];
   scorecard_suggestion: ScorecardSuggestion;
-  meta: { transcript_entries_used: number; code_aware: boolean; method: 'gemini' | 'fallback' };
+  meta: { transcript_entries_used: number; code_aware: boolean; method: 'ai' | 'fallback' };
 }
 
 const VALID_RECOMMENDATIONS = ['strong_hire', 'hire', 'no_hire', 'strong_no_hire'];
@@ -51,7 +51,9 @@ export function parseCopilotResponse(
     : [];
 
   const sc = parsed.scorecard_suggestion || {};
-  const ratingNum = Number(sc.rating);
+  // Respect an explicit null (model signalling "not enough signal yet") rather
+  // than coercing it to 1 via Number(null) === 0.
+  const ratingNum = sc.rating == null ? NaN : Number(sc.rating);
   const rating = !isNaN(ratingNum) ? Math.min(5, Math.max(1, Math.round(ratingNum))) : null;
   const recommendation = VALID_RECOMMENDATIONS.includes(sc.recommendation) ? sc.recommendation : null;
 

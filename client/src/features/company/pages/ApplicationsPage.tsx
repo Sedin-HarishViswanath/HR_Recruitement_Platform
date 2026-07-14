@@ -129,10 +129,22 @@ export const CompanyApplicationsPage = () => {
   const [screenStarting, setScreenStarting] = useState(false);
 
   const runScreen = async () => {
-    if (selectedJob === 'all') { toast.error('Pick a specific job to screen.'); return; }
+    // AI screening runs per-job. If no specific job is selected, auto-pick when
+    // there's only one, otherwise guide the user to the job filter instead of
+    // leaving them with a dead button.
+    let jobId = selectedJob;
+    if (jobId === 'all') {
+      if (jobs.length === 1) {
+        jobId = jobs[0].id;
+        setSelectedJob(jobId);
+      } else {
+        toast.error('Select a specific job from the filter above to run AI screening.');
+        return;
+      }
+    }
     setScreenStarting(true);
     try {
-      await api.post(`/applications/job/${selectedJob}/screen`, {});
+      await api.post(`/applications/job/${jobId}/screen`, {});
       setScreenOpen(true);
     } catch {
       toast.error('Could not start screening.');
@@ -314,9 +326,9 @@ export const CompanyApplicationsPage = () => {
             {/* AI screening agent */}
             <button
               onClick={runScreen}
-              disabled={screenStarting || selectedJob === 'all'}
+              disabled={screenStarting}
               className="btn-primary py-2 px-4 text-xs disabled:opacity-50"
-              title={selectedJob === 'all' ? 'Select a job first' : 'Run the AI screening agent'}
+              title={selectedJob === 'all' ? 'Select a job to run the AI screening agent' : 'Run the AI screening agent'}
             >
               <Sparkles size={13} />
               {screenStarting ? 'Starting…' : 'Run AI Screen'}

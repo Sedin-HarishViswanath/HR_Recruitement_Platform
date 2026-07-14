@@ -1,5 +1,13 @@
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '../../../components/ui/dialog';
-import { Sparkles, CheckCircle2, Users, X } from 'lucide-react';
+import { Sparkles, CheckCircle2, Users, X, Trophy, Loader2 } from 'lucide-react';
+import { api } from '../../../shared/lib/api';
+
+interface CompareVerdict {
+  recommended: { application_id: string; name: string } | null;
+  summary: string;
+  per_candidate: { application_id: string; name: string; text: string }[];
+}
 
 const REC_LABEL: Record<string, string> = {
   strong_hire: 'Strong Hire', hire: 'Hire',
@@ -33,7 +41,30 @@ interface CandidateCompareModalProps {
 export const CandidateCompareModal = ({
   isOpen, onClose, candidates,
 }: CandidateCompareModalProps) => {
+  const [verdict, setVerdict] = useState<CompareVerdict | null>(null);
+  const [loadingVerdict, setLoadingVerdict] = useState(false);
+  const [verdictError, setVerdictError] = useState(false);
+
+  // Comma-joined ids so the effect re-runs only when the actual selection changes.
+  const idsKey = candidates.map((c) => c.id).join(',');
+
+  useEffect(() => {
+    if (!isOpen || candidates.length < 2) return;
+    let cancelled = false;
+    setVerdict(null);
+    setVerdictError(false);
+    setLoadingVerdict(true);
+    api
+      .post('/applications/compare', { application_ids: candidates.map((c) => c.id) })
+      .then(({ data }) => { if (!cancelled) setVerdict(data.data); })
+      .catch(() => { if (!cancelled) setVerdictError(true); })
+      .finally(() => { if (!cancelled) setLoadingVerdict(false); });
+    return () => { cancelled = true; };
+  }, [isOpen, idsKey, candidates.length]);
+
   if (!candidates.length) return null;
+
+  const recommendedId = verdict?.recommended?.application_id;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -56,14 +87,57 @@ export const CandidateCompareModal = ({
         </div>
 
         <div className="overflow-auto flex-1 p-6">
+
+          {/* ── AI Verdict panel ── */}
+          <div className="mb-6 rounded-2xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50/80 to-white p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles size={13} className="text-emerald-600" />
+              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700">AI Verdict</span>
+            </div>
+            {loadingVerdict ? (
+              <div className="flex items-center gap-2 py-2 text-[12px] text-stone-500 font-medium">
+                <Loader2 size={13} className="animate-spin text-emerald-600" /> Analysing candidates head-to-head…
+              </div>
+            ) : verdictError ? (
+              <p className="text-[12px] text-stone-500 font-medium py-1">Couldn't generate an AI comparison right now.</p>
+            ) : verdict ? (
+              <div className="space-y-2.5">
+                {verdict.recommended && (
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold shadow-sm">
+                    <Trophy size={12} /> Advance first: {verdict.recommended.name}
+                  </div>
+                )}
+                {verdict.summary && (
+                  <p className="text-[12.5px] text-stone-700 font-medium leading-relaxed">{verdict.summary}</p>
+                )}
+                {verdict.per_candidate?.some((p) => p.text) && (
+                  <div className="grid gap-1.5 pt-1">
+                    {verdict.per_candidate.filter((p) => p.text).map((p) => (
+                      <div key={p.application_id} className="text-[11.5px] text-stone-600 leading-snug">
+                        <span className="font-bold text-stone-800">{p.name}:</span> {p.text}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+
           <div className={`grid gap-5`} style={{ gridTemplateColumns: `200px repeat(${candidates.length}, 1fr)` }}>
 
             {/* Column headers */}
             <div /> {/* empty corner */}
             {candidates.map((c, i) => (
               <div key={c.id} className="text-center space-y-2">
-                <div className={`w-12 h-12 mx-auto rounded-2xl bg-gradient-to-br ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-extrabold text-sm shadow-sm`}>
-                  {getInitials(c.candidate_name || c.user_name)}
+                <div className="relative">
+                  <div className={`w-12 h-12 mx-auto rounded-2xl bg-gradient-to-br ${AVATAR_GRADIENTS[i % AVATAR_GRADIENTS.length]} flex items-center justify-center text-white font-extrabold text-sm shadow-sm ${recommendedId === String(c.id) ? 'ring-2 ring-emerald-500 ring-offset-2' : ''}`}>
+                    {getInitials(c.candidate_name || c.user_name)}
+                  </div>
+                  {recommendedId === String(c.id) && (
+                    <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center shadow-sm" title="AI top pick">
+                      <Trophy size={10} className="text-white" />
+                    </span>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-bold text-stone-900 leading-tight">{c.candidate_name || c.user_name || 'Unknown'}</p>
