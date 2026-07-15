@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from '../../../components/ui/dialog';
 import { Label } from '../../../components/ui/label';
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import {
   Select,
   SelectContent,
@@ -27,7 +28,7 @@ import {
   SelectValue,
 } from '../../../components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Search, MoreVertical, Shield, UserX, UserCheck, CheckCircle2, Users, UserCog, UserCheck2 } from 'lucide-react';
+import { Plus, Search, MoreVertical, Shield, UserX, UserCheck, CheckCircle2, Users, UserCog, UserCheck2, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,6 +66,9 @@ export const UsersPage = () => {
   const [inviteData, setInviteData] = useState({ name: '', email: '', role: 'Recruiter', password: '' });
   const [invitedLink, setInvitedLink] = useState<string | null>(null);
   const [isInviting, setIsInviting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; user: User | null; loading: boolean }>({
+    open: false, user: null, loading: false,
+  });
 
   const metrics = useMemo(() => ({
     total: users.length,
@@ -109,15 +113,29 @@ export const UsersPage = () => {
 
   const handleToggleActive = async (user: User) => {
     if (user.id === currentUser?.id) {
-      toast.error('You cannot deactivate your own account.');
+      toast.error('You cannot revoke your own access.');
       return;
     }
     try {
       await api.patch(`/companies/me/users/${user.id}/deactivate`);
-      toast.success(`User ${user.is_active ? 'deactivated' : 'activated'}`);
+      toast.success(`Access ${user.is_active ? 'revoked' : 'restored'}`);
       fetchUsers();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to update user status');
+      toast.error(err?.response?.data?.message || 'Failed to update user access');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteConfirm.user) return;
+    setDeleteConfirm(prev => ({ ...prev, loading: true }));
+    try {
+      await api.delete(`/companies/me/users/${deleteConfirm.user.id}`);
+      toast.success('User deleted');
+      setDeleteConfirm({ open: false, user: null, loading: false });
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to delete user');
+      setDeleteConfirm(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -326,7 +344,7 @@ export const UsersPage = () => {
                       {user.is_active ? (
                         <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200 text-[9.5px] font-bold">Active</Badge>
                       ) : (
-                        <Badge className="bg-stone-100 text-stone-500 hover:bg-stone-100 border-stone-200 text-[9.5px] font-bold">Deactivated</Badge>
+                        <Badge className="bg-stone-100 text-stone-500 hover:bg-stone-100 border-stone-200 text-[9.5px] font-bold">Access Revoked</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-[11px] text-stone-500 font-semibold">
@@ -341,16 +359,26 @@ export const UsersPage = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           {user.id !== currentUser?.id && (
-                            <DropdownMenuItem
-                              className="cursor-pointer text-red-600 focus:text-red-600 text-xs"
-                              onClick={() => handleToggleActive(user)}
-                            >
-                              {user.is_active ? (
-                                <><UserX size={13} className="mr-2" /> Deactivate</>
-                              ) : (
-                                <><UserCheck size={13} className="mr-2" /> Activate</>
+                            <>
+                              <DropdownMenuItem
+                                className="cursor-pointer text-amber-600 focus:text-amber-600 text-xs"
+                                onClick={() => handleToggleActive(user)}
+                              >
+                                {user.is_active ? (
+                                  <><UserX size={13} className="mr-2" /> Revoke Access</>
+                                ) : (
+                                  <><UserCheck size={13} className="mr-2" /> Restore Access</>
+                                )}
+                              </DropdownMenuItem>
+                              {user.role_name !== 'Admin' && (
+                                <DropdownMenuItem
+                                  className="cursor-pointer text-red-600 focus:text-red-600 text-xs"
+                                  onClick={() => setDeleteConfirm({ open: true, user, loading: false })}
+                                >
+                                  <Trash2 size={13} className="mr-2" /> Delete User
+                                </DropdownMenuItem>
                               )}
-                            </DropdownMenuItem>
+                            </>
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -363,6 +391,17 @@ export const UsersPage = () => {
         </div>
 
       </main>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, user: null, loading: false })}
+        onConfirm={handleDelete}
+        loading={deleteConfirm.loading}
+        variant="danger"
+        title={`Delete ${deleteConfirm.user?.name}?`}
+        description="This permanently blocks their login. Their past interviews and feedback records stay intact for audit purposes, but this action cannot be undone."
+        confirmLabel="Delete User"
+      />
     </div>
   );
 };

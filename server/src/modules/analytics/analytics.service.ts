@@ -40,13 +40,16 @@ export class AnalyticsService {
       .groupBy(db.raw('DATE(applied_at)'))
       .orderBy('date', 'asc');
 
+    const totalAppsCount = parseInt(totalApps[0].count as string);
+    const hiredCountValue = parseInt(hiredCount[0].count as string);
+
     return {
       kpis: {
         totalJobs: parseInt(totalJobs[0].count as string),
-        totalApplications: parseInt(totalApps[0].count as string),
+        totalApplications: totalAppsCount,
         activeCandidates: parseInt(activeCandidates[0].count as string),
-        hiredCount: parseInt(hiredCount[0].count as string),
-        hireRate: totalApps[0].count ? ((parseInt(hiredCount[0].count as string) / parseInt(totalApps[0].count as string)) * 100).toFixed(1) : 0
+        hiredCount: hiredCountValue,
+        hireRate: totalAppsCount > 0 ? ((hiredCountValue / totalAppsCount) * 100).toFixed(1) : '0.0'
       },
       funnel,
       overTime

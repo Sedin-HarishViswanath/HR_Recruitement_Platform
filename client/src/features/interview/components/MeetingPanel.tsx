@@ -168,6 +168,10 @@ export const MeetingPanel = ({
             });
           }
 
+          api.post(`/interviews/${interviewId}/transcript`, {
+            entries: [{ speaker: participantRole, text, timestamp: now }],
+          }).catch(() => {});
+
           if (!hasAutoSwitchedRef.current) {
             setTab('transcript');
             hasAutoSwitchedRef.current = true;

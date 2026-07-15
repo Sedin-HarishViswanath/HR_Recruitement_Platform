@@ -26,7 +26,6 @@ const jobFormSchema = z.object({
   deadline: z.string().optional(),
   remote: z.boolean().default(false),
   status: z.enum(['draft', 'published']).default('draft'),
-  interview_rounds: z.number().int().min(1).max(10).default(1),
 });
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
@@ -53,7 +52,6 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
       required_skills: [],
       remote: false,
       status: 'draft',
-      interview_rounds: 1,
     },
   });
 
@@ -214,20 +212,6 @@ export const JobForm = ({ initialData, onSubmit, onCancel }: JobFormProps) => {
               <SelectItem value="senior">Senior Level</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-
-        {/* Interview Rounds */}
-        <div className="space-y-1.5">
-          <Label className="text-xs font-bold text-stone-700 uppercase tracking-wide">
-            Interview Rounds <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            type="number" min="1" max="10"
-            {...register('interview_rounds', { valueAsNumber: true })}
-            placeholder="e.g. 3"
-            className="h-10 text-sm rounded-xl border-stone-200"
-          />
-          {errors.interview_rounds && <p className="text-red-500 text-xs">{errors.interview_rounds.message as string}</p>}
         </div>
 
         {/* Required Skills */}

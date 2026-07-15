@@ -66,6 +66,7 @@ const CandidateApplicationsPage = load(() => import('./features/candidate/pages/
 const CandidateInterviewsPage = load(() => import('./features/candidate/pages/InterviewsPage').then(named('CandidateInterviewsPage')));
 const CandidateOffersPage = load(() => import('./features/candidate/pages/OffersPage').then(named('CandidateOffersPage')));
 const CandidateJobBoard = load(() => import('./features/job/pages/CandidateJobBoard').then(named('CandidateJobBoard')));
+const JobDetailPage = load(() => import('./features/job/pages/JobDetailPage').then(named('JobDetailPage')));
 const PracticeRoom = load(() => import('./features/candidate/pages/PracticeRoom').then(named('PracticeRoom')));
 
 // Interview workspace (heaviest: Monaco + Daily.co)
@@ -238,6 +239,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <CandidateJobBoard />,
+      },
+      {
+        path: ':id',
+        element: <JobDetailPage />,
       },
     ],
   },

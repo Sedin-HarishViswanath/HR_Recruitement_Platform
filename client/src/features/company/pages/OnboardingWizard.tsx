@@ -186,20 +186,28 @@ export const OnboardingWizard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm border p-8">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-2xl w-full card-premium p-8">
+
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-[22px] font-extrabold text-stone-900 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
+            Set up your company workspace
+          </h1>
+          <p className="text-[13px] text-stone-500 font-medium mt-1">Tell us about your company to get started.</p>
+        </div>
 
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
+            <span className="text-[10.5px] font-bold text-stone-400 uppercase tracking-wider">
               Step {step} of 2
             </span>
-            <span className="text-sm font-medium text-emerald-600">
+            <span className="text-[12px] font-bold text-emerald-700">
               {step === 1 ? 'Company Profile' : 'Location & Contact'}
             </span>
           </div>
-          <div className="h-2 bg-stone-100 rounded-full">
+          <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-emerald-600 rounded-full transition-all duration-300"
               style={{ width: `${(step / 2) * 100}%` }}

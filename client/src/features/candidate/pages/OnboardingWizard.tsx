@@ -171,25 +171,36 @@ export const CandidateOnboardingWizard = () => {
     set4('skills', newSkills);
   };
 
-  if (loading) return <div className="flex justify-center items-center h-screen bg-stone-50">Loading...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="w-8 h-8 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
+  const stepLabels = ['Personal Info', 'Resume & Summary', 'Professional Links', 'Preferences & Skills'];
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-6">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm border p-8">
-        
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-2xl w-full card-premium p-8">
+
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-[22px] font-extrabold text-stone-900 tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
+            Set up your candidate profile
+          </h1>
+          <p className="text-[13px] text-stone-500 font-medium mt-1">A complete profile gets 4&times; more recruiter views.</p>
+        </div>
+
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-stone-500 uppercase tracking-wider">Step {step} of 4</span>
-            <span className="text-sm font-medium text-blue-600">
-              {step === 1 && 'Personal Info'}
-              {step === 2 && 'Resume & Summary'}
-              {step === 3 && 'Professional Links'}
-              {step === 4 && 'Preferences & Skills'}
+            <span className="text-[10.5px] font-bold text-stone-400 uppercase tracking-wider">Step {step} of 4</span>
+            <span className="text-[12px] font-bold text-emerald-700">
+              {stepLabels[step - 1]}
             </span>
           </div>
-          <div className="h-2 bg-stone-100 rounded-full">
-            <div className="h-full bg-blue-600 rounded-full transition-all duration-300" style={{ width: `${(step / 4) * 100}%` }} />
+          <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
+            <div className="h-full bg-emerald-600 rounded-full transition-all duration-300" style={{ width: `${(step / 4) * 100}%` }} />
           </div>
         </div>
 
@@ -223,7 +234,7 @@ export const CandidateOnboardingWizard = () => {
               <Textarea {...reg1('about_me')} placeholder="A short bio..." className="h-24" />
               {err1.about_me && <p className="text-red-500 text-xs">{err1.about_me.message as string}</p>}
             </div>
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">Continue</Button>
+            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700">Continue</Button>
           </form>
         )}
 
@@ -241,9 +252,9 @@ export const CandidateOnboardingWizard = () => {
                 />
                 <Label htmlFor="resume-upload" className="cursor-pointer">
                   <div className="mx-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3">
-                    <svg className="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                   </div>
-                  <span className="text-blue-600 font-medium hover:underline">Click to upload PDF</span>
+                  <span className="text-emerald-700 font-bold hover:underline">Click to upload PDF</span>
                   <p className="text-xs text-stone-500 mt-1">Max 5MB</p>
                 </Label>
                 {resumeFile && <p className="mt-3 text-sm font-medium text-stone-700">Selected: {resumeFile.name}</p>}
@@ -265,7 +276,7 @@ export const CandidateOnboardingWizard = () => {
 
             <div className="flex gap-4">
               <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1">Back</Button>
-              <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">Continue</Button>
+              <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700">Continue</Button>
             </div>
           </form>
         )}
@@ -293,7 +304,7 @@ export const CandidateOnboardingWizard = () => {
 
             <div className="flex gap-4">
               <Button type="button" variant="outline" onClick={() => setStep(2)} className="flex-1">Back</Button>
-              <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">Continue</Button>
+              <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700">Continue</Button>
             </div>
           </form>
         )}
@@ -305,7 +316,7 @@ export const CandidateOnboardingWizard = () => {
                 <Label>Top Skills</Label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {skills.map(skill => (
-                    <span key={skill} className="bg-blue-100 text-blue-800 text-sm px-2.5 py-1 rounded-md flex items-center gap-1">
+                    <span key={skill} className="bg-emerald-100 text-emerald-800 text-sm px-2.5 py-1 rounded-md flex items-center gap-1">
                       {skill}
                       <button type="button" onClick={() => handleRemoveSkill(skill)}><X size={14} /></button>
                     </span>
@@ -345,7 +356,7 @@ export const CandidateOnboardingWizard = () => {
 
             <div className="flex gap-4 pt-4">
               <Button type="button" variant="outline" onClick={() => setStep(3)} className="flex-1">Back</Button>
-              <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">Complete Profile</Button>
+              <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700">Complete Profile</Button>
             </div>
           </form>
         )}

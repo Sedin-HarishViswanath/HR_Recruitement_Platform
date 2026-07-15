@@ -187,7 +187,8 @@ export class CompanyService {
       .join('memberships', 'users.id', 'memberships.user_id')
       .join('roles', 'memberships.role_id', 'roles.id')
       .select('users.*', 'roles.name as role_name')
-      .where('users.company_id', companyId);
+      .where('users.company_id', companyId)
+      .whereNull('users.deleted_at');
 
     if (params.role) {
       query = query.where('roles.name', params.role);
@@ -218,10 +219,26 @@ export class CompanyService {
   }
 
   async deactivateCompanyUser(companyId: string, userId: string) {
-    const user = await db('users').where({ id: userId, company_id: companyId }).first();
+    const user = await db('users').where({ id: userId, company_id: companyId }).whereNull('deleted_at').first();
     if (!user) throw new AppError('User not found in your company', 404);
-    // Toggle active status
+    // Toggle active status (this is the reversible revoke/restore access action)
     await db('users').where({ id: userId }).update({ is_active: !user.is_active });
+  }
+
+  async deleteCompanyUser(companyId: string, userId: string) {
+    const user = await db('users')
+      .join('memberships', 'users.id', 'memberships.user_id')
+      .join('roles', 'memberships.role_id', 'roles.id')
+      .select('users.*', 'roles.name as role_name')
+      .where({ 'users.id': userId, 'users.company_id': companyId })
+      .whereNull('users.deleted_at')
+      .first();
+    if (!user) throw new AppError('User not found in your company', 404);
+    if (user.role_name === 'Admin') {
+      throw new AppError('Admin accounts cannot be deleted here', 400);
+    }
+    // Soft delete: permanently blocks login while preserving historical interview/feedback records
+    await db('users').where({ id: userId }).update({ deleted_at: new Date(), is_active: false });
   }
 
   async inviteUser(companyId: string, data: any) {

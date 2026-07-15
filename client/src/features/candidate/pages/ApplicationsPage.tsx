@@ -51,8 +51,7 @@ export const CandidateApplicationsPage = () => {
     if (s === 'applied' || s === 'new') return 0;
     if (s === 'screening') return 1;
     if (s === 'interview' || s.startsWith('interview_')) return 2;
-    if (s === 'offer') return 3;
-    if (s === 'hired') return 4;
+    if (s === 'hired') return 3;
     return -1; // rejected/withdrawn
   };
 
@@ -61,7 +60,6 @@ export const CandidateApplicationsPage = () => {
     if (s === 'applied' || s === 'new') return 'bg-blue-500/10 text-blue-700 border-blue-500/20';
     if (s === 'screening') return 'bg-amber-500/10 text-amber-700 border-amber-500/20';
     if (s === 'interview' || s.startsWith('interview_')) return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20';
-    if (s === 'offer') return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20';
     if (s === 'hired') return 'bg-emerald-600 text-white border-emerald-600';
     if (s === 'rejected') return 'bg-rose-500/10 text-rose-700 border-rose-500/20';
     return 'bg-stone-500/10 text-stone-600 border-stone-500/20';
@@ -103,7 +101,7 @@ export const CandidateApplicationsPage = () => {
     return job.includes(query) || company.includes(query);
   });
 
-  const stagesList = ['Applied', 'Screening', 'Interview', 'Offer', 'Hired'];
+  const stagesList = ['Applied', 'Screening', 'Interview', 'Hired'];
 
   return (
     <div className="flex flex-col min-h-screen">
