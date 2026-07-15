@@ -159,6 +159,10 @@ export const MeetingPanel = ({
 
           setTranscript(prev => [...prev, entry]);
 
+          // The server's 'transcript-entry' socket handler both relays this to
+          // the other participant AND persists it to interview_transcripts, so
+          // emitting here is the single source of truth (no extra HTTP POST —
+          // that would insert every line twice).
           if (socketRef.current?.connected) {
             socketRef.current.emit('transcript-entry', {
               interviewId,
@@ -167,10 +171,6 @@ export const MeetingPanel = ({
               timestamp: now,
             });
           }
-
-          api.post(`/interviews/${interviewId}/transcript`, {
-            entries: [{ speaker: participantRole, text, timestamp: now }],
-          }).catch(() => {});
 
           if (!hasAutoSwitchedRef.current) {
             setTab('transcript');
