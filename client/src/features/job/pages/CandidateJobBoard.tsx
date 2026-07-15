@@ -1,20 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../../app/store';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Search, MapPin, Briefcase, FilterX } from 'lucide-react';
 import { toast } from 'sonner';
-import { ApplyModal } from '../components/ApplyModal';
 import { formatDistanceToNow } from 'date-fns';
 import { unwrapArray } from '../../../shared/lib/response';
 
 export const CandidateJobBoard = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  
+
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -130,7 +126,11 @@ export const CandidateJobBoard = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-stagger">
               {jobs.map((job) => (
-                <div key={job.id} className="card-premium p-4 flex flex-col h-full group hover-lift transition-all">
+                <div
+                  key={job.id}
+                  onClick={() => navigate(`/candidate/jobs/${job.id}`)}
+                  className="card-premium p-4 flex flex-col h-full group hover-lift transition-all cursor-pointer"
+                >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-500 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                       {job.company_name?.charAt(0) || 'C'}
@@ -176,23 +176,12 @@ export const CandidateJobBoard = () => {
                       <span className="tag-pill bg-emerald-50 text-emerald-700 border-emerald-100 text-[10px]">
                         Applied
                       </span>
-                    ) : isAuthenticated ? (
-                      <ApplyModal 
-                        jobId={job.id} 
-                        jobTitle={job.title} 
-                        onSuccess={fetchPublicJobs}
-                        trigger={
-                          <Button size="sm" className="h-8 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white text-[11px] font-bold rounded-lg shadow-sm transition-all active:scale-95">
-                            View & Apply
-                          </Button>
-                        }
-                      />
                     ) : (
-                      <Button 
-                        size="sm" 
-                        onClick={() => navigate('/login', { state: { role: 'candidate' } })}
-                        className="h-8 px-4 bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 text-[11px] font-bold rounded-lg shadow-sm transition-all active:scale-95">
-                        Sign In to Apply
+                      <Button
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/candidate/jobs/${job.id}`); }}
+                        className="h-8 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white text-[11px] font-bold rounded-lg shadow-sm transition-all active:scale-95">
+                        View Details
                       </Button>
                     )}
                   </div>

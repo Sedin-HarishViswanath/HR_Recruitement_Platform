@@ -151,6 +151,21 @@ export class CompanyController {
     }
   }
 
+  async deleteUser(req: Request, res: Response) {
+    try {
+      const companyId = req.user.companyId;
+      const { userId } = req.params;
+      if (userId === req.user.userId) {
+        throw new AppError('You cannot delete your own account', 400);
+      }
+      await companyService.deleteCompanyUser(companyId!, userId as string);
+      return sendResponse(res, 200, true, 'User deleted successfully');
+    } catch (error: any) {
+      if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
+  }
+
   async inviteUser(req: Request, res: Response) {
     try {
       const companyId = req.user.companyId;

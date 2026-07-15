@@ -164,7 +164,7 @@ export const FeedbackPage = () => {
                             <div className="flex items-center gap-2 mt-0.5 text-[10.5px] font-semibold text-stone-400 flex-wrap">
                               <span className="flex items-center gap-1 text-stone-700 font-semibold"><Briefcase size={10} className="text-stone-400" /> {f.job_title || 'Position'}</span>
                               <span className="text-stone-300">·</span>
-                              <span className="flex items-center gap-1"><User size={10} className="text-stone-400" /> {f.interviewer_name || 'Interviewer'}</span>
+                              <span className="flex items-center gap-1"><User size={10} className="text-stone-400" /> {f.interviewer_name || (f.round_type === 'technical' || f.round_type === 'aptitude' ? 'Automated System' : 'Interviewer')}</span>
                             </div>
                           </div>
                         </div>

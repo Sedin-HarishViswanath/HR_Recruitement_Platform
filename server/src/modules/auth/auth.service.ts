@@ -144,6 +144,11 @@ export class AuthService {
       throw new AppError('Invalid email or password', 401);
     }
 
+    // Company users whose access has been revoked or deleted cannot log in
+    if (!isCandidate && (userRecord.deleted_at || userRecord.is_active === false)) {
+      throw new AppError('Your access has been revoked. Contact your company admin.', 403);
+    }
+
     // Check lockout status
     if (userRecord.failed_login_attempts >= MAX_LOGIN_ATTEMPTS && userRecord.lock_until) {
       if (new Date() < new Date(userRecord.lock_until)) {
@@ -323,6 +328,10 @@ export class AuthService {
 
     if (!userRecord) {
       throw new AppError('User not found', 404);
+    }
+
+    if (!isCandidate && (userRecord.deleted_at || userRecord.is_active === false)) {
+      throw new AppError('Your access has been revoked. Contact your company admin.', 403);
     }
 
     // 5. Generate new access token

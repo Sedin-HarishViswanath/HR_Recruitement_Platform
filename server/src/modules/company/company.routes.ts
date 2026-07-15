@@ -15,6 +15,7 @@ router.get('/me/users', authenticate, authorize('Admin', 'Recruiter'), companyCo
 router.post('/me/users/invite', authenticate, authorize('Admin'), companyController.inviteUser.bind(companyController));
 router.patch('/me/users/:userId', authenticate, authorize('Admin'), companyController.updateUser.bind(companyController));
 router.patch('/me/users/:userId/deactivate', authenticate, authorize('Admin'), companyController.deactivateUser.bind(companyController));
+router.delete('/me/users/:userId', authenticate, authorize('Admin'), companyController.deleteUser.bind(companyController));
 
 import { candidateController } from '../candidate/candidate.controller';
 import { interviewController } from '../interview/interview.controller';

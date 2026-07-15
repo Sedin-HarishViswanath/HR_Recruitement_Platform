@@ -141,8 +141,8 @@ export const ScheduleInterviewModal = ({ isOpen, onClose, onSuccess, preselected
               <SelectContent>
                 <SelectItem value="aptitude">Aptitude — Automated MCQ</SelectItem>
                 <SelectItem value="technical">Technical — Automated Coding</SelectItem>
-                <SelectItem value="hr">HR — Live Video</SelectItem>
-                <SelectItem value="final">Final — Live</SelectItem>
+                <SelectItem value="hr">Technical Interview — Live Video</SelectItem>
+                <SelectItem value="final">HR Interview — Live</SelectItem>
               </SelectContent>
             </Select>
           </div>

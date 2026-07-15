@@ -139,7 +139,7 @@ export class InterviewRepository {
       .join('applications', 'interviews.application_id', 'applications.id')
       .join('candidates', 'applications.candidate_id', 'candidates.id')
       .join('jobs', 'applications.job_id', 'jobs.id')
-      .join('users', 'interviews.interviewer_id', 'users.id')
+      .leftJoin('users', 'interviews.interviewer_id', 'users.id')
       .where('jobs.company_id', companyId)
       .orderBy('feedbacks.created_at', 'desc');
   }

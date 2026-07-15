@@ -153,7 +153,12 @@ export class JobService {
       });
     }
     if (query.location) {
-      dbQuery = dbQuery.where('jobs.location', 'ilike', `%${query.location}%`);
+      const locationTerm = String(query.location).trim();
+      if (locationTerm.toLowerCase() === 'remote') {
+        dbQuery = dbQuery.where('jobs.remote', true);
+      } else {
+        dbQuery = dbQuery.where('jobs.location', 'ilike', `%${locationTerm}%`);
+      }
     }
     if (query.type) {
       const types = query.type.split(',');
