@@ -57,6 +57,9 @@ export const MeetingPanel = ({
   const meetingWindowRef = useRef<Window | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
+  const user = useSelector((state: RootState) => state.auth.user);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+
   useEffect(() => {
     const fetchRoom = async () => {
       try {
@@ -89,10 +92,14 @@ export const MeetingPanel = ({
   }, [interviewId]);
 
   useEffect(() => {
+    // The server's socket middleware rejects unauthenticated connections, so
+    // the JWT must be passed here — without it this socket never connects and
+    // transcript relay/persistence silently no-ops.
     const socket = io(BACKEND_URL, {
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      auth: accessToken ? { token: accessToken } : {},
     });
     socketRef.current = socket;
 
@@ -108,14 +115,13 @@ export const MeetingPanel = ({
     });
 
     return () => { socket.disconnect(); };
-  }, [interviewId]);
+  }, [interviewId, accessToken]);
 
   // Auto-scroll transcript
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [transcript]);
 
-  const user = useSelector((state: RootState) => state.auth.user);
   const displayName = user?.name || (participantRole === 'candidate' ? candidateName : 'Interviewer');
 
   const joinUrl = roomUrl
