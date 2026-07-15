@@ -49,8 +49,9 @@ export const OnboardingWizard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit, setValue, watch } = useForm<OnboardingValues>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
+    mode: 'onTouched',
     defaultValues: {
       name: '',
       domain: '',
@@ -141,6 +142,16 @@ export const OnboardingWizard = () => {
     }
   };
 
+  // If validation fails on step-1 fields (which aren't visible on step 2),
+  // send the user back to step 1 so they can see and fix them.
+  const onInvalid = (formErrors: Record<string, unknown>) => {
+    const step1Fields = ['name', 'domain', 'company_size', 'industry'];
+    if (step1Fields.some((f) => f in formErrors)) {
+      setStep(1);
+      toast.error('Please complete the required company details.');
+    }
+  };
+
   const onSubmit = async (data: OnboardingValues) => {
     try {
       await api.patch('/companies/me/profile', {
@@ -196,7 +207,7 @@ export const OnboardingWizard = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="grid grid-cols-2 gap-4">
@@ -269,7 +280,8 @@ export const OnboardingWizard = () => {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="space-y-2">
                 <Label>Address Line 1 <span className="text-red-500">*</span></Label>
-                <Input {...register('address_line1')} placeholder="123 Main St" />
+                <Input {...register('address_line1')} placeholder="123 Main St" className={errors.address_line1 ? 'border-red-400' : ''} />
+                {errors.address_line1 && <p className="text-red-500 text-xs">{errors.address_line1.message}</p>}
               </div>
 
               <div className="space-y-2">
@@ -280,11 +292,13 @@ export const OnboardingWizard = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>City <span className="text-red-500">*</span></Label>
-                  <Input {...register('city')} placeholder="San Francisco" />
+                  <Input {...register('city')} placeholder="San Francisco" className={errors.city ? 'border-red-400' : ''} />
+                  {errors.city && <p className="text-red-500 text-xs">{errors.city.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label>State <span className="text-red-500">*</span></Label>
-                  <Input {...register('state')} placeholder="CA" />
+                  <Input {...register('state')} placeholder="CA" className={errors.state ? 'border-red-400' : ''} />
+                  {errors.state && <p className="text-red-500 text-xs">{errors.state.message}</p>}
                 </div>
               </div>
 
@@ -295,7 +309,7 @@ export const OnboardingWizard = () => {
                     onValueChange={(v) => setValue('country', v)}
                     value={watch('country') || undefined}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={errors.country ? 'border-red-400' : ''}>
                       <SelectValue placeholder="Select country" />
                     </SelectTrigger>
                     <SelectContent>
@@ -304,17 +318,20 @@ export const OnboardingWizard = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.country && <p className="text-red-500 text-xs">{errors.country.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label>Postal Code <span className="text-red-500">*</span></Label>
-                  <Input {...register('postal_code')} placeholder="94103" />
+                  <Input {...register('postal_code')} placeholder="94103" className={errors.postal_code ? 'border-red-400' : ''} />
+                  {errors.postal_code && <p className="text-red-500 text-xs">{errors.postal_code.message}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Contact Email <span className="text-red-500">*</span></Label>
-                  <Input {...register('contact_email')} type="email" placeholder="hr@acme.com" />
+                  <Input {...register('contact_email')} type="email" placeholder="hr@acme.com" className={errors.contact_email ? 'border-red-400' : ''} />
+                  {errors.contact_email && <p className="text-red-500 text-xs">{errors.contact_email.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label>Contact Phone</Label>

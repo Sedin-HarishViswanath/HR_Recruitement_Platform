@@ -40,6 +40,22 @@ export class InAppNotificationService {
   }
 
   /**
+   * Fan out a notification to every Super Admin user (platform-wide alerts,
+   * e.g. a new company registration awaiting approval).
+   */
+  async notifySuperAdmins(data: Omit<CreateNotificationInput, 'userId' | 'candidateId'>): Promise<void> {
+    const superAdmins = await db('users')
+      .join('memberships', 'users.id', 'memberships.user_id')
+      .join('roles', 'memberships.role_id', 'roles.id')
+      .where('roles.name', 'Super Admin')
+      .pluck('users.id');
+
+    await Promise.all(
+      superAdmins.map((userId: string | number) => this.create({ ...data, userId })),
+    );
+  }
+
+  /**
    * Get all notifications for a user (sorted by most recent first)
    */
   async getForUser(userId: string | null, candidateId: string | null, limit = 30) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../shared/lib/api';
-import { Users, Briefcase, Activity, MoreVertical } from 'lucide-react';
+import { Users, Briefcase, Activity, MoreVertical, Building2, Clock, CheckCircle2, CalendarCheck } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 import { toast } from 'sonner';
@@ -25,9 +25,14 @@ export const AdminDashboard = () => {
   }, []);
 
   const statMeta = [
-    { label: 'Total companies', key: 'totalCompanies', icon: Briefcase, colorClass: 'bg-emerald-50 border-emerald-100 text-emerald-600' },
+    { label: 'Total companies', key: 'totalCompanies', icon: Building2, colorClass: 'bg-blue-50 border-blue-100 text-blue-600' },
+    { label: 'Active companies', key: 'activeCompanies', icon: CheckCircle2, colorClass: 'bg-emerald-50 border-emerald-100 text-emerald-600' },
+    { label: 'Pending approval', key: 'pendingApprovals', icon: Clock, colorClass: 'bg-amber-50 border-amber-100 text-amber-600' },
     { label: 'Total jobs', key: 'totalJobs', icon: Briefcase, colorClass: 'bg-blue-50 border-blue-100 text-blue-600' },
+    { label: 'Total candidates', key: 'totalCandidates', icon: Users, colorClass: 'bg-emerald-50 border-emerald-100 text-emerald-600' },
     { label: 'Total applications', key: 'totalApplications', icon: Users, colorClass: 'bg-emerald-50 border-emerald-100 text-emerald-600' },
+    { label: 'Interviews', key: 'totalInterviews', icon: CalendarCheck, colorClass: 'bg-blue-50 border-blue-100 text-blue-600' },
+    { label: 'Platform users', key: 'totalUsers', icon: Users, colorClass: 'bg-stone-50 border-stone-100 text-stone-600' },
   ];
 
   return (
@@ -45,7 +50,7 @@ export const AdminDashboard = () => {
           ) : (
             <>
               {/* Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {statMeta.map((s, i) => (
                   <div key={i} className="metric-card p-4 sm:p-5 flex items-center gap-4 group cursor-default">
                     <div className="metric-card-accent" />
@@ -114,6 +119,34 @@ export const AdminDashboard = () => {
                       <div className="text-stone-400 text-[12px] font-medium py-4 text-center">No companies found.</div>
                     )}
                   </div>
+                </div>
+              </div>
+
+              {/* Recent signups */}
+              <div className="panel p-4 sm:p-5 animate-fade-in-up" style={{ animationDelay: '250ms' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <Building2 size={12} />
+                  </div>
+                  <h3 className="font-bold text-stone-900 tracking-tight text-[13px]" style={{ fontFamily: 'Plus Jakarta Sans' }}>Recent Company Signups</h3>
+                </div>
+                <div className="divide-y divide-stone-50">
+                  {(data.recentCompanies || []).length === 0 ? (
+                    <div className="text-stone-400 text-[12px] font-medium py-4 text-center">No signups yet.</div>
+                  ) : (
+                    (data.recentCompanies || []).map((c: any) => (
+                      <div key={c.id} className="flex items-center justify-between py-2.5">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-blue-600/5 text-blue-600 flex items-center justify-center font-black text-sm border border-blue-600/10 shrink-0">{c.name?.[0]}</div>
+                          <span className="text-[12px] font-bold text-stone-800 truncate">{c.name}</span>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${c.status === 'active' ? 'bg-emerald-50 text-emerald-600' : c.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-stone-100 text-stone-500'}`}>{c.status}</span>
+                          <span className="text-[10px] text-stone-400 font-medium">{c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </>

@@ -107,7 +107,7 @@ export const CandidateDashboard = () => {
       border: 'border-emerald-100',
     },
     {
-      label: 'Active Apps',
+      label: 'Active Applications',
       value: stats.activeApps,
       icon: Briefcase,
       color: 'text-sky-600',

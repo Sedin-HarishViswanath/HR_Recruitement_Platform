@@ -116,6 +116,13 @@ export const NotificationBell = () => {
     }
   };
 
+  // Only surface the most recent unread notifications — marking one read (or
+  // "mark all read") removes it from view.
+  const MAX_VISIBLE = 5;
+  const visibleNotifications = notifications
+    .filter(n => !n.read_at)
+    .slice(0, MAX_VISIBLE);
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Bell Button */}
@@ -163,13 +170,13 @@ export const NotificationBell = () => {
               <div className="py-8 text-center">
                 <div className="w-5 h-5 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mx-auto" />
               </div>
-            ) : notifications.length === 0 ? (
+            ) : visibleNotifications.length === 0 ? (
               <div className="py-12 text-center">
                 <Bell size={28} className="text-stone-200 mx-auto mb-2" />
-                <p className="text-xs font-bold text-stone-400">No notifications yet</p>
+                <p className="text-xs font-bold text-stone-400">You're all caught up</p>
               </div>
             ) : (
-              notifications.map(n => (
+              visibleNotifications.map(n => (
                 <div
                   key={n.id}
                   className={`px-4 py-3 flex gap-3 cursor-pointer transition-colors ${n.read_at ? 'bg-white hover:bg-stone-50/60' : 'bg-emerald-50/40 hover:bg-emerald-50/70'}`}

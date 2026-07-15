@@ -37,6 +37,9 @@ const envSchema = z.object({
   MINIO_ACCESS_KEY: z.string().optional(),
   MINIO_SECRET_KEY: z.string().optional(),
   MINIO_BUCKET: z.string().default('resumes'),
+
+  // Piston code-execution engine (self-hosted). Base URL including /api/v2.
+  PISTON_URL: z.string().optional(),
 });
 
 const envVars = envSchema.safeParse(process.env);

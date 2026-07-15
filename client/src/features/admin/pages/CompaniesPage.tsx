@@ -5,7 +5,6 @@ import {
   Building2,
   CheckCircle2,
   XCircle,
-  Filter,
   ExternalLink,
   Users,
   Clock,
@@ -22,6 +21,7 @@ import {
   SelectValue,
 } from '../../../components/ui/select';
 import { toast } from 'sonner';
+import { Dialog, DialogContent } from '../../../components/ui/dialog';
 import { DashboardHeader } from '../../../shared/components/DashboardHeader';
 
 interface Company {
@@ -41,6 +41,22 @@ export const CompaniesPage = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [detail, setDetail] = useState<any>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const openDetail = async (id: string) => {
+    setDetail({ id }); // open modal immediately with a loading state
+    setDetailLoading(true);
+    try {
+      const { data } = await api.get(`/companies/admin/${id}`);
+      setDetail(data.data);
+    } catch {
+      toast.error('Failed to load company details');
+      setDetail(null);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
 
   const fetchCompanies = async () => {
     try {
@@ -139,7 +155,7 @@ export const CompaniesPage = () => {
                 <CheckCircle2 size={18} />
               </div>
               <div>
-                <p className="section-eyebrow mb-0.5">Active Tenants</p>
+                <p className="section-eyebrow mb-0.5">Active Companies</p>
                 <h4 className="text-[22px] font-extrabold text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>
                   {companies.filter(c => c.status === 'active').length}
                 </h4>
@@ -171,9 +187,6 @@ export const CompaniesPage = () => {
                   <SelectItem value="revoked">Revoked</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" className="h-10 rounded-xl border-stone-100 bg-stone-50 px-4 text-stone-600 hover:bg-stone-100 text-sm">
-                <Filter size={14} className="mr-2" /> Filters
-              </Button>
             </div>
           </div>
 
@@ -213,17 +226,21 @@ export const CompaniesPage = () => {
                     companies.map((company) => (
                       <tr key={company.id} className="hover:bg-stone-50/60 transition-colors group">
                         <td className="px-5 py-3.5">
-                          <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => openDetail(company.id)}
+                            className="flex items-center gap-3 text-left cursor-pointer group/name"
+                            title="View company details"
+                          >
                             <div className="w-9 h-9 rounded-xl bg-blue-600/5 text-blue-600 flex items-center justify-center font-black text-base border border-blue-600/10 shrink-0">
                               {company.name[0]}
                             </div>
                             <div>
-                              <p className="font-bold text-stone-900 text-sm leading-none">{company.name}</p>
+                              <p className="font-bold text-stone-900 text-sm leading-none group-hover/name:text-blue-600 transition-colors">{company.name}</p>
                               <p className="text-[10px] text-stone-400 font-medium mt-1 flex items-center gap-1">
                                 <ExternalLink size={10} /> {company.domain}
                               </p>
                             </div>
-                          </div>
+                          </button>
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-2">
@@ -302,6 +319,69 @@ export const CompaniesPage = () => {
 
         </div>
       </main>
+
+      {/* Company detail modal */}
+      <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden">
+          {detailLoading || !detail?.name ? (
+            <div className="py-16 flex items-center justify-center">
+              <div className="w-7 h-7 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div>
+              <div className="p-5 border-b border-stone-100 flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-blue-600/5 text-blue-600 flex items-center justify-center font-black text-lg border border-blue-600/10">
+                  {detail.name?.[0]}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-stone-900 text-base leading-tight">{detail.name}</h3>
+                  <p className="text-[11px] text-stone-400 font-medium flex items-center gap-1 mt-0.5">
+                    <ExternalLink size={10} /> {detail.domain || '—'}
+                  </p>
+                </div>
+                <div className="ml-auto">{getStatusBadge(detail.status)}</div>
+              </div>
+
+              <div className="p-5 grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Jobs', value: detail.stats?.jobs ?? 0 },
+                  { label: 'Applications', value: detail.stats?.applications ?? 0 },
+                  { label: 'Team Members', value: detail.stats?.users ?? 0 },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl bg-stone-50 border border-stone-100 p-3 text-center">
+                    <p className="text-[20px] font-black text-stone-900 leading-none" style={{ fontFamily: 'Plus Jakarta Sans' }}>{s.value}</p>
+                    <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-wider mt-1">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="px-5 pb-5 space-y-2.5">
+                {[
+                  { label: 'Industry', value: detail.industry },
+                  { label: 'Company Size', value: detail.company_size ? `${detail.company_size} employees` : null },
+                  { label: 'Admin', value: detail.admin_name },
+                  { label: 'Contact', value: detail.admin_email },
+                  { label: 'Phone', value: detail.contact_phone },
+                  { label: 'Website', value: detail.website_url },
+                  { label: 'Location', value: [detail.city, detail.country].filter(Boolean).join(', ') || null },
+                  { label: 'Registered', value: detail.created_at ? new Date(detail.created_at).toLocaleDateString() : null },
+                ].filter((r) => r.value).map((r) => (
+                  <div key={r.label} className="flex items-start justify-between gap-4 text-[12px]">
+                    <span className="text-stone-400 font-semibold shrink-0">{r.label}</span>
+                    <span className="text-stone-800 font-medium text-right break-words">{r.value}</span>
+                  </div>
+                ))}
+                {detail.bio && (
+                  <div className="pt-2 border-t border-stone-100">
+                    <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-wider mb-1">About</p>
+                    <p className="text-[12px] text-stone-700 leading-relaxed">{detail.bio}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -66,10 +66,13 @@ export class AnalyticsService {
       .where('jobs.company_id', companyId)
       .where('interviews.status', 'scheduled')
       .count('* as count');
+    // Only candidates still "in progress" — i.e. with at least one application
+    // that hasn't reached a terminal state (rejected / hired / withdrawn).
     const [totalCandidates] = await db('candidates')
       .join('applications', 'candidates.id', 'applications.candidate_id')
       .join('jobs', 'applications.job_id', 'jobs.id')
       .where('jobs.company_id', companyId)
+      .whereNotIn('applications.status', ['rejected', 'hired', 'withdrawn'])
       .countDistinct('candidates.id as count');
 
     // 2. Pipeline Stages (Funnel)
@@ -121,10 +124,31 @@ export class AnalyticsService {
   }
 
   async getAdminAnalytics() {
-    const totalCompanies = await db('companies').count('* as count');
-    const companiesByStatus = await db('companies').select('status').count('* as count').groupBy('status');
-    const totalJobs = await db('jobs').count('* as count');
-    const totalApps = await db('applications').count('* as count');
+    const num = (rows: any[]) => parseInt(rows?.[0]?.count as string) || 0;
+
+    const [
+      totalCompanies,
+      companiesByStatus,
+      totalJobs,
+      publishedJobs,
+      totalApps,
+      totalCandidates,
+      totalUsers,
+      totalInterviews,
+      pendingApprovals,
+      activeCompanies,
+    ] = await Promise.all([
+      db('companies').count('* as count'),
+      db('companies').select('status').count('* as count').groupBy('status'),
+      db('jobs').whereNull('deleted_at').count('* as count'),
+      db('jobs').where({ status: 'published', deleted_at: null }).count('* as count'),
+      db('applications').count('* as count'),
+      db('candidates').count('* as count'),
+      db('users').count('* as count'),
+      db('interviews').count('* as count'),
+      db('companies').where({ status: 'pending' }).count('* as count'),
+      db('companies').where({ status: 'active' }).count('* as count'),
+    ]);
 
     const topCompanies = await db('companies')
       .select('companies.name')
@@ -134,14 +158,27 @@ export class AnalyticsService {
       .orderBy('jobs_count', 'desc')
       .limit(5);
 
+    // Most recent company signups for an activity feed.
+    const recentCompanies = await db('companies')
+      .select('id', 'name', 'status', 'created_at')
+      .orderBy('created_at', 'desc')
+      .limit(6);
+
     return {
       kpis: {
-        totalCompanies: parseInt(totalCompanies[0].count as string),
-        totalJobs: parseInt(totalJobs[0].count as string),
-        totalApplications: parseInt(totalApps[0].count as string)
+        totalCompanies: num(totalCompanies),
+        totalJobs: num(totalJobs),
+        publishedJobs: num(publishedJobs),
+        totalApplications: num(totalApps),
+        totalCandidates: num(totalCandidates),
+        totalUsers: num(totalUsers),
+        totalInterviews: num(totalInterviews),
+        pendingApprovals: num(pendingApprovals),
+        activeCompanies: num(activeCompanies),
       },
       companiesByStatus,
-      topCompanies
+      topCompanies,
+      recentCompanies,
     };
   }
 }

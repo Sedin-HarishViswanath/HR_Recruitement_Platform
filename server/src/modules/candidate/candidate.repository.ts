@@ -1,14 +1,35 @@
 import { db as knex } from '../../config/db';
 
+// jsonb columns on `candidates`. Postgres serializes a raw JS array parameter
+// as an array literal ({...}), which is invalid JSON for a jsonb column, so any
+// object/array bound for these columns must be JSON.stringify'd first. (`skills`
+// is text[] and must stay a raw JS array — do NOT include it here.)
+const CANDIDATE_JSONB_COLUMNS = ['experience', 'preferences', 'resume_data'] as const;
+
+function serializeJsonbColumns(data: any): any {
+  const out = { ...data };
+  for (const col of CANDIDATE_JSONB_COLUMNS) {
+    if (col in out && out[col] != null && typeof out[col] !== 'string') {
+      out[col] = JSON.stringify(out[col]);
+    }
+  }
+  return out;
+}
+
 export class CandidateRepository {
   async findById(candidateId: string) {
     return knex('candidates').where({ id: candidateId }).first();
   }
 
+  /** Increment a candidate's recruiter profile-view counter. */
+  async incrementProfileViews(candidateId: string) {
+    return knex('candidates').where({ id: candidateId }).increment('profile_views', 1);
+  }
+
   async updateProfile(candidateId: string, data: any) {
     const [updated] = await knex('candidates')
       .where({ id: candidateId })
-      .update(data)
+      .update(serializeJsonbColumns(data))
       .returning('*');
     return updated;
   }
@@ -64,6 +85,7 @@ export class CandidateRepository {
         'jobs.title',
         'jobs.location',
         'jobs.department',
+        'jobs.required_skills',
         'companies.name as company_name'
       )
       .join('companies', 'jobs.company_id', 'companies.id')
@@ -74,7 +96,21 @@ export class CandidateRepository {
       q = q.whereNotIn('jobs.id', appliedJobIds);
     }
 
-    return q.limit(limit);
+    const jobs = await q.limit(limit);
+
+    // Compute a skill-overlap match score (% of the job's required skills the
+    // candidate has). Case-insensitive so "Node.js" matches "node.js".
+    const candidateSkills = new Set(skills.map((s) => s.toLowerCase().trim()));
+    return jobs
+      .map((job: any) => {
+        const required: string[] = Array.isArray(job.required_skills) ? job.required_skills : [];
+        const matched = required.filter((s) => candidateSkills.has(String(s).toLowerCase().trim()));
+        const match_score = required.length > 0
+          ? Math.round((matched.length / required.length) * 100)
+          : 0;
+        return { ...job, match_score };
+      })
+      .sort((a: any, b: any) => b.match_score - a.match_score);
   }
 
   async getStats(candidateId: string) {
@@ -93,10 +129,21 @@ export class CandidateRepository {
       .where('interviews.status', 'scheduled')
       .count('* as count');
 
+    // Average AI fit score across this candidate's applications.
+    const [avgMatch] = await knex('applications')
+      .where({ candidate_id: candidateId })
+      .whereNotNull('ai_score')
+      .avg('ai_score as avg');
+
+    // Recruiter profile views (incremented when a company opens the candidate).
+    const profile = await knex('candidates').select('profile_views').where({ id: candidateId }).first();
+
     return {
       totalApplications: parseInt(totalApps?.count as string || '0'),
       activeApplications: parseInt(activeApps?.count as string || '0'),
       scheduledInterviews: parseInt(scheduledInterviews?.count as string || '0'),
+      averageMatchScore: avgMatch?.avg != null ? Math.round(Number(avgMatch.avg)) : 0,
+      profileViews: Number(profile?.profile_views || 0),
     };
   }
 
