@@ -126,7 +126,28 @@ export class ApplicationService {
       // Notify candidate of status update
       const candidate = await trx('candidates').where({ id: application.candidate_id }).first();
       const job = await trx('jobs').where({ id: application.job_id }).first();
-      
+
+      // Hiring can happen either through the formal offer flow (offer created,
+      // then accepted) or via this direct stage shortcut. Either way, the
+      // candidate's Offers page should reflect the hire — so if no offer
+      // record exists yet for this application, create an accepted one now.
+      if (stage === 'hired') {
+        const existingOffer = await trx('offers').where({ application_id: id }).first();
+        if (!existingOffer) {
+          const defaultStartDate = new Date();
+          defaultStartDate.setDate(defaultStartDate.getDate() + 14);
+
+          await trx('offers').insert({
+            application_id: id,
+            salary: job?.salary_max || job?.salary_min || 0,
+            currency: 'USD',
+            start_date: defaultStartDate,
+            additional_terms: 'Hired directly by the hiring team.',
+            status: 'accepted',
+          });
+        }
+      }
+
       void notificationService.notifyStatusUpdate(candidate, job, stage);
 
       return updated;

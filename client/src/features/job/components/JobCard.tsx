@@ -30,11 +30,12 @@ interface JobCardProps {
   job: Job;
   onEdit: (id: string) => void;
   onView: (id: string) => void;
+  onViewDetails: (id: string) => void;
   onDelete: (id: string) => void;
   onChangeStatus: (id: string, status: string) => void;
 }
 
-export const JobCard = ({ job, onEdit, onView, onDelete, onChangeStatus }: JobCardProps) => {
+export const JobCard = ({ job, onEdit, onView, onViewDetails, onDelete, onChangeStatus }: JobCardProps) => {
   const isClosed = job.status === 'closed';
   const isDraft = job.status === 'draft';
 
@@ -98,7 +99,7 @@ export const JobCard = ({ job, onEdit, onView, onDelete, onChangeStatus }: JobCa
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44 rounded-xl p-1.5 border-stone-200 shadow-lg">
-            <DropdownMenuItem onClick={() => onView(job.id)} className="rounded-lg text-[12px] font-semibold cursor-pointer">
+            <DropdownMenuItem onClick={() => onViewDetails(job.id)} className="rounded-lg text-[12px] font-semibold cursor-pointer">
               <Eye className="mr-2" size={14} /> View Details
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(job.id)} className="rounded-lg text-[12px] font-semibold cursor-pointer">

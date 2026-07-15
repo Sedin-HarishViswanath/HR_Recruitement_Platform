@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../../shared/lib/api';
 import { Button } from '../../../components/ui/button';
-import { Plus, BriefcaseBusiness } from 'lucide-react';
+import { Plus, BriefcaseBusiness, MapPin, Briefcase, GraduationCap, Wallet, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { JobCard } from '../components/JobCard';
 import type { Job } from '../components/JobCard';
@@ -19,6 +19,7 @@ export const CompanyJobsPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [editingJob, setEditingJob] = useState<any | null>(null);
+  const [viewingJob, setViewingJob] = useState<any | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; id: string; title: string; loading: boolean }>({
     open: false, id: '', title: '', loading: false,
   });
@@ -83,6 +84,15 @@ export const CompanyJobsPage = () => {
       fetchJobs();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to create job');
+    }
+  };
+
+  const handleViewDetails = async (id: string) => {
+    try {
+      const { data } = await api.get(`/jobs/${id}`);
+      setViewingJob(data?.data || data);
+    } catch (err: any) {
+      toast.error('Failed to load job details');
     }
   };
 
@@ -177,11 +187,88 @@ export const CompanyJobsPage = () => {
                     deadline: editingJob.deadline ? editingJob.deadline.split('T')[0] : '',
                     remote: editingJob.remote || false,
                     status: editingJob.status || 'draft',
-                    interview_rounds: editingJob.interview_rounds || 1,
                   } : undefined}
                   onSubmit={editingJob ? handleEditJob : handleCreateJob}
                   onCancel={closeForm}
                 />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {viewingJob && (
+          <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-stone-200 animate-in zoom-in duration-300">
+              <div className="p-8 space-y-5">
+                <div className="flex justify-between items-start gap-4">
+                  <div>
+                    <h2 className="text-2xl font-black text-stone-900 tracking-tight">{viewingJob.title}</h2>
+                    <p className="text-sm text-stone-500 font-semibold mt-1">{viewingJob.department || 'General'}</p>
+                  </div>
+                  <button onClick={() => setViewingJob(null)} className="text-stone-400 hover:text-stone-600 font-bold shrink-0">Close</button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-stone-100">
+                  <div className="flex items-center gap-2 text-[12px] text-stone-600 font-semibold">
+                    <MapPin size={14} className="text-stone-300 shrink-0" />
+                    <span className="truncate">{viewingJob.remote ? 'Remote' : viewingJob.location || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[12px] text-stone-600 font-semibold">
+                    <Briefcase size={14} className="text-stone-300 shrink-0" />
+                    <span className="truncate">{viewingJob.employment_type?.replace('_', '-') || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[12px] text-stone-600 font-semibold">
+                    <GraduationCap size={14} className="text-stone-300 shrink-0" />
+                    <span className="truncate">{viewingJob.experience_level || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[12px] text-stone-600 font-semibold">
+                    <Users size={14} className="text-stone-300 shrink-0" />
+                    <span className="truncate">{viewingJob.applicant_count || 0} applicants</span>
+                  </div>
+                </div>
+
+                {(viewingJob.salary_min || viewingJob.salary_max) && (
+                  <div className="flex items-center gap-2 text-[12px] text-stone-600 font-semibold">
+                    <Wallet size={14} className="text-stone-300 shrink-0" />
+                    {viewingJob.salary_min && viewingJob.salary_max
+                      ? `$${Number(viewingJob.salary_min).toLocaleString()} – $${Number(viewingJob.salary_max).toLocaleString()}`
+                      : `$${Number(viewingJob.salary_min || viewingJob.salary_max).toLocaleString()}+`}
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="text-xs font-bold text-stone-700 uppercase tracking-wide mb-2">Description</h3>
+                  <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-wrap">{viewingJob.description}</p>
+                </div>
+
+                {viewingJob.required_skills && viewingJob.required_skills.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold text-stone-700 uppercase tracking-wide mb-2">Required Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {viewingJob.required_skills.map((skill: string) => (
+                        <span key={skill} className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-stone-50 text-stone-600 border border-stone-100">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-3 border-t border-stone-100">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => { navigate(`/company/applications?job_id=${viewingJob.id}`); setViewingJob(null); }}
+                  >
+                    View Pipeline
+                  </Button>
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold"
+                    onClick={() => { handleEditClick(viewingJob.id); setViewingJob(null); }}
+                  >
+                    Edit Job
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -212,6 +299,7 @@ export const CompanyJobsPage = () => {
                 job={job}
                 onEdit={() => handleEditClick(job.id)}
                 onView={() => navigate(`/company/applications?job_id=${job.id}`)}
+                onViewDetails={() => handleViewDetails(job.id)}
                 onDelete={handleDelete}
                 onChangeStatus={handleChangeStatus}
               />

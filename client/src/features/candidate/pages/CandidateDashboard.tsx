@@ -164,7 +164,7 @@ export const CandidateDashboard = () => {
         {/* ── Profile completion banner ── */}
         {!loading && profileCompletion < 100 && (
           <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-600 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-5 shadow-lg shadow-emerald-200/40">
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 80% 50%, white 0%, transparent 60%)' }} />
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 80% 50%, white 0%, transparent 60%)' }} />
             <div className="relative w-14 h-14 shrink-0">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 56 56">
                 <circle cx="28" cy="28" r="24" stroke="rgba(255,255,255,0.2)" strokeWidth="4" fill="none" />

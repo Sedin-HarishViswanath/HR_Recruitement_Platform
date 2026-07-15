@@ -589,7 +589,9 @@ export const CompanyApplicationsPage = () => {
                         <div className="space-y-4">
                           {appFeedback.map((f: any, fi: number) => {
                             const hasFeedback = !!f.rating;
-                            const isAptitude = (f.round_type || '').toLowerCase() === 'aptitude';
+                            const roundTypeLower = (f.round_type || '').toLowerCase();
+                            const isAptitude = roundTypeLower === 'aptitude';
+                            const isAutomated = isAptitude || roundTypeLower === 'technical';
                             const aptitudePct = f.aptitude_score != null ? Math.round((f.aptitude_score / 20) * 100) : null;
                             return (
                               <div key={f.interview_id || f.id || fi} className="outer-bezel">
@@ -632,18 +634,18 @@ export const CompanyApplicationsPage = () => {
                                       )}
                                       {!hasFeedback && (
                                         <span className="badge-premium badge-amber">
-                                          {f.interview_status === 'completed' || isAptitude ? 'Completed' : 'Pending feedback'}
+                                          {f.interview_status === 'completed' || isAutomated ? 'Completed' : 'Pending feedback'}
                                         </span>
                                       )}
                                     </div>
                                   </div>
 
-                                  {/* Aptitude score block */}
-                                  {isAptitude && f.aptitude_score != null && (
+                                  {/* Automated (aptitude/technical) score block */}
+                                  {isAutomated && f.aptitude_score != null && (
                                     <div className="flex items-center gap-4 p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
                                       <div className="text-center shrink-0">
                                         <p className="text-2xl font-black text-emerald-750">{f.aptitude_score}<span className="text-sm font-bold text-emerald-400">/20</span></p>
-                                        <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">Aptitude Score</p>
+                                        <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">{isAptitude ? 'Aptitude Score' : 'Coding Score'}</p>
                                       </div>
                                       <div className="flex-1">
                                         <div className="w-full bg-emerald-100/50 rounded-full h-1.5 mb-1.5">
@@ -659,10 +661,10 @@ export const CompanyApplicationsPage = () => {
                                     </div>
                                   )}
 
-                                  {/* Aptitude pending */}
-                                  {isAptitude && f.aptitude_score == null && (
+                                  {/* Automated round pending */}
+                                  {isAutomated && f.aptitude_score == null && (
                                     <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-100 text-center">
-                                      <p className="text-xs text-stone-400 font-medium">Aptitude assessment not yet completed</p>
+                                      <p className="text-xs text-stone-400 font-medium">{isAptitude ? 'Aptitude' : 'Coding'} assessment not yet completed</p>
                                     </div>
                                   )}
 
@@ -698,8 +700,8 @@ export const CompanyApplicationsPage = () => {
                                     </>
                                   )}
 
-                                  {/* Non-aptitude round with no feedback yet */}
-                                  {!hasFeedback && !isAptitude && (
+                                  {/* Live interview round with no feedback yet */}
+                                  {!hasFeedback && !isAutomated && (
                                     <p className="text-xs text-stone-400 font-medium text-center py-2">
                                       Interviewer feedback pending
                                     </p>
