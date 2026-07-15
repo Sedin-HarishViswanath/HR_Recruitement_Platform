@@ -58,7 +58,7 @@ const statMeta = [
   { title: 'Applications', icon: Users },
   { title: 'Open positions', icon: Briefcase },
   { title: 'Interviews scheduled', icon: Calendar },
-  { title: 'Total candidates', icon: TrendingUp },
+  { title: 'Active candidates', icon: TrendingUp },
 ];
 
 export const CompanyDashboard = () => {

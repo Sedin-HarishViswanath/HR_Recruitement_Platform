@@ -3,6 +3,7 @@ import { env } from '../../config/env';
 import { AppError } from '../../shared/errors/AppError';
 import { db } from '../../config/db';
 import { generateAccessToken, generateRefreshToken } from '../../shared/utils/jwt';
+import { inAppNotificationService } from '../notification/inapp-notification.service';
 import crypto from 'crypto';
 
 const client = new OAuth2Client(env.GOOGLE_CLIENT_ID);
@@ -113,6 +114,14 @@ export class GoogleOAuthService {
             
             userRecord = { ...user, company_id: company.id };
             userRecord.role_name = 'Admin';
+
+            // Alert platform Super Admins that a new company needs approval.
+            void inAppNotificationService.notifySuperAdmins({
+              title: 'New company registration',
+              body: `${name}'s Company has registered and is awaiting approval.`,
+              type: 'info',
+              link: '/superadmin/companies',
+            });
           });
         }
       }

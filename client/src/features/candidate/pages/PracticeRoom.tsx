@@ -280,7 +280,7 @@ export const PracticeRoom = () => {
       setExecutionResult(res.data.data);
     } catch {
       setExecutionResult({
-        output: '// Code execution unavailable in practice mode.\n// Share your code with the AI for review instead.',
+        output: '// Couldn\'t run your code right now — the execution engine may be busy.\n// Try again in a moment, or share your code with the AI for review.',
         code: 1,
       });
     } finally {

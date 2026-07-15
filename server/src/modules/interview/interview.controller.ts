@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { interviewService } from './interview.service';
 import { aiDebriefService } from './ai-debrief.service';
 import { interviewCopilotService } from './interview-copilot.service';
+import { candidateRepository } from '../candidate/candidate.repository';
 import { 
   scheduleInterviewSchema, 
   rescheduleInterviewSchema, 
@@ -187,6 +188,8 @@ export class InterviewController {
     try {
       const { candidateId } = req.params;
       const companyId = req.user.companyId;
+      // A recruiter opening the candidate counts as a profile view.
+      void candidateRepository.incrementProfileViews(candidateId as string);
       const transcripts = await interviewService.getCandidateTranscripts(candidateId as string, companyId as string);
       return sendResponse(res, 200, true, 'Candidate transcripts retrieved', transcripts);
     } catch (error: any) {

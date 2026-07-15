@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '../../config/db';
 import { logger } from '../../shared/utils/logger';
 import { notificationService } from '../notification/notification.service';
+import { inAppNotificationService } from '../notification/inapp-notification.service';
 import { SignupInput, LoginInput } from './auth.schema';
 import { AppError } from '../../shared/errors/AppError';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt';
@@ -95,6 +96,16 @@ export class AuthService {
           role: 'Admin'
         };
         void notificationService.notifyWelcome(user.id, user.name, user.email, false);
+
+        // Alert platform Super Admins that a new company needs approval.
+        const newCompanyName = companyDetails?.companyName || `${name}'s Company`;
+        void inAppNotificationService.notifySuperAdmins({
+          title: 'New company registration',
+          body: `${newCompanyName} has registered and is awaiting approval.`,
+          type: 'info',
+          link: '/superadmin/companies',
+        });
+
         return result;
       }
     });

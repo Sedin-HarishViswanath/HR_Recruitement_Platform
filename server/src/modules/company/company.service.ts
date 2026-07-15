@@ -13,6 +13,37 @@ export class CompanyService {
     return company;
   }
 
+  /**
+   * Rich company detail for the Super Admin view: the company row plus its
+   * admin contact and headline activity counts.
+   */
+  async adminGetCompanyDetail(companyId: string) {
+    const company = await db('companies').where({ id: companyId }).first();
+    if (!company) throw new AppError('Company not found', 404);
+
+    const admin = company.admin_user_id
+      ? await db('users').select('name', 'email').where({ id: company.admin_user_id }).first()
+      : null;
+
+    const [jobs] = await db('jobs').where({ company_id: companyId, deleted_at: null }).count('* as count');
+    const [users] = await db('users').where({ company_id: companyId }).count('* as count');
+    const [apps] = await db('applications')
+      .join('jobs', 'applications.job_id', 'jobs.id')
+      .where('jobs.company_id', companyId)
+      .count('applications.id as count');
+
+    return {
+      ...company,
+      admin_name: admin?.name || null,
+      admin_email: admin?.email || company.contact_email || null,
+      stats: {
+        jobs: Number(jobs?.count || 0),
+        users: Number(users?.count || 0),
+        applications: Number(apps?.count || 0),
+      },
+    };
+  }
+
   async updateCompanyProfile(companyId: string, data: CompanyProfileInput) {
     const [updatedCompany] = await db('companies')
       .where({ id: companyId })

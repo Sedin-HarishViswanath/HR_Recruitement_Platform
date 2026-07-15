@@ -56,7 +56,7 @@ export class CompanyController {
   async adminGetCompany(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const company = await companyService.getCompanyProfile(id as string);
+      const company = await companyService.adminGetCompanyDetail(id as string);
       return sendResponse(res, 200, true, 'Company details retrieved', company);
     } catch (error: any) {
       if (error instanceof AppError) return sendResponse(res, error.statusCode, false, error.message);

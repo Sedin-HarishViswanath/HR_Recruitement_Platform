@@ -16,7 +16,7 @@ import { X } from 'lucide-react';
 const step1Schema = z.object({
   name: z.string().min(1, 'Name is required'),
   phone: z.string().min(10, 'Phone must be at least 10 characters'),
-  location: z.string().optional(),
+  location: z.string().min(1, 'Location is required'),
   date_of_birth: z.string().optional(),
   about_me: z.string().max(300, 'About me must be less than 300 characters').optional(),
 });
@@ -114,6 +114,11 @@ export const CandidateOnboardingWizard = () => {
   };
 
   const onStep2Submit = async (data: any) => {
+    // A resume is required — either an uploaded PDF or a drive link.
+    if (!resumeFile && !data.resume_drive_link?.trim()) {
+      toast.error('Please upload a resume PDF or provide a resume drive link.');
+      return;
+    }
     try {
       await api.patch('/candidate/profile/step/2', data);
       if (resumeFile) {
@@ -204,8 +209,9 @@ export const CandidateOnboardingWizard = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Location</Label>
+                <Label>Location <span className="text-red-500">*</span></Label>
                 <Input {...reg1('location')} placeholder="City, State" />
+                {err1.location && <p className="text-red-500 text-xs">{err1.location.message as string}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Date of Birth</Label>
@@ -224,7 +230,7 @@ export const CandidateOnboardingWizard = () => {
         {step === 2 && (
           <form onSubmit={handle2(onStep2Submit)} className="space-y-6 animate-in fade-in duration-500">
             <div className="space-y-4">
-              <Label>Resume Upload</Label>
+              <Label>Resume Upload <span className="text-red-500">*</span></Label>
               <div className="border-2 border-dashed border-stone-300 rounded-xl p-8 text-center bg-stone-50">
                 <Input 
                   type="file" 

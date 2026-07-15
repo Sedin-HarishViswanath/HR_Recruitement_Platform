@@ -37,7 +37,10 @@ export const SuperAdminAnalyticsPage = () => {
 
   const statMeta = [
     { label: 'Total Companies', value: data.kpis?.totalCompanies || 0, icon: Briefcase, gradient: 'from-amber-500 to-orange-500' },
+    { label: 'Active Companies', value: data.kpis?.activeCompanies || 0, icon: Activity, gradient: 'from-emerald-500 to-teal-500' },
+    { label: 'Pending Approval', value: data.kpis?.pendingApprovals || 0, icon: Activity, gradient: 'from-amber-500 to-yellow-500' },
     { label: 'Total Jobs', value: data.kpis?.totalJobs || 0, icon: Briefcase, gradient: 'from-teal-500 to-emerald-500' },
+    { label: 'Total Candidates', value: data.kpis?.totalCandidates || 0, icon: Users, gradient: 'from-blue-500 to-cyan-500' },
     { label: 'Total Applications', value: data.kpis?.totalApplications || 0, icon: Users, gradient: 'from-emerald-500 to-emerald-500' },
   ];
 
@@ -50,7 +53,7 @@ export const SuperAdminAnalyticsPage = () => {
       <main className="p-4 sm:p-5 lg:p-6 space-y-5 animate-fade-in">
         <div className="max-w-[1400px] mx-auto space-y-5">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {statMeta.map((s, i) => (
             <div key={i} className="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 flex items-center justify-between shadow-sm">
               <div>

@@ -1,8 +1,15 @@
 import axios from 'axios';
 import { AppError } from '../../shared/errors/AppError';
 import { env } from '../../config/env';
+import { logger } from '../../shared/utils/logger';
 
-const JDOODLE_API = 'https://api.jdoodle.com/v1/execute';
+/**
+ * Code execution via a Piston engine (https://github.com/engineer-man/piston).
+ * No credentials required — used by both live technical assessments and the
+ * candidate practice room. Defaults to the self-hosted `piston` container
+ * (the public emkc.org API became whitelist-only in Feb 2026).
+ */
+const PISTON_URL = (env.PISTON_URL || 'http://piston:2000/api/v2').replace(/\/$/, '');
 
 export interface PistonExecuteParams {
   language: string;
@@ -21,76 +28,108 @@ export interface PistonResult {
   memory?: string;
 }
 
-// Maps our UI language IDs -> JDoodle language + versionIndex
-export const JDOODLE_LANGUAGE_MAP: Record<string, { lang: string; versionIndex: string }> = {
-  javascript: { lang: 'nodejs', versionIndex: '4' },
-  python:     { lang: 'python3', versionIndex: '4' },
-  java:       { lang: 'java', versionIndex: '4' },
-  cpp:        { lang: 'cpp', versionIndex: '5' },
-  c:          { lang: 'c', versionIndex: '5' },
-  csharp:     { lang: 'csharp', versionIndex: '4' },
-  go:         { lang: 'go', versionIndex: '4' },
-  ruby:       { lang: 'ruby', versionIndex: '4' },
-  php:        { lang: 'php', versionIndex: '4' },
-  swift:      { lang: 'swift', versionIndex: '4' },
-  kotlin:     { lang: 'kotlin', versionIndex: '3' },
-  rust:       { lang: 'rust', versionIndex: '4' },
-  bash:       { lang: 'bash', versionIndex: '4' },
-  typescript: { lang: 'nodejs', versionIndex: '4' }, // Fallback to Node for TS (needs compilation normally, but simple JS syntax works)
+// Maps our UI/monaco language IDs -> Piston language names.
+const PISTON_LANGUAGE_MAP: Record<string, string> = {
+  javascript: 'javascript',
+  typescript: 'typescript',
+  python: 'python',
+  java: 'java',
+  cpp: 'c++',
+  c: 'c',
+  csharp: 'csharp',
+  go: 'go',
+  ruby: 'ruby',
+  php: 'php',
+  swift: 'swift',
+  kotlin: 'kotlin',
+  rust: 'rust',
+  bash: 'bash',
+};
+
+// Cache Piston's available runtimes so we can resolve a concrete version per
+// language (Piston requires an explicit version on execute).
+let runtimeCache: { language: string; version: string; aliases: string[] }[] | null = null;
+
+const loadRuntimes = async () => {
+  if (runtimeCache) return runtimeCache;
+  const res = await axios.get(`${PISTON_URL}/runtimes`, { timeout: 10000 });
+  runtimeCache = res.data;
+  return runtimeCache!;
+};
+
+const resolveVersion = async (pistonLang: string): Promise<string | null> => {
+  const runtimes = await loadRuntimes();
+  const match = runtimes.find(
+    (r) => r.language === pistonLang || (r.aliases || []).includes(pistonLang),
+  );
+  return match?.version || null;
 };
 
 /**
- * Execute code via the JDoodle API (fallback from Piston).
+ * Execute code via Piston. Never needs API keys.
  */
 export const executeWithPiston = async (
   params: PistonExecuteParams,
-  maxRetries = 2,
 ): Promise<PistonResult> => {
   const { language, code, stdin } = params;
 
-  if (!env.JDOODLE_CLIENT_ID || !env.JDOODLE_CLIENT_SECRET) {
-    throw new AppError('Code execution engine is not configured (missing JDoodle credentials).', 500);
-  }
-
-  const langConfig = JDOODLE_LANGUAGE_MAP[language];
-  if (!langConfig) {
+  const pistonLang = PISTON_LANGUAGE_MAP[language];
+  if (!pistonLang) {
     return { output: `Language "${language}" is not supported by the execution engine.`, stderr: '', code: 1, signal: null };
   }
 
-  const payload = {
-    clientId: env.JDOODLE_CLIENT_ID,
-    clientSecret: env.JDOODLE_CLIENT_SECRET,
-    script: code,
-    stdin: stdin || '',
-    language: langConfig.lang,
-    versionIndex: langConfig.versionIndex,
-  };
+  let version: string | null;
+  try {
+    version = await resolveVersion(pistonLang);
+  } catch (err: any) {
+    logger.warn('Piston runtimes lookup failed', { module: 'CodeExec', message: err?.message });
+    throw new AppError('Code execution service is currently unavailable. Please try again shortly.', 502);
+  }
+  if (!version) {
+    return { output: `Language "${language}" is not available on the execution engine.`, stderr: '', code: 1, signal: null };
+  }
 
   try {
-    const response = await axios.post(JDOODLE_API, payload, {
-      timeout: 15000,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await axios.post(
+      `${PISTON_URL}/execute`,
+      {
+        language: pistonLang,
+        version,
+        files: [{ content: code }],
+        stdin: stdin || '',
+        compile_timeout: 10000,
+        run_timeout: 3000,
+      },
+      { timeout: 20000, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const run = response.data?.run || {};
+    const compile = response.data?.compile;
+
+    // Surface compile errors (e.g. Java/C++) ahead of run output.
+    const compileErr = compile && compile.code !== 0 ? (compile.stderr || compile.output || '') : '';
+    const stdout = run.stdout || '';
+    const stderr = run.stderr || '';
+    const combined = [compileErr, run.output ?? (stdout + stderr)].filter(Boolean).join('\n').trim();
 
     return {
-      output: response.data.output || '(no output)',
-      stderr: '', // JDoodle combines stderr and stdout into output
-      code: response.data.statusCode === 200 ? 0 : 1, 
-      signal: null,
-      cpuTime: response.data.cpuTime,
-      memory: response.data.memory
+      output: combined || '(no output)',
+      stderr,
+      code: compileErr ? 1 : (typeof run.code === 'number' ? run.code : 0),
+      signal: run.signal || null,
     };
   } catch (error: any) {
-    throw new AppError(
-      'Code execution service (JDoodle) is currently unavailable. Please try again in a few seconds.',
-      502,
-    );
+    if (error?.response?.status === 429) {
+      throw new AppError('Code execution is rate-limited right now. Please try again in a few seconds.', 429);
+    }
+    logger.warn('Piston execute failed', { module: 'CodeExec', message: error?.message });
+    throw new AppError('Code execution service is currently unavailable. Please try again shortly.', 502);
   }
 };
 
 /**
- * Dummy health check for JDoodle
+ * Fetch the available runtimes (used for diagnostics / health checks).
  */
 export const getPistonRuntimes = async () => {
-  return [{ language: 'nodejs' }]; // Stub response
+  return loadRuntimes();
 };
